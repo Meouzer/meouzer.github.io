@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">JavaScript: Parse Data String</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../00-Commons/JSHTML.js"></script>	
+	<script src="../00-Scripts/typing.js"></script>	
+	<script src="../00-Scripts/Stringify.js"></script>
+	<script src="../00-Scripts/parseDataString.js"></script>
+	<script src="Test.js"></script>  
+	<script src="Test-Functions.js"></script> 
+	<script>
+		window.addEventListener("load", function()
+		{
+			applyJSHTML();
+			
+			function TestCircularReferenceIntoMap()
+			{
+				const key = {a:1};
+				const value = {b:2};
+				const x = new Map([[key, value] ]);
+				x.a = {circ:key};
+				
+				const copy = parseDataString(serializeSimpleData(x));
+				alert(compareObjects(x, copy));	
+			}
+			
+			//TestCircularReferenceIntoMap();			
+		});							
+	</script>
+
+	<style>	
+		div.codeBox.simple{background-color:rgb(255,245, 255);border-radius:20px; padding:1em;border:none}
+	</style>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1>JavaScript: Parse Data String</h1>
+<header id="header" style="margin-top:2em">	
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">		
+			Well I hate to confess
+			but doing JavaScript is a stress
+			so my editors got to working
+			and after they quit smirking
+			turned my JavaScript into a real mess 		<br>
+		<cite style="margin-left: 28em">Meouzer</cite>	
+	</div>
+</blockquote>
+
+<p>
+	Full code at 
+	<a target="_blank" href="../00-Scripts/parseDataString.js">parseDataString.js</a>, which depends on
+	<a target="_blank" href="../00-Scripts/typing.js">typing.js</a>. But you'll also want
+	<a target="_blank" href="../00-Scripts/Stringify.js">Stringify.js</a>. 
+</p>
+
+<section>
+	<h2>Introduction</h2>
+	<p class="display">
+		If <var>x</var> is simple-data then <var>parseDataString(serializeSimpleData(x))</var> is a deep copy of <var>x</var>.
+		This is analogous to what JSON does, but <var>parseDataString()</var> 
+		together with <var>serializeSimpleData()</var>
+		is much more powerful than JSON because  they can handle all simple-data including typed arrays, ArrayBuffers, DataViews,
+		Maps, and Sets. Furthermore these two functions handle complicated constructs with the greatest of ease.
+		You can have Sets whose members are Maps, whose keys are Arrays, and values are Booleans: The Set can
+		also have properties that are DataViews which in turn have properties that are Maps which in turn
+		have properties that are Numbers.
+	</p>
+	<p>
+		<i>Simple data</i> was defined in the stringification article.
+	</p>	
+	<p>
+		Like <var>stringify()</var>, <var>parseDataString()</var> uses very complex parsing, and its code
+		will not be displayed. We will instead give examples of deep copying by serializing an object and then
+		deserializing the resulting string. 
+	</p>
+</section>
+<section>
+	<h2>Examples</h2>
+
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Deep Copy Simple Data x through serialization/deserialization on line 21
+		</header><div class="numberShield colorBurlywood"></div>
+			
+		function WildCircularTest()
+		{
+			const buffer = new ArrayBuffer(4);
+		    const view = new DataView(buffer);
+		    view.setInt8(0, 127);
+		    view.setInt8(1, 11);
+		    view.setInt8(2, 17);
+		    view.setInt8(3, -17);
+		      
+		
+			const map1 = Map.makeMap([ [ [1,2], new Date()],   [7,true], ['key1', 'value1'], 
+			[buffer, view] ]);	
+			const map2 = Map.makeMap([ ['key2', {a:1,b:2}], 
+			[new Boolean(true), new Number(7)] ]);
+			
+			map1.buf = buffer; buffer.z = map1;
+			map2.view = view; 
+			
+			view.x = new Boolean(true);
+			buffer.x = new Boolean(true);
+				
+			const x = Set.makeSet([map1, map2]);		
+			x.a = new Date(1618595373337);
+			x.a.b = Set.makeSet(["cat", "dog", buffer, view, ["a", new String("b")]]);
+			x.a.b.c = x; 
+			x.buff = buffer;
+				
+			const deepCopy_x = parseDataString(serializeSimpleData(x));
+			
+			console.log(stringify(x ));
+							
+			if(stringify(x) === stringify(deepCopy_x) &amp;&amp; type(x) === type(deepCopy_x))
+			{
+				console.log("Wild Circular Test Passed: true");
+			}
+			else
+			{
+				console.log("Wild Circular Test Passed: false");
+			}	
+		}
+		
+		WildCircularTest();	
+			
+	</div>
+	
+	<p>
+		Open your browser's console window to see the result of the test.
+	</p>
+	
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Deep Copy F-Data x through serialization/deserialization <br>
+			(Three circular gets used)
+		</header><div class="numberShield colorBurlywood"></div>
+			
+		function TestCircularGets()
+    {
+    	const A = {x:{a:{b:{c:1}}}, y:{c:{a:{b:1}}}, z:{}};
+       
+       	// Three circular gets
+       	Object.defineProperty(A.z, "x", 
+        {
+            get:function(){return A.x;},
+        });
+
+        Object.defineProperty(A.x, "y",
+        {
+            get:function(){return A.y;},
+        });
+
+        Object.defineProperty(A.y, "z",
+        {
+            get:function(){return A.z;},
+        });
+        
+        var string = serializeFData(A);
+        
+       function deserializeA()
+       {	        	
+        	const evaluator = function(){return eval('(' + arguments[0] + ')');}         	     	
+        	
+        	// The three copied getters need a variable A in context. So we put one
+        	// in context and create the deep copy at the same time. 
+        	
+        	var A = parseDataString(string, evaluator);
+        	return A; 		
+        }
+        
+        const B = deserializeA();
+        console.log("TestCircularGets passed: " + (stringify(B) == stringify(A)));
+      	console.log("TestCircularGets ref 1 passed: " + (B.z != A.z));
+        console.log("TestCircularGets ref 2 passed: " + (B.z.x != A.z.x));
+        console.log("TestCircularGets ref 3 passed: " + (B.z.x.y != A.z.x.y));
+        console.log("TestCircularGets ref 4 passed: " + (B.z.x.y.z != A.z.x.y.z));    
+     }
+    
+    TestCircularGets();
+
+			
+	</div>
+
+	
+	
+	
+</section>
+
+
+		
+<br><br><br><br><br>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

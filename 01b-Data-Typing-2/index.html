@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">JavaScript Data Typing Gone Wild</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../00-Commons/JSHTML.js"   type="text/javascript" id="script"></script>
+		
+	<script type="text/javascript">
+		window.addEventListener("load", function(){applyJSHTML();});
+	</script>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1>JavaScript Data Typing Gone Wild<br>
+	<span style="font-size:.8em">The Definitive Typing Function dtype()</span>
+</h1>
+<header id="header" style="margin-top:2em">	
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	meouzer@gmail.com</span>
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">
+		Classification cats' easy but Clasifacaiton JavaScrypt committeee members diff9kult becuase they arent cats.	 
+		<cite style="margin-left: 28em">Meouzer</cite></div>
+</blockquote>
+
+<p>
+		Mouser knows what he is talking about. JavaScript messed up type information 
+		because there isn't a single cat on the JavaScript committee. 
+	 	The native type was great for typing
+		in ECMA-2009 but for ECMA-20015 they threw it all away for nothing because they don't have cats who would be curious
+		enough to check things out. 
+		So coding the <var>type()</var>
+		function in <a target="_blank" href="../01a-Data-Typing-1/index.html"> Data Typing in JavaScript isn't as Simple as you Think</a> 
+		was possible only by mere luck and the JavaScript prowess of the cats of the Meouzer consortium. 
+	</p>	
+<section>
+	<h2>Introduction</h2>
+	<p>
+		The predecessors of <var>dtype()</var> are <var>type()</var> and <var>usertype()</var>.
+		<var>userType()</var> like <var>type()</var> should be useful to the programmer because it provides  basic data typing 
+		infrastructure that JavaScript itself lacks. The code for <var>userType()</var> is expanded to obtain the 
+		<var>dtype()</var> typing function that types in great detail. 
+		<u>However, the reader will have no use for <var>dtype()</var></u> most likely.
+ 	</p>
+ 	<p>
+ 		The <var>dtype()</var> function has two important roles. It provides the headers for the <var>stringify()</var>
+ 		function so that deserialization can take place. It also detects objects that are not suitable for serialization.
+ 	</p>	
+			
+	<section>
+		<h3>Specification for dtype()</h3>		
+		<ol>	
+			<li>If <var>x</var> is of a primitive data type then <var>dtype(x)</var> is the name of that data type.</li>
+			<li>
+				If <var>x</var> is a host object then <var>dtype(x)</var> is the native type of <var>x</var>.
+			</li>		
+			<li>
+				If <var>x</var> is the argument list of a function then <var>dtype(x)</var> is <var>"Arguments"</var>.
+			</li>
+			<li>
+				If <var>Klass</var> is a proper class then <var>dtype(Klass.prototype)</var> is <var>"Klass[Prototype]"</var>.
+			</li>
+			<li>
+				Assume there is a most derived <i>proper class</i>  <var>Klass </var> for which <var>x</var> 
+				is an instance of <var>Klass</var>. If <var>x</var> is a class instance of <var>Klass</var>
+				then <var>dtype(x)</var> is <var>"Klass"</var>. But if <var>x</var> is a mere instance of 
+				<var>Klass</var> then <var>dtype(x)</var>  is <var>"Klass[Object(n)]"</var> where n is the 
+				degree of the instance. However <var>"(n)"</var> is omitted if <var>n</var> is <var>1</var>.
+			</li>
+			<li>
+				Assume there is no proper class for which <var>x</var> is an instance.
+				If <var>x</var> is a null object and <var>n</var> is the number of degrees of <var>x</var> from <var>null</var>
+				then <var>dtype(x)</var> is <var>"NullObject(n)"</var>. If <var>x</var> is a standard object then
+				<var>dtype(x)</var> is <var>"Object(n)"</var> where <var>n</var> is the number of degrees of <var>x</var> 
+				from <var>Object.prototype</var>.
+				In both cases, <var>"(n)"</var> is omitted if <var>n</var> is <var>1</var>.
+			</li>
+		</ol>
+	</section>		
+	<section>
+		<h3>Examples</h3>
+		<table class="web">
+			<thead>
+				<tr><td>dtype(x)</td><td style="white-space:nowrap">The most specific thing to be said</td><td>Example value of x</td></tr>
+			</thead>
+			<tbody style="padding:.5em">
+				<tr><td>"Window"</td><td>x is the window</td><td>window</td></tr>
+				<tr><td>"HTMLDocument"</td><td>x is the document</td><td>window.document</td></tr>
+				<tr><td>"Boolean[Prototype]"</td><td><var>x</var> is the <var>Boolean</var> prototype</td><td>Boolean.prototype</td></tr>
+				<tr><td>"Boolean"</td><td><var>x</var> is a <var>Boolean</var> class instance</td><td>new Boolean(true)</td></tr>
+				<tr><td>"Boolean[Object]"</td>
+					<td><var>x</var> is a <var>Boolean</var> instance of degree 1.  However 
+						<var>type(x)</var> is <var>"Object"</var> because <var>x</var>
+						is not a <var>Boolean</var> class instance.
+					</td><td>Object.create(Boolean.Prototype)</td>
+				</tr>
+				<tr><td>"Boolean[Object(2)]"</td>
+					<td><var>x</var> is a <var>Boolean</var> instance of degree 2.  However 
+						<var>type(x)</var> is <var>"Object"</var> because <var>x</var>
+						is not a <var>Boolean</var> class instance.
+					</td><td>Object.create(new Boolean(true))</td>
+				</tr>
+				<tr><td>"Boolean[Object(2)]"</td>
+					<td><var>x</var> is a <var>Boolean</var> instance of degree 2.  However 
+						<var>type(x)</var> is <var>"Object"</var> because <var>x</var>
+						is not a <var>Boolean</var> class instance.
+					</td><td style="font-size:.85em">Object.create(Object.create(Boolean.prototype))</td>
+				</tr>
+				<tr><td>"Function"</td><td><var>x</var> is a function</td><td>Boolean</td></tr>
+				<tr><td>"Function[Object(2)]"</td>
+					<td><var>x</var> is a <var>Function</var> instance of degree 2.  However 
+						<var>type(x)</var> is <var>"Object"</var> because <var>x</var>
+						is not a <var>Function</var> class instance.
+					</td><td>Object.create(Boolean)</td>
+				</tr>
+				<tr><td>"NullObject"</td><td><var>x</var> is a null object, 1 degree from <var>null</var></td><td>Object.create(null)</td></tr>
+				<tr><td>"NullObject(2)"</td><td><var>x</var> is a null object, 2 degrees from <var>null</var></td><td>Object.create(Object.create(null))</td></tr>
+				<tr><td>"Object"</td><td><var>x</var> is an object, 1 degree from <var>Object.prototype</var></td><td>{a:1}</td></tr>
+				<tr><td>"Object(2)"</td><td><var>x</var> is an object, 2 degrees from <var>Object.prototype</var></td><td>Object.create({a:1})</td></tr>
+			
+				<tr><td>"foo"</td><td><var>x</var> is an instace of the proper foo class one degree away from foo.prototype,
+					and <var>x</var> itself is not a proper prototype.
+				</td>
+				<td>new foo(...)</td></tr>
+				<tr><td>"foo[Object(4)]"</td><td style="text-align:left"><var>x</var> is an instace of the proper foo class four degrees away from foo.prototype,
+					and <var>x</var> is not a proper prototype.
+				</td>
+				<td>Use Object.create() on <var>new foo()</var> three times</td></tr>
+
+			</tbody>
+		</table>				
+	</section>	
+</section>
+
+<section>
+	<h2>The dtype() Function</h2>
+	<p>Full code is at <a target="_blank" href="../00-Scripts/typing.js">typing.js</a></p>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			The dtype() Function	
+		</header><div class="numberShield colorLightBlue"></div>		
+		
+		function dtype(x)
+		{
+			const t = type(x);
+			if(t !== "Object") return t;
+			try { x.constructor; } catch(e) { return "CrossOriginObject";} 		
+			const g = getClassPrototype(x); const P = g.classPrototype; const n = g.degree;		        
+			if(P === null) return "NullObject" + ((n === 1)?"":"(" + n + ")");   
+	       	if(P === x)    return P.constructor.name + "[Prototype]";       	
+	       	if(P === Object.prototype) return "Object" + ((n === 1)?"":"(" + n + ")");       	
+	       	if(Object.getPrototypeOf(x) != P ) 
+	       		return P.constructor.name + "[Object" + "(" + n + ")" + "]";  
+	       	return isNativeCode(P.constructor)? P.constructor.name + "[Object]": 
+	       	P.constructor.name;       	       	   
+		}
+		 		
+	</div>
+</section>
+
+<br><br><br><br><br><br><br>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

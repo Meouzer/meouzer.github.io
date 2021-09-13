@@ -1,0 +1,1063 @@
+﻿ <!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Object Inheritance in JavaScript</title>
+<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+<link href="../00-Commons/JSHTML.css"  rel="stylesheet" type="text/css" />
+<script src="../00-Commons/JSHTML.js"  type="text/javascript"></script>
+
+<script type="text/javascript">	
+	window.addEventListener("load", function(){applyJSHTML();});
+	
+	//var x = {a:undefined}	
+	//alert(x.a !== undefined);
+	
+	/*var x = Object.create(null);
+	var y = {};
+	Object.setPrototypeOf(y,x);
+	alert(Object.getPrototypeOf(y) == x);
+	alert(x.__proto__ == undefined);*/		
+</script>
+	
+<style type="text/css">
+blockquote {border-left: thin blue solid;padding-left: 1em;font-style: italic;}
+dfn {color: rgb(0,0,255);font-style: oblique;}
+var {font-style: italic;color: purple;}
+mark {color: red;font-weight: bold;border: thin blue solid;}
+.display {background-color:rgb(255,225,200);border:thin maroon solid;padding:1em;}
+</style>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family: Georgia">
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<header>
+	<h1>A Review of Inheritance in JavaScript</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+	</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+		C++ hsas only one wase! It rgiht wise!! JavaScript countless waises, and all's wrung!!!.<br>
+		<span style="float:right">Meouzer</span></div>
+</blockquote>
+<section>
+	<h2>About the Author</h2>
+	<p>
+		As an adept JavaScript master, Meouzer thoroughly enjoys writing his own articles, and I am grateful 
+		for the opportunity of employing my skills in correction of the atrocious grammar that cats think 
+		they can get away with. Meouzer's spelling is natively quite good, but since cats write articles
+		with keyboards, it's understandable that misspellings are the catographical results. Actually, and this is quite 
+		embarrassing, Meouzer was an excellent 
+		typist until we had him declawed. For some unfathomable reason the vet didn't disclose the adverse effects of declawing 
+		on a cat's ability to accurately strike keys. This was just like the time Meouzer was taken in for rambunctiousness and 
+		somehow ended up getting neutered. After some protest, the fee was waived, which was a great deal since we were going to 
+		have him neutered anyway.
+	</p>
+</section>
+<section>
+	<h2>Introduction</h2>
+	<p>
+		Object inheritance is defined and is then used to partition the space of all JavaScript elements.
+		The members of the partition are discussed individually, showing the particulars of their inheritance.
+	</p>
+	<p>
+		<var>Object.create()</var> is the way to derive objects from objects, as we shall see. The result
+		of <var>Object.create()</var> is derived from or inherits from the first parameter to <var>Object.Create()</var>.
+	</p>	
+	
+	<div class="codeBox centerTable colorLightPink" style="border:none;padding:1em;border-radius:20px">
+		// Create x from y 	
+	
+		var x = Object.create(y)
+		{
+			// property descriptors here
+		});
+		
+		/* This code insures that x derives from y, or equivalently as 
+		we shall see that the internal prototype of x is y. */		
+	</div>
+	
+	<p>
+		If <var>x</var> is created from null, then <var>x</var> is our first example of a top-level null object.
+	</p>
+	
+	<section>
+		<h3>What's an Object</h3>
+		<p>
+			By consensus all elements except for the primitives are objects.
+			The primitives are the, <var>undefineds</var>, <var>nulls</var>, <var>booleans</var>, <var>numbers</var>,
+			<var>strings</var>, <var>symbols</var>, and <var>bigints</var>. That is the elements <var>x</var> 
+			whose <var>typeof(x)</var> is either <var>"undefined"</var>, <var>"null"</var>, <var>"boolean"</var>, <var>"number"</var>,
+			<var>"string"</var>, <var>"symbol"</var>, or <var>"bigint"</var>. A defining characteristic of primitives is that
+			properties can't be added to them. Its's also true that they do not have any properties of their own.	
+		</p>
+	
+		<blockquote style="margin-top:2em">
+			In JavaScript, functions are first-class objects, because they can have properties and methods just like any 
+			other object. What distinguishes them from other objects is that functions can be called. In brief, they are 
+			Function objects. <br>
+			&nbsp;
+			<a style="float:right" target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions">MDN</a>
+		</blockquote>
+		
+		<table class="web">
+		<thead>
+			<tr><th colspan="3">Data Types Recognized by the typeof Operator</th></tr>
+			<tr><th style="white-space:nowrap">Primitive Data Type</th><td>Categorization</td><td>Test <var>x</var> for Membership</td></tr>
+		</thead>
+			<tbody>
+				<tr><th>null</th><td>The literal <var>null</var> or variable set to such</td><td><var>x === null</var></td></tr>
+				<tr><th>undefined</th><td>The literal <var>undefined</var> or variable set to such
+					<td><var>typeof(x) == "undefined"</var></td></tr>
+				<tr><th>boolean</th><td>The literals <var>true</var>, <var>false</var> or variable set to such</td>
+					<td><var>typeof(x) == "boolean"</var></td></tr>
+				<tr><th>number</th><td>A literal number or variable set to such<td><var>typeof(x) == "number"</var></td></tr>
+				<tr><th>string</th><td>A literal string or variable set to such<td><var>typeof(x) == "string"</var></td></tr>
+				<tr><th>BigInt</th><td>A literal BigInt or variable set to such. <br>Or a class instance of BigInt<td><var>typeof(x) == "bigint"</var></td></tr>
+				<tr><th>Symbol</th><td>A class instance of Symbol<td><var>typeof(x) == "symbol"</var></td></tr>
+			</tbody>
+		<thead>			
+			<tr><th style="white-space:nowrap">Classless Data Type</th><td>Categorization</td><td>Test <var>x</var> for Membership</td></tr>			
+		</thead>
+		<tbody>
+			<tr><th>function</th><td>A function</td><td><var>typeof(x) == "function"</var></td></tr>
+			<tr><th>object</th><td>An object</td><td><var>typeof(x) == "function" || <br> typeof(x) == "object"</var></td></tr>
+		</tbody>	
+	</table>
+
+		<p>
+			From the typeof table we have the following test.
+		</p>
+		<div class="codeBox centerTable colorLightPink" style="border:none;padding:1em;border-radius:20px">
+			function isObject(x)
+		    {
+		        return (x != null&nbsp;&amp;&amp;&nbsp; typeof(x) == 'object') || typeof(x) == 'function';		    
+		    }
+
+		</div>
+		
+		<p>
+			No one considers <var>null</var> to be an object but unfortunately <var>typeof(null)</var> 
+			evaluates to <var>"object"</var> most likely by a bad original decision.
+		</p>
+		<p>
+			Now <var>x instanceof Object</var> being <var>true</var> is NOT a test for being an 
+			object because of the existence of null objects. Also because <var>Object.prototype</var> is an object
+			yet <var>Object.prototype instanceof Object</var> evaluates to <var>false</var>.
+		</p>
+	</section>	
+</section>
+<section>
+	<h2>Object Inheritance and the Internal Prototype</h2>
+	<p>
+		The internal prototype of any element <var>x</var> is <var>Object.getPrototypeOf(x)</var>. 
+		Every JavaScript element except for <var>undefined and </var><var>null</var> has a defined
+		internal prototype.  
+	</p>
+	<p>
+		Starting with <var>x</var> and repeatedly taking internal prototypes gives the following sequence or chain. 
+	</p>
+	<ul class="centerTable">		
+		<li><var>x</var></li>
+		<li><var>x<sub>1</sub> = Object.GetPrototypeOf(x)</var></li>
+		<li><var>x<sub>2</sub> = Object.GetPrototypeOf(x<sub>1</sub>)</var></li>
+		<li><var>x<sub>3</sub> = Object.GetPrototypeOf(x<sub>2</sub>)</var></li>
+		<li>...</li>
+		<li><var>x <sub>last</sub></var></li>
+		<li><var>null = Object.GetPrototypeOf(x <sub>last</sub>)</var></li>
+	</ul>
+	<p>
+			The inheritance chain of <var>x</var> is the sequence with both <var>x</var> and <var>null</var> excluded.
+			However, <var>x</var> and <var>null</var> are honary members and we may intentionally goof up 
+			and include them in the chain so we don't have to engage in awkward semantics like 
+			<i>the inheritance chain of x with x appended as first member</i>.
+	</p>
+	<p>
+		An element has no inheritance chain, precisely when its internal prototype is <var>null</var>. 
+	</p>
+	
+	<p>
+		<var>null</var> sits atop the inheritance chain as an <dfn>honary</dfn> member and itself does not 
+		have an internal prototype. If it did, the chain would continue. The last element <var>x <sub>last</sub></var>
+		&nbsp; of the inheritance chain is more interesting. It's called a <var>top-level</var> element because 
+		its internal prototype is null: it
+		has no inheritance chain. 
+	</p>	
+	<p>
+		Any element has the properties with identical values of the next following element unless 
+		redefined or&nbsp; overridden by the element. Applying recursion says that any element has the 
+		properties with identical values of any subsequent element, unless overridden somewhere along the way.
+		An official way to say this is that <var>x</var> inherits the properties of any element in its
+		inheritance chain. For simplicity this is just called <dfn>inheritance</dfn>. <var>x</var> <dfn>inherits</dfn>
+		(or <dfn>derives</dfn>) from each element of its inheritance chain.
+ 	</p>	
+	<section>
+		<h3>Checking for Properties</h3>
+		<p>
+			We need to talk about some JavaScript goofiness. Let <var>x</var> be an object. 
+			If we set <var>x.a = undefined</var> then we agree that <var>x.a</var> is not defined,
+			but it is specified. <var>x.a = b</var> defines the property a as long as <var>b</var>
+			is not <var>undefined</var>. If we write <var>x.a = b</var>, then we say <var>x.a</var> is
+			specified even if <var>b</var> is <var>undefined</var>. 			
+		</p>
+		<p>
+			If you want to know if <var>x</var> or an ancestor defines a property <var>a</var>,
+			just check the expression <var>x.a&nbsp;&nbsp;!==&nbsp;&nbsp;undefined</var>. 
+			It's true precisely when <var>x</var> or an ancestor has defined the property <var>a</var>. Be 
+			careful to use two equality symbols because of JavaScript shenanigans where statements like 
+			<var>undefined != null</var> evaluate to false.
+		</p>
+		<p>
+			If you want to know if <var>x</var> specifies the property <var>a</var> directly, check 
+			<var>hasOwnProperty(x,a)</var>, which will be true precisely when <var>x</var> 
+			directly specifies the property <var>a</var>. 
+		</p>
+		<div class="codeBox centerTable colorLightPink" 
+ 			style="border:none;padding:1em;border-radius:20px;font-size:.8em;margin-top:2em">
+ 			function hasOwnProperty(x,a)
+ 			{
+ 				return Object.prototype.hasOwnProperty.call(x, a);			
+ 			}
+	 	</div>	
+		<p>
+			You may be curious has to why we didn't use <var>return x.hasOwnProperty(a)</var>. Well this works if
+			<var>x</var> is a standard object, but not if <var>x</var> is a null object because null objects
+			don't inherit <var>hasOwnProperty()</var> from <var>Object.Prototype</var>. More on standard and null objects later. 
+		</p>	
+	</section>	
+ 	<section>
+ 		<h3>Top of the Inheritance Chain</h3> 		
+ 		<div class="codeBox centerTable colorLightPink" 
+ 			style="border:none;padding:1em;border-radius:20px;font-size:.8em;margin-top:2em">
+ 			function getLastPrototypeOf(x)
+			{
+				if(x === null || x === undefined){return undefined;}
+				for(var P = x; Object.getPrototypeOf(P) !== null; P = Object.getPrototypeOf(P));
+				return P;				
+			}
+ 		</div>	
+ 		<p>
+ 			<var>getLastPrototypeOf(x)</var> is the top-level element from which <var>x</var> inherits.
+ 		</p>
+ 		<p>
+ 			The most distinguished top-level element is <var>Object.prototype</var>. There are infinitely many
+ 			possible top level null objects every one of which is created from <var>null</var> as follows.
+ 		</p>
+ 		<div class="codeBox centerTable colorLightPink" 
+ 			style="border:none;padding:1em;border-radius:20px;font-size:.8em;margin-top:2em">
+ 			
+ 			var myTopLevelNullObject = Object.create(null, {
+ 				//property descriptors here
+ 			});
+ 		</div>
+ 	</section> 	
+ 	<section>
+ 		<h3>Synonyms for Inheritance</h3>
+ 		<p>
+ 			It's strange that there are so many synonyms for the type of derivation and inheritance described above. 
+			Multiple committees, not run by cats, were obviously at work. Inheritance/derivation synonyms follow.
+ 		</p>
+		<ol>
+			<li>object inheritance/object derivation</li>
+			<li>proto inheritance/proto derivation</li>
+			<li>prototypical inheritance/prototypical derivation</li>
+			<li>prototypal inheritance/prototypal derivation</li>
+			<li>prototype inheritance/prototype derivation</li>
+		</ol>
+		<p>
+			If you want your listeners to not understand you at all, use prototypal. 
+			Douglass Crockford uses it, and it's not even a real word. <!-- Well OK! It came into the English 
+			language in about 1693.--> 	
+		</p>
+ 	</section>
+ 	<section>
+ 		<h3>Testing Inheritance</h3>
+ 		<p>
+ 			If <var>x</var> and <var>y</var> are objects, how do you tell if <var>y</var> is in the inheritance 
+ 			chain of <var>x</var>? All you have to do is ask <var>y</var>. <var>y.isPrototypeOf(x)</var>
+ 			is <var>true</var> precisely when <var>y</var> is in the inheritance chain of <var>x</var>.
+ 		</p>
+ 		<p>
+ 			On a related note, if <var>x</var> is an object and <var>foo</var> is a constructor then 
+ 			<var>x instanceof foo</var> is true precisely when <var>foo.prototype</var> is in the
+ 			inheritance chain of <var>x</var>.
+ 		</p>
+ 	</section>
+ 	<section>
+ 		<h3>Inheritance Partitions the Elements</h3> 		
+ 		<dl> 			
+ 			<dt>Null object</dt>
+ 			<dd>
+ 				<!-- Any element with a defined internal prototype, OK but complicated-->
+ 				Any object, which is neither <var>Object.prototype</var> nor inherits 
+ 				from <var>Object.prototype</var>. 	
+			  <p style="margin-left: 2em">You should be able to figure out why an element created from or 
+			  inherited from a null object is a null object.</p>
+ 			</dd>
+ 			<dt>Standard object</dt>
+ 			<dd>
+ 				<var>Object.prototype</var> or any object which inherits from it. 				
+ 				<p style="margin-left:">When most think of an object, it's of a standard object because most don't
+ 				know about null objects.</p> 				 	
+ 			</dd> 			
+ 		</dl>
+ 		<p>
+ 			Fact: Every object is either a null object or a standard object.
+ 		</p>	
+ 		<div class="colorLightPink" style="padding:1em; border-radius:20px">	 		
+	 			The following conditions are equivalent for an element <var>x</var> not equal to <var>Object.prototype</var>.	 		
+	 		<ol>
+	 			<li><var>x</var> is a null object</li>
+	 			<li><var>getLastPrototypeOf(x)</var> exists and is not equal to <var>Object.prototype</var></li>
+	 			<li><var>x</var> is an object and <var>x instanceof Object</var> evaluates to false</li>
+	 			<li><var>x</var> is an object and <var>Object.prototype.isPrototypeOf(x)</var> evaluates to false</li>
+	 			<li><var>x.__proto__ == undefined</var> evaluates to true </li>
+	 		</ol>
+	 		<p style="margin-top:2em">
+	 			The following conditions are equivalent for an element <var>x</var> not equal to <var>Object.Prototype</var>.
+	 		</p>	 			 		
+	 		<ol>
+	 			<li><var>x</var> is a standard object</li>
+	 			<li><var>x</var> is an object and <var>getLastPrototypeOf(x)</var> is equal to <var>Object.prototype</var></li>
+	 			<li><var>x instanceof Object</var> evaluates to true</li>
+	 			<li><var>Object.prototype.isPrototypeOf(x)</var> evaluates to true</li>
+	 		</ol>
+ 		</div> 		
+ 				
+ 		 				 		
+ 		<table class="web" style="margin-top:2em">
+ 			<thead style="padding:.5em">
+				<tr><th colspan="4" style="background-color:aqua">Partition of Elements by Inheritance</th></tr>
+			</thead>
+ 			<tbody style="padding:.5em">
+				<tr>
+					<th rowspan="2">
+						<span style="font-size:.9em;margin-top:1em;display:block">Elements with no inheritance chain</span>						
+					</th>
+					<td colspan="3">undefineds</td>
+				</tr>
+				<tr><td colspan="3">nulls</td></tr>
+			</tbody>
+			<tbody>
+				<tr>
+					<th rowspan="7">
+					<span style="font-size:.9em;margin-top:1em;display:block">Elements with an inheritance chain</span>
+					</th>
+					<td colspan="3" style="background-color:#C6FFC6"><dfn>Null Objects</dfn>
+					<span style="font-size:.9em;margin-top:1em;display:block">do not derive from <var>Object.prototype</var></span>
+					</td>
+					<tr>
+						<td rowspan="6" style="background-color:#C6FFC6">
+						<span style="font-size:.9em;margin-top:1em;display:block">is or derives from <var>Object.prototype</var></span>
+						</td>
+						<td rowspan="5"  style="background-color:#FFACAC">Primitives</td>
+						<td>boolean</td>
+					</tr>
+					<tr><td>number</td></tr>
+					<tr><td>string</td></tr>
+					<tr><td>symbol</td></tr>
+					<tr><td>BitInt</td></tr>
+
+					<tr><td colspan="2" style="background-color:#FFACAC">Standard Objects
+					</td></tr>
+			</tbody>
+ 		</table>
+ 	</section> 	
+</section>
+<section>
+  <h2>Class Inheritance</h2>
+	<p>
+		A class <var>foo</var> has a constructor of the same name. JavaScript always insures that
+		an instance <var>x</var> of <var>foo</var> created by a call to <var>foo</var> has internal
+		prototype <var>foo.prototype</var>. 
+	</p>
+	<p>
+		To say that <var>foo</var> derives
+		from a class <var>bar</var> is to say the internal prototype of <var>foo.prototype</var> is 
+		<var>bar.prototype</var>. To say that <var>foo</var> derives from an object <var>obj</var>
+		is to say the internal prototype of <var>foo.prototype</var> is <var>obj</var>.
+	</p>
+	<p>
+	One way to derive the <var>foo</var>
+			class from the <var>foo<sub>1</sub></var> class is to use the following code.	However, see
+			section <i>Historical Note on Class Inheritance</i>. 		
+  </p>
+		<div class="codeBox centerTable colorLightPink" style="border:none;padding:1em;border-radius:20px">
+			foo.prototype = Object.create(foo<sub>1</sub>.prototype,
+			{
+				// property descriptors here
+			});		
+			
+			// Since foo.protoype is created from foo<sub>1</sub>.prototype, the 
+			//	internal prototype of foo.prototype must be foo<sub>1</sub>.prototype
+		</div>
+		<p>
+			Now let's say <var>foo</var> derives from <var>foo<sub>1</sub></var>, <var>foo<sub>1</sub></var> derives
+			from <var>foo<sub>2</sub></var>, and the derivations continue until <var>foo<sub>last</sub></var>
+			which is not created from any other class or element. Then an instance <var>x</var> of 
+			<var>foo</var> has the following inheritance chain.
+		</p>
+		
+		<img alt="" src="PrototypeChain.svg" style="margin-top:2em;margin-bottom:2em">
+		<p>This means the instance of <var>x</var> of <var>foo</var> inherits all the properties of the <var>foo</var> prototypes 
+		and <var>Object.prototype</var>.</p>
+		
+		<p>
+			Now, if <var>foo<sub>last</sub></var> were created directly from <var>null</var> as in 		
+		</p>
+		<div class="codeBox centerTable colorLightPink" style="border:none;padding:1em;border-radius:20px">
+			foo<sub>last</sub>  = Object.create(null,
+			{
+				// property descriptors here
+			});
+		</div>
+		<p>then he inheritance chain of <var>x</var> is </p>		
+		<img alt="" src="PrototypeChain2.svg" style="margin-top:2em;margin-bottom:2em">
+		<p>
+			This means the instance of <var>foo</var> inherits the properties of all the foo prototypes but
+			doesn't inherit from <var>Object.prototype</var>. <var>foo<sub>last</sub>.prototype</var>
+			is a top level null object. You may want this if you desire to 
+			eliminate the inheritance
+			baggage from <var>Object.prototype</var>. 			
+		</p>
+		<p>
+			Since <var>Object.prototype</var> doesn't sit atop the inheritance chain, then by our definition of null
+			object, the whole chain from <var>x</var> to <var>foo<sub>last</sub>.prototype</var>
+			are in fact null objects. 
+		</p>
+		<p>
+			We say that <var>foo</var> to <var>foo<sub>last</sub></var>
+			are <dfn>null classes</dfn>, which is appropriate because their prototypes are null objects, 
+			and all their instances are null objects.
+		</p>		
+		<p> 
+			In the first type of derivation, the prototypes of constructors are always given a constructor
+			property set up by JavaScript itself. However, for null classes JavaScript 
+			fails to do its duty and there is never a constructor to be found.
+		</p>
+		<section>
+			<h3>Review</h3>
+			<img alt="" src="ClassInheritance.svg" style="margin-top:2em;margin-bottom:2em">
+			
+			<p>
+				Recall that by definition, class inheritance of <var>foo</var> from <var>bar</var> 
+				means object inheritance of <var>foo.protoype</var> 
+				from <var>bar.prototype</var>.
+			</p>
+			<p>
+				If you follow the arrows around you can see that <var>x</var>, an 
+				instance of <var>foo</var>, inherits from 
+				<var>foo.prototype</var>, from <var>bar.prototype</var>, and from <var>foobar.prototype</var>.
+			</p>
+			<p>
+				There is definitely the concept of <i>class</i>, as being identified with a constructor and
+				all instances created from the constructor but <i>class</i> is not a native construct of the language.
+				Class inheritance of <var>foo</var> from <var>bar</var> is defined externally as object inheritance 
+				of <var>foo.protoype</var> from <var>bar.prototype</var>. Class inheritance is not native JavaScript, 
+				but object inheritance is. This is why you will hear form various author's that JavaScript is a classes 
+				language. Behind the scenes of such external language, everything is object based.				 
+			</p>			
+		</section>			
+</section>
+<section>
+  <h2>The Primitives</h2>
+	<p>
+		The primitives with an inheritance chain are <var>boolean</var>, <var>number</var>, 
+		<var>string</var>, <var>symbol</var> and <var>bigint</var>.
+	</p>
+	<p>
+		The inheritance chain of the number 7 follows.
+	</p>
+	<ol>
+		<li>
+			<var>Object.getPrototypeOf(7) = Number.prototype</var>
+		</li>
+		<li>
+			<var>Object.getPrototypeOf(Number.prototype) = Object.prototype</var>
+		</li>
+	</ol>
+	<p>
+		Now we are most interested in <var>Number.prototype</var> from which <var>7</var> directly derives.
+		We will add a property to <var>Number.prototype</var> and show it is inherited by <var>7</var>.
+	</p>
+	<div class="codeBox colorLightBurlywood" data-codeNumbers="true">
+		<header class="codeHeader colorLightPink">						
+			<div class="codeListing"></div>
+			Example: numbers are members of the Number class. 
+		</header><div class="numberShield colorLightBlue"></div>
+				
+			// Add a property called <var>message</var> to <var>Number.prototype</var>	
+			Object.defineProperty(Number.prototype, 'message',
+			{
+				value:function()
+				{
+					alert("Hello! I'm Mr. Number number " + this + "!!");
+				}
+			});
+					
+			// And yes the property is immediately available to the number 7						
+			(7).message(); // Hello! I'm Mr. Number number 7!! 			
+											
+	</div>
+	<p>
+		So is <var>7</var> a member of the <var>Number</var> class? Well <var>7 instanceof Number</var> evaluates
+		to false. However, when classes
+		like <var>Number</var> are conflated with their prototype <var>Number.prototype</var> the members of 
+		<var>Number</var> are precisely those elements whose internal prototype is <var>Number.prototype</var>.
+		So in that sense <var>7</var> is a member of <var>Number</var>.
+	</p>
+	
+	<p>
+		Analogous discussions hold for <var>booleans/Booleans</var> and <var>strings/Strings</var>.
+		See the <a href="#Boxing">Boxing</a> appendix for more information.
+	</p>	
+</section>
+<section>
+	<h2>Instances and Class Instances</h2>
+	<p>
+		Even though under the hood JavaScript is primarily object based, it still the case that classes are 
+		first class JavaScript citzens. Objects and Classes have different ideas on what it means to be
+		an instance. It is therfore prudent to invent nomenclature to make the distinction.
+	</p>
+	<p>
+		JavaScript's <var>instanceof</var> operator should be respected. Let <var>Klass</var> be a class/constructor.
+		If <var>x instance of Klass</var> evaluates to true then <var>x</var> is an <dfn>instance</dfn> of the Klass.
+		However, if <var>x</var> is created from <var>Klass</var> with operator <var>new</var> as in
+		<var>x = new Klass(...)</var> then <var>x</var> is a <dfn>class instance</dfn> of <var>Klass</var>.
+	</p>
+	<p>
+		<var>x</var> being an instance of the <var>Klass</var> means precisely that 
+		<var>Klass.prototype</var> is in the inheritance chain of <var>x</var>. However, <var>x</var> being a 
+		class instance of <var>Klass</var> means that <var>x</var> is a direct instance of the class (the internal
+		prototype of x is Klass.prototype) and that <var>x</var> has signed the contract that <var>Klass</var> enforces.
+	</p>
+	<p>
+		Now class instances are instances but not conversely. 
+	</p>
+	
+</section>
+
+
+<section>
+  <h2>The Null Objects</h2>
+		<p>The only top level null objects take the following form where they are created directly from null.</p>
+		<div class="codeBox centerTable colorLightPink" style="border:none;padding:1em;border-radius:20px;margin-top:2em">
+			Object.create(null, 
+			{
+				// property descriptors here
+			});			
+		</div>
+	<p>
+		Any object created directly from <var>null</var> is a top-level null object.
+		Any object created directly from a null object is a null object. A class <var>foo</var> is a <dfn>null class</dfn>
+		if its prototype <var>foo.prototype</var> is a null object. So a class deriving from a null class is
+		a null class. Instances of null classes are null objects. That covers how all null objects
+		are created.
+	</p>	
+	<p>
+		Normally the internal prototype <var>Object.getPrototypeOf(x)</var> of an element is its
+		<var>x.__proto__</var> property. However, one characterization of <var>null</var> objects
+		is that their <var>__proto__</var> property is <var>undefined</var>.
+	</p>
+	
+	<div class="codeBox rounded colorLightPink" style="letter-spacing:1px;" data-codeNumbers="true">
+			<header class=" codeHeader colorBurlywood">					
+				<div class="codeListing"></div>	
+				Constructing Null Objects<br>
+				(Derivations of top level null objects through Object.create())
+			</header><div class="numberShield colorLightOrange"></div>	
+			
+			function getTopLevelParent(x)
+			{
+				if(x === null || x === undefined){return undefined;}
+				for(var P = x; Object.getPrototypeOf(P) !== null; P = Object.getPrototypeOf(P));
+				return P;				
+			}
+			
+			// Create a top level null object.			
+			\^i1var x = Object.create(null, 
+			{
+				cat:{value:'meouzer'},
+				food:{value:'tuna'},
+			});\$i1
+			
+			// Verify x is a null object.
+			\^i1alert(getTopLevelPrototypeOf(x) !== Object.prototype);\$i1
+			
+			// Verify again that x is a null object.
+			\^i1alert(x.__proto__ === undefined);\$i1
+			
+			// Verify that x is a top level object.
+			\^i1alert(Object.getPrototypeOf(x) === null);\$i1
+			
+			// To construct other null objects, continue the 
+			// derivation process with Object.create().
+
+			\^i1var y = Object.create(x,
+			{
+				type:{value:'rambunctious'}
+			});\$i1
+
+			// Verify y is a null object
+			\^i1alert(y.__proto__ === undefined);\$i1			
+			
+			// Verify again that y is a null object.
+			\^i1alert(getTopLevelPrototypeOf(y) !== Object.prototype);\$i1		
+			
+			// Verify that y inherits the properties of x with their values.
+			\^i1alert(y.cat == "meouzer");
+			alert(y.food == "tuna");\$i1			
+				
+		</div>			
+</section>
+
+<section>
+	<h2>Standard Objects</h2>
+	<section>
+		<h3>Literal Objects</h3>
+		<p>
+			Any literal object such as <var>{a:8, b:"cat"}</var> derives directly from <var>Object.prototype</var>.
+			In other words its internal prototype <var>Object.getPrototypeOf({a:8, b:"cat"})</var> is <var>Object.prototype</var>.
+			In other words <var>Object.prototype</var> is the sole element of the inheritance chain of
+			<var>{a:8, b:"cat"}</var>.			
+		</p>
+	</section>
+	
+	<section>
+		
+		<h3>Standard Objects in General</h3>
+		<p>
+			Where do standard objects come from? <var>Object.prototype</var> is the top level standard object.
+			Objects derived from or created from standard objects are standard objects. In particular,
+			literal objects are standard objects, function prototypes are standard objects, and instances 
+			of standard classes are standard objects.   
+		</p>
+				
+		<div class="codeBox rounded colorLightPink" style="letter-spacing:1px;" data-codeNumbers="true">
+			<header class=" codeHeader colorBurlywood">					
+				<div class="codeListing"></div>	
+				Deriving from literal objects.
+			</header><div class="numberShield colorLightOrange"></div>	
+			// Start with a literal object
+			\^i1var x = {cat:'meozuer', food:'tuna'};\$i1
+			
+			// Verify x is a prototypical object (in fact x directly derives from Object.prototype)
+    		\^i1alert(Object.getPrototypeOf(x) == Object.prototype);\$i1
+			
+			// Verify x is a standard object
+			\^i1alert(x instanceof Object);\$i1
+    
+    		// To construct another standard object derive with Object.create().
+    		\^i1var y = Object.create(x,
+    		{
+    		    type:{value:'rambunctious'}
+    		});\$i1
+
+	    	// Verify y derives from x 
+	    	\^i1alert(Object.getPrototypeOf(y) == x);\$i1
+	    	
+	    	// Verify y is a standard object 
+	    	\^i1alert(y instanceof Object);\$i1
+	    		
+	    	// Verify that y inherits the properties of x with their values.
+	    	\^i1alert(y.cat == "meouzer");
+	    	alert(y.food == "tuna");\$i1
+	    	
+	    	// Now derive from y to produce another standard object.
+	    	
+		</div>
+		
+		<div class="codeBox rounded colorLightPink" style="letter-spacing:1px;" data-codeNumbers="true">
+			<header class=" codeHeader colorBurlywood">					
+				<div class="codeListing"></div>	
+				Deriving from Object.prototype
+			</header><div class="numberShield colorLightOrange"></div>	
+			
+			var x = Object.create(Object.prototype, 
+			{
+				cat:
+				{
+					value:"meouzer",
+					enumerable:true,
+					writable:true,
+					configurable:true
+				},
+				food:
+				{
+					value:"tuna",					
+					enumerable:true,
+					writable:true,
+					configurable:true
+				}
+			});
+	    	
+	    	/* Here what we have done is to produce what is completely equivalent to the literal
+	    	object {cat:"meouzer, food:"tuna}. If we were to change some of the flags from true to
+	    	false we would get something not quite the same as {cat:"meouzer, food:"tuna}. The
+	    	property descriptors would be different. Not something we are going to go over here.  
+	    	*/
+	    	
+	    	/* Now continue to derive recursively from x. Verify as in listing 3 to see that you
+	    	always get standard objects.*/
+		</div>		
+		
+		<div class="codeBox rounded colorLightPink" style="letter-spacing:1px;" data-codeNumbers="true">
+			<header class=" codeHeader colorBurlywood">					
+				<div class="codeListing"></div>	
+				Classical Class Inheritance
+			</header><div class="numberShield colorLightOrange"></div>	
+			
+			// Create a null class Person
+			function Person(firstName, lastName)
+			{ 
+					this.firstName = firstName;
+					this.lastName = lastName;								
+				}
+			
+				Person.prototype = Object.create(null,          
+				{
+					fullName:
+					{
+						value:function()
+						{
+							return this.firstName + " " + this.lastName;
+						}
+					}
+			});
+			
+			// Derive Employee from the null class Person
+			function Employee(firstName, lastName, id)
+			{				
+					Person.call(this, firstName, lastName); // base class initialization
+				    this.id = id;
+			}
+					
+			Employee.prototype = Object.create(Person.prototype,          
+			{
+						info:
+						{
+							value:function()
+							{
+								return this.id + ": " + this.fullName();
+							}
+						}
+			});
+			
+				
+			var emp = new Employee("Mister", "Mouzer", 1);
+			alert(emp.info());	  	
+				
+			<header class="codeSection fitted colorLightBurlywood">
+				Wait! I don't want to use null Classes.
+			</header>
+			
+			// Yea! Well, so change use of null on line four above to 
+			// Object.prototype or equivalently just replace lines 4-7 with
+			
+			Object.defineProperties(Person.prototype,
+			{
+				fullName:
+					{
+						value:function()
+						{
+							return this.firstName + " " + this.lastName;
+						}
+					}
+			});		
+					
+		</div>	
+		
+		
+	</section>
+</section>
+<section>
+	<h2>Appendices</h2>
+	<section>
+		<h3>The <i>Writable</i> Property Descriptor is Inherited</h3>
+		<p>
+			We assume the reader knows all about property descriptors, perhaps from MDN (Mozilla Developer Network). 
+			The object <var>P = Object.getOwnPropertyDescriptor(x, "prop")</var> is the property
+			descriptor of the property <var>prop</var> for the object <var>x</var>. The property descriptor
+			has a <var>writable</var> property, which is <var>true</var> precisely when the corresponding 
+			property of <var>x</var> may be assigned a (new) value through an assignment statement as in 
+			<var>x.prop = 7</var>.			
+		</p>
+		<p>
+			If <var>x.prop</var> is defined with a property descriptor, the default value for <var>writable</var>
+			is <var>false</var>, and if <var>writable</var> is <var>false</var> then statements like 
+			<var>x.prop = 7</var> have no effect.
+			Now you may be suprised by the fact that if <var>y</var> derives from <var>x</var> then statements
+			like <var>y.prop = 7</var> also have no effect: In other words the writability of the property 
+			was inherited from <var>x</var> to <var>y</var>.				
+		</p>
+		<div class="codeBox rounded colorLightPink" style="letter-spacing:1px;" data-codeNumbers="true">
+			<header class=" codeHeader colorBurlywood">					
+				<div class="codeListing"></div>	
+				Inheriting <i>Writable</i>
+			</header><div class="numberShield colorLightOrange"></div>	
+			
+			const x = Object.create(Object.prototype,
+			{				
+				cat:
+				{
+					value:"Meouzer"
+					// The writable property of cat is not specified
+					// and is therefore false by default.
+				}
+			});		
+		
+			const y= Object.create(x,
+			{
+				//cat: 
+				//{								
+				//	value:"Pete"
+				//}
+			});
+						
+			y.cat = "Pete";  // No effect. As if non writable were inherited.
+			alert(y.cat);      // Meouzer
+	    	
+	    	// You can still redefine y.cat, but just not through assignment.
+	    	// Uncomment the lines just after line 4, comment out line 5,
+	    	// and you get the expected redefinition: Line 6 will alert "Pete." 
+	    		    	
+		</div>
+		
+		<p>
+			Since you know all about property descriptors, the above example shows that the
+			configurable property descriptor is not inherited.
+		</p>
+		
+	</section>
+	<section>
+		<h3>Historical Note on Class Inheritance</h3>
+		<p>
+			Here we are talking about standard class inheritance. Everyone now knows that
+			to derive a class <var>foo</var> from <var>bar</var> one can 
+			<span lang="en-us"></span>create 
+			<var>foo.prototype</var> with <var>Object.create()</var> with first parameter
+			<var>bar.prototype</var>. As in		
+		</p>
+		<div class="codeBox centerTable" style="border:0">
+		
+			foo.prototype = Object.create(bar.prototype, 
+			{
+				// Property Descriptors for foo.prototype here.
+			});
+			
+		</div>
+		<p>
+			However, there was a time when there was no <var>Object.create()</var> and no <var>__proto__</var>
+			exposed for manipulation. So what did programmers do? It seems a lot of smart programmers did
+			a silly thing because JavaScript did not expose a good way of deriving. The 
+			capability of useful
+			derivation was always there, but JavaScript did not make it available. The correct way was very
+			obscure.		
+		</p>
+		<p>
+			Douglass Crockford wrote about this obscure technique at	
+			<a href="http://crockford.com/javascript/prototypal.html" target="_blank">
+				http://crockford.com/javascript/prototypal.html</a>,
+			but I don't think anyone caught on. I found this technique on my own, which is why I
+			recognized it while reading Crockford. 
+			My version is <var>protoProxy</var>.
+		</p>
+		<div class="codeBox colorLightBurlywood" style="display:table-cell" data-codeNumbers="true">
+			<div class="numberShield colorLightBlue"></div>
+			
+			protoProxy = function(myClass)
+		    {
+		        function foobar(){};
+		        foobar.prototype = myClass.prototype;
+		        return new foobar();
+		    } 
+		    
+		    // Now to derive the class foo from bar, write one short line.
+		    foo.prototype = protoProxy(bar);
+		    
+		</div>
+		
+		<p>
+			So <var>protoProxy</var> was the historical substitute for <var>Object.create()</var> and completely
+			equivalent to it. Now what was the silly thing that programmers did, me included? Instead of line 5, 
+			one would write the following. 
+		</p>
+		<div class="codeBox centerTable" style="border:0">
+			foo.prototype = new bar(...);
+		</div>
+		<p>
+			Nowadays, you don't have to think hard on why this is bad, unless you really want to derive
+			from an instance, but everyone did it way back.
+		</p>
+		<p>
+			What protoProxy does is to insure that the internal prototype of <var>foo.prototype</var>
+			is <var>bar.prototype</var>, which means that <var>foo</var> inherits from <var>bar</var>
+			in a classical way. As Crockford would say, protopalriffic. 	
+		</p>	
+	</section>
+	<section>
+		<h3>Null Objects and the __proto__ property</h3>
+		<p>
+			We mentioned that the proto property being undefined was a definitive test for being a null object. Why?
+			Because a null object starts out with an undefined proto property. You can't figure this out because this 
+			is just a quirk of JavaScript. If you try to change the proto property it doesn't stick: the proto property
+			remains undefined. If you take a standard object and try to set its proto property to undefined it 
+			doesn't stick: the proto property remains the same.
+		</p>			
+		<p class="display">
+			Use of the <var>x.__proto__</var> property is deprecated. Use <var>Object.GetPrototypeOf(x)</var> instead.
+			JavaScript simply screwed up because <var>x.__proto__</var> is supposed to be the internal prototype of an
+			object <var>x</var> but this fails for null objects.
+		</p>	
+	</section>
+	<section>
+		<h3>Casting</h3>
+		<p>
+			The statement <var>Object.setPrototypeOf(x, y)</var> resets the internal prototype of <var>x</var> to <var>y</var>.
+			The author calls this a <dfn>cast</dfn> of <var>x</var> to <var>y</var>.  The cast changes the object from which <var>x</var>
+			directly inherits and so changes the entire inheritance chain of <var>x</var>. However, the cast will result in a
+			<dfn>broken object</dfn> if <var>x</var> doesn't support the methods in its new inheritance chain.
+		</p>
+		<p>
+				Let's suppose that an  object <var>x</var> inherits from an object  <var>y</var>.					
+	  	</p>
+		<ol>
+				<li>The statement <var>Object.setPrototypeOf(x, y)</var> is an <dfn>upward cast</dfn> of <var>x</var> to
+				<var>y</var>. </li>
+				<li>the equation <var>Object.setPrototypeOf(y, x)</var> is a 
+				<dfn>downward cast</dfn> of <var>y</var> to <var>x</var>.	</li>
+				<li>
+					If neither <var>x</var> nor <var>z</var> lie in the inheritance chain of the other then the statement
+					<var>Object.setPrototypeOf(x,z) </var> is a <dfn>sidewise cast</dfn> of <var>x</var> to <var>z</var>.
+ 				</li>
+		</ol>
+		<p>
+				An upward cast is the most likely to succeed by not resulting in a broken object. A downward cast is the next
+				most likely to succeed, and a sidewise cast is the least likely to 
+				succeed.
+		</p>	
+		<p>
+			If you ever decide to cast, be careful and test. The author has seen a cast object whose inherited
+			properties run 20 to over 100 times slower than normal.
+		</p>
+		<p class="display">
+			In any particular sitiuation this may or may not make sense. However, you can cast standard objects
+			to null objects, you can cast null objects to standard objects.  
+		</p>		
+							
+  </section>
+	<section id="Boxing">
+  		<h3>Boxing</h3>
+	  	<p>
+	  		The primitive types with an inheritance chain are <var>boolean</var>, <var>number</var>, <var>string</var>,
+	  		<var>symbol</var>, and <var>bigint</var>. A primitive type never has properties of its own, but they
+	  		do inherit properties in a round about way via boxing. 		
+	  	</p>
+	  	<img alt="Primitive-Chains.svg" src="Primitive-Chains.svg" style="width:400px;padding:2em 0" class="centerTable">
+  	
+	  	<div class="codeBox centerTable colorLightPink" style="border:none;padding:1em;border-radius:20px">
+			Object.defineProperty(Boolean.prototype, "getMyTypeOf",
+			{
+				value:function()
+				{
+					return&nbsp;typeof(this);
+				}
+			});
+			
+			var b = true;
+			alert(typeof(b)); 			         // "boolean"
+			alert(b.getMyTypeOf());  	// "object"
+			
+		</div>
+		<p>
+			What this code says is that when you apply an inherited property to a primitive, the primitive is 
+			<span lang="en-us"></span>first
+			boxed behind the scenes to obtain an object and then the property is applied to that object. In this case, the boolean
+			<var>b</var> is boxed to an anonymous <var>Boolean</var> object and <var>getMyTypeOf()</var> is applied to that <var>Boolean</var>, 
+			which is why we get <var>"object"</var> and not <var>"boolean"</var> as the result of <var>getMyTypeOf()</var>.
+		</p>
+  	</section>
+	<section>
+		<h3>It's the Nature of Class Prototypes to Pollute</h3>
+		<p>
+			Given a class/constructor Klass, when you create a property for Klass.prototype, your usual 
+			intent is for that property to be inherited by class instances of Klass and class instances of 
+			any class ultimately derived from Klass by class inheritance. However, you get much more than you want. 
+			Every object inherited from <var>Klass.prototype</var> inherits that property. Let's look at an example 
+			where that's a problem.
+		</p>
+		<p>
+			Let's say you want to prototype copy functions for all the built in classes, and objects in general.				   
+		</p>
+		
+		<div class="codeBox rounded colorLightPink" style="letter-spacing:1px;" data-codeNumbers="true">
+			<header class=" codeHeader colorBurlywood">					
+				<div class="codeListing"></div>	
+				A copy function for class instances of Boolean 
+			</header><div class="numberShield colorLightOrange"></div>	
+			
+			// First attempt			
+			Object.defineProperty(Boolean.prototype, 'copy',
+			{			
+				value:function()         
+				{	
+					return new Boolean(this.valueOf());
+				}
+			});
+			
+			// First polluted property:
+			// true.copy() should be true. It should be a boolean, like true is a boolean.
+			// However true.copy() is a Boolean class instance because of boxing. 
+			
+			// Second polluted property:
+			// x = Object.create(Boolean.prototype) is an instanceof but not a class instance
+			// of Boolean. We weren't interested in it inheriting copy, but it did. 
+			// Worse, x.valueCopy() throws an error because it doesn't have the valueOf
+			// property that a true class instance of Boolean would have.
+			
+			// Third polluted property: 
+			// We defined the Boolean.prototype.copy() function
+			// but the copy function is never called on Boolean.prototype. 
+			
+			// Second attempt
+			Object.defineProperty(Boolean.prototype, 'copy',
+			{			
+				value:function()         
+				{	
+					if(typeof(this) == "boolean") return this; // Failed attempt to avoid boxing
+					if(isBoolean(this)) return new Boolean(this.valueOf()); // for class instance of Boolean
+					return Object.create(Object.getPrototypeOf(this)); // for other instances of Boolean
+				}
+			});
+			
+			// First the attempt to avoid boxing is impossible. As soon as true.copy() is called
+			// true is boxed as new Boolean(true), and so line 6 does not get executed. Line 7
+			// gets executed instead. If x = new Boolean(true), then the call x.copy()
+			// executes line 7 and a copy is made. For the other instances of Boolean something
+			// that makes sense is returned on line 8, but in general there may be nothing to 
+			// write that makes sense.  
+
+		</div>
+	</section>
+</section>
+
+	<p class="centerTable colorLightPink" style="border-radius:20px;padding:2em;font-size:1.1em">
+		Well I hate to confess<br>
+		but doing JavaScript is a stress<br>
+		so Meouzer got to working<br>
+		and after he quit smirking<br>
+		turned my JavaScript into a real mess		
+	</p>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	
+</body>
+
+</html>
+
+

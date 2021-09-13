@@ -1,0 +1,79 @@
+﻿
+	
+	.colorBurlywood{background-color:rgb(252,214,165)}
+	.colorLightBurlywood{background-color:rgb(252,234,185)}	
+	.colorLightYellow{ background-color:rgb(255,255,180)} 
+	.colorLightGreen{ background-color:#DEFFDE}
+	.colorBlue{background-color:rgb(210,210,255);}	
+	.colorLightBlue{background-color:rgb(230,230,255);}			
+	.colorPink{background-color:rgb(255,202,213);} 
+	.colorLightPink{background-color:rgb(255,232,243);} 	
+	.colorLightOrange{background-color:rgba(255,102,0,0.2);} 
+	.colorLightViolet{background-color:rgb(235,214,255)}
+	.colorLightPurple{background-color:rgb(255,200,255)}
+		
+	div.codeBox
+	{
+		position:relative;font-family:Arial;letter-spacing:3px;font-size:.9em;text-align:left;
+		margin-top:1em;margin-bottom:1em;font-family:arial;
+		border:thin maroon ridge;
+	}	
+	
+	div.codeBox.rounded{border-top-left-radius:20px;border-bottom-right-radius:20px;}
+		
+	div.codeBox div.numberShield
+	{
+		display:block;position:absolute;top:0px;height:100%;width:1.8em;
+		border-right:thin maroon solid;border-top-left-radius:inherit;z-index:2;
+	}	
+	
+	div.codeBox span[jstabs]{display:inline-block}
+	
+	div.codeBox div.numberShield.rounded{border-top-left-radius:20px;}
+
+	span.lineNumber{display:inline-block;width:2em;text-align:center;font-size:.8em;position:relative;
+	font-weight:bold;color:rgb(0,150,0); z-index:2;	} 
+		
+	div.codeBox header.codeHeader
+	{
+		display:block;top:0px;width:100%;position:relative;padding-bottom:1em;padding-top:1em;text-align:center;z-index:3;
+		border-bottom:thin maroon solid;border-top-left-radius:inherit;border-top-right-radius:inherit;
+		line-height:1.5em;
+	}
+	
+	div.codeBox header.codeHeader.rounded{border-top-left-radius:20px;}
+
+			
+	div.codeBox header.codeSection
+	{
+		display:block;top:0px;width:100%;text-align:center; position:relative; z-index:1;padding-top:1em;padding-bottom:1em;
+		border-top:medium maroon ridge;border-bottom:thin maroon ridge;
+	}  
+		
+	div.codeBox div.codeListing{position:absolute;top:0px;right:0px;font-size:25px;padding-right:10px;padding-left:10px;
+	color:maroon;z-index:4}	
+		
+	body {counter-reset:codeListing;}
+	div.codeBox {counter-reset:codeSection;}	
+	div.codeBox header.codeSection div.codeListing {counter-increment: codeSection;}
+	div.codeBox header.codeSection div.codeListing::before {content:counter(codeListing) counter(codeSection, lower-latin)}
+		
+	div.codeBox div.codeListing {counter-increment: codeListing;}
+	div.codeBox div.codeListing::before {content:counter(codeListing)}	
+	
+
+	/*******************************************************************************************************/
+	span[js=op]{color:blue}
+	span[js=regexp]{color:#7f007f;}
+	span[js=keyword]{color:blue}
+	span[js=number]{color:red} 
+	span[js=db-qt]{color:maroon} 
+	span[js=s-qt]{color:purple} 
+	span[js=db-qt-code]{color:maroon;font-style:italic} 
+	span[js=eol-comment]{color:rgb(0,100,0);font-style:italic;} 
+	span[js=block-comment]{color:green;font-style:italic;} 
+
+	
+	div.codeBox{font-family:"Times New Roman", Times, serif; font-size:15px}
+	div.codeBox > table, p, header, ol, ul, dfn, mark, q, cite, blockquote, dl {font-family:Arial} /*add to as needed*/
+}

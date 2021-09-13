@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1147 417" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-52.2832,-233.012)">
+        <g>
+            <g>
+                <g transform="matrix(1,0,0,1,0,31)">
+                    <g>
+                        <g transform="matrix(1.6886,0,0,1,-310.316,173)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:0.72px;"/>
+                        </g>
+                        <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,1069,14)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,92.5,73)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">class inheritance</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,468,34)">
+                    <g>
+                        <g transform="matrix(1.6886,0,0,1,-310.316,173)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:0.72px;"/>
+                        </g>
+                        <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,1069,14)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,92.5,73)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">class inheritance</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,860.5,125)">
+                    <text x="186px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">foobar</text>
+                </g>
+                <g transform="matrix(1,0,0,1,373.5,120)">
+                    <text x="211.005px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">bar</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-95.5,119)">
+                    <text x="211.005px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">foo</text>
+                </g>
+            </g>
+            <g>
+                <g transform="matrix(1,0,0,1,-6,-110)">
+                    <g transform="matrix(1,0,0,1,65,30)">
+                        <g transform="matrix(1,0,0,1,-88,79)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1px;"/>
+                        </g>
+                        <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,941,-80)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,101,11)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">object inheritance</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,459,-110)">
+                    <g transform="matrix(1,0,0,1,65,30)">
+                        <g transform="matrix(1,0,0,1,-88,79)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1px;"/>
+                        </g>
+                        <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,941,-80)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,101,11)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">object inheritance</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,797,-86)">
+                    <text x="186px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">foobar<tspan x="269.408px 277.743px " y="353.489px 353.489px ">.p</tspan>rototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,310,-86)">
+                    <text x="211.005px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">bar<tspan x="252.709px 261.044px " y="353.489px 353.489px ">.p</tspan>rototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-159,-82)">
+                    <text x="211.005px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">foo.prototype</text>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,0,7)">
+                <g transform="matrix(1,0,0,1,7,-7)">
+                    <g transform="matrix(1,0,0,1,-403,-258)">
+                        <g transform="matrix(2.95419e-17,-0.482456,1,6.12323e-17,275,816.947)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1.27px;"/>
+                        </g>
+                        <g transform="matrix(1,0,0,1,116,55)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-40.5,14.5)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">prototype</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,460,-7)">
+                    <g transform="matrix(1,0,0,1,-403,-258)">
+                        <g transform="matrix(2.95419e-17,-0.482456,1,6.12323e-17,275,816.947)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1.27px;"/>
+                        </g>
+                        <g transform="matrix(1,0,0,1,116,55)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-40.5,14.5)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">prototype</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,944,-7)">
+                    <g transform="matrix(1,0,0,1,-403,-258)">
+                        <g transform="matrix(2.95419e-17,-0.482456,1,6.12323e-17,275,816.947)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1.27px;"/>
+                        </g>
+                        <g transform="matrix(1,0,0,1,116,55)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-40.5,14.5)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">prototype</text>
+                    </g>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,3,203)">
+                <g transform="matrix(1,0,0,1,7,-7)">
+                    <g transform="matrix(1,0,0,1,-403,-258)">
+                        <g transform="matrix(2.95419e-17,-0.482456,1,6.12323e-17,275,816.947)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1.27px;"/>
+                        </g>
+                        <g transform="matrix(1,0,0,1,116,55)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-40.5,14.5)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">instance</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,460,-7)">
+                    <g transform="matrix(1,0,0,1,-403,-258)">
+                        <g transform="matrix(2.95419e-17,-0.482456,1,6.12323e-17,275,816.947)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1.27px;"/>
+                        </g>
+                        <g transform="matrix(1,0,0,1,116,55)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-40.5,14.5)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">instance</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,944,-7)">
+                    <g transform="matrix(1,0,0,1,-403,-258)">
+                        <g transform="matrix(2.95419e-17,-0.482456,1,6.12323e-17,275,816.947)">
+                            <path d="M288,262L516,262" style="fill:none;stroke:black;stroke-width:1.27px;"/>
+                        </g>
+                        <g transform="matrix(1,0,0,1,116,55)">
+                            <path d="M421,505L428,519L414,519L421,505Z" style="fill:rgb(0,0,235);"/>
+                        </g>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-40.5,14.5)">
+                        <text x="186px" y="349.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;fill:rgb(0,0,255);">instance</text>
+                    </g>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,-48.5,290)">
+                <text x="186px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">x</text>
+            </g>
+            <g transform="matrix(1,0,0,1,405.5,290)">
+                <text x="186px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">y</text>
+            </g>
+            <g transform="matrix(1,0,0,1,889.5,290)">
+                <text x="186px" y="353.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">z</text>
+            </g>
+        </g>
+    </g>
+</svg>

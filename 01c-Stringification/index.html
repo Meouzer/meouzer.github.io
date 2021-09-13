@@ -1,0 +1,740 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">Stringification and Serialization of Complex JavaScript Objects</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../00-Commons/JSHTML.js"></script>
+	<script src="../00-Scripts/typing.js"></script>
+	<script src="../00-Scripts/Stringify.js"></script>
+	<script src="Test-Stringify.js"></script> 
+	<script>
+		window.addEventListener("load", function()
+		{
+			applyJSHTML();		
+			
+			const reg = /^!*0$|^!*[123456789][1234567890]*$/;
+			var key = "!!1230";
+						
+			function escapeKey(key)
+			{
+				return reg.test(key)? "!" + key: key;	
+			}		
+			
+			const reg2 = /^!+0$|^!+[123456789][1234567890]*$/;		
+		});							
+	</script>
+
+	<style>	
+		div.codeBox.simple{background-color:rgb(255,245, 255);border-radius:20px; padding:1em;border:none}
+	</style>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1 style="font-size:1.8em">Stringification and Serialization of Complex JavaScript Objects</h1>
+<header id="header" style="margin-top:2em">	
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="GeorgeHarrison.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">
+		It's so hard to be what it's all about! When your outsides in. Insides out and your downsides up.
+		Yea! Don't you want to twist and shout when you're inside out.<br><br>
+		<cite style="margin-left: 20em"><a target="_blank" href="https://www.youtube.com/watch?v=fq5yHdVKSQs">The Travelling Wilburys</a></cite>
+	</div>
+</blockquote>
+
+<p>
+	The Wilburys know what it takes to stringify Maps, Sets, ArrayBuffers, and DataViews.
+	They have to be turned inside out. A stringification algorithm, which transverses subobjects/subproperties in
+	a preorder transversal, only naturally deals with external properites, not internal properties. 
+	So the internal properties are turned inside out to become external properties that the algorithm can deal with. 
+</p>
+
+<div class="codeBox centerTable" style="padding-right:1em" data-codeNumbers="true">
+<div class="numberShield colorLightBlue" style="border-top:thin maroon solid;border-bottom:thin maroon solid"></div>
+<br>
+	// For example turn a class instance 
+	// of Set, say sourceSet, inside out.
+	
+		const proxySource = {}; var n = 0;
+	
+		sourceSet.forEach(function (value1, value2, theSet) 
+			{
+				// Turn internal state properties of sourceSet
+				// into external properties of proxySource.
+				proxySource[n++] = value2;
+			});
+			
+		// proxySource will replace sourceSet in the stringification algorithm.
+		// So we also need to copy the external properties of sourceSet over
+		// to external properties of proxySource.
+		
+		const keys = Object.getOwnPropertyNames(originalSource);
+			
+			// Now transfer the external properties of originalSource
+			// to external properties of proxySource.			
+			
+			for (let i = 0; i &lt; keys.length; i++) 
+			{
+				const clam = isDigitString(keys[i])? '!' :'';
+				proxySource[clam + keys[i]] = originalSource[keys[i]];	
+				
+				// Not a clam. An exclam! Sung to the tune of
+				// Rock Lobster.
+				
+				// If an external property of sourceSet is a number/string 
+				// of digits then it is escaped with a clam on line 7. Thats 
+				// because digits as public properties of proxySource are use to 
+				// represent internal properties of sourceSet (See line 3).				
+			}			
+</div>
+
+<p>
+	We invite the clever reader to show how to turn an ArrayBuffer inside out. 
+</p>
+
+<p>
+	If you want to attempt to understand the source code at <a target="_blank" href="../00-Scripts/Stringify.js">Stringify.js</a>,
+	then the article <a target="_blank" href="../Deep-Copy-Articles/02-Deep-Copies-With-Circular-References/index.html">
+	Deep Copies with Circular References
+	</a>
+	is a prerequisite since it
+	introduces <i>The Basic and Powerful Preorder Transversal </i> which is used in <i>Stringify.js</i>,
+	<i>parseDataString.js</i>, <i>deepCopyData.js</i>, and <i>deepCopy.js</i>. It's a general technique
+	that should be studied by the sorts of programmers who study those sorts of things.
+</p>
+
+<!-- 
+<p class="centerTable">
+Meouzer is on special forces recon<br>
+to destroy the enemy balls of yarn<br>
+he bites, claws, and whacks them<br>
+but before unfriendly K9s find him<br>
+he is already long since gone.	
+</p>
+-->
+
+<section>
+	<h2>Introduction</h2>
+	<p>
+		The title and following paragraphs are shameless promotion. But it needs to be made clear that you should be excited because
+		our serialization/deserialization goes way beyond JSON into actually serializing objects that
+		are class instances in such a way that deserialization produces a deep copy of the
+		object with equivalent but separate internal state.  		
+	</p>
+	<p>
+		The mundane level also goes way beyond
+		JSON. JSON is rather limited in the types of objects that can be serialized. We 
+		serialize all<sup>*</sup> built in data types with infinite complexity. E.g., Sets whose members 
+		are Maps whose keys are ArrayBuffers and values are typed arrays. The Set can also have properties 
+		that are DataViews whose properties are Maps whose properties are Sets whose properties are ArrayBuffers.
+	</p>
+	<p style="margin-left:2em">
+		(*) It is impossible for any system to serialize <var>symbols</var>, <var>WeakSets</var>, 
+		and <var>WeakMaps</var> because there is no way for the programmer to read their internal state. 
+	</p>
+	<p>
+		Serialization is built on stringification. In our system, stringification is just for display/dumping.
+		Our stringification, not originally intended for serialization, was easy to 
+		modify for serialization. Our <var>dtype()</var> function wasn't designed for serialization either,
+		but its detailed design gave it an automatically small but important role in checking that certain
+		objects are suitable for serialization. 
+	</p>		
+	<p>
+		Both serialization/deserialization and stringification handles circular and duplicate references.
+		Stringification and hence serialization encodes such references so that deserialization can decode them and reproduce the
+		circular and duplicate references.
+	</p>
+	<p style="margin-left:2em">
+		Two nodes in the object tree of <var>x</var> that are equal are <dfn>circular references</dfn> if
+		one is the ancestor of the other. Otherwise they are <dfn>duplicate references</dfn>.
+		Naive algorithms for various tasks will loop infinitely with circular references, but not with duplicate
+		references.
+	</p>
+	<p>
+		Serialization/Deserialization preserves property descriptors by encoding/decoding them. For example
+		if <var>Y</var> is a deep copy of <var>X</var> through serializtion/deserialization then the property descriptor of 
+		<var>Y.a.b.c</var> in <var>Y.a.b</var> is the same as the property descriptor of <var>X.a.b.c</var> in <var>X.a.b</var>.
+	</p>
+	<p class="display">
+		The following sections discuss stringification. However, after that, be sure to read the serialization appendix
+		because it introduces terms necessary in two subsequent articles. One is the article on <var>parseDataString()</var>,
+		which is our deserialization function. The other is the article on serializing classes.		
+	</p>
+	
+</section>	
+	<section>
+
+		<h3>Syntax of stringify()</h3>
+		<p>
+			Defalt values are underlined and the question mark indicates existence is optional.
+		</p>
+		<ul>
+			<li>
+				<var>stringify(object, param?)</var>
+				<ul>
+					<li>
+						<var>object</var>: the required object to be stringified
+					</li>
+					<li>
+						<var>param = {doHost?:true|<u>false</u>, writeGetsSets?:true|<u>false</u>, doAbbreviate:<u>true</u>|false}?</var>: 
+						<ul>
+							<li><var>doHost</var>: If <var>true</var> then host objects in the stream 
+									will be stringified in full rather than just noting the host object and stopping.</li>
+							
+							<li><var>writeGetsSets:</var> If <var>true</var>
+								then getters/setters will be 
+								written rather than the value of the getter. Processing of child nodes stops with
+								a getter/setter because a getter/setter has no child nodes.
+								<p>
+									If <var>false</var>, then the value returned by the getter is written and processing 
+									continues for any of its child nodes.
+								</p>
+							</li>
+							<li><var>doAbbreviate:</var> If <var>true</var> then the <var>caller</var> property
+								of functions are ignored. If <var>false</var>, not ignored. Showing <var>caller</var> properties is interesting
+								but can drastically increase string size, and also is not suitable for deserialization. 
+							</li>
+						</ul>   
+					</li>
+				</ul>
+			</li>			
+		</ul>	
+		<p>
+			There's actually more attributes that <var>param</var> can have, but they are for internal use in
+			our library.
+		</p>			
+	</section>
+<section>
+	<h2>Object and Circular References</h2>
+	
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Object and Circular References	
+		</header>	
+		
+		var x = {q:100}, y = {q:101};
+		x.a = y;
+		y.b = x;			
+		var z = {M:x, N:y};
+		
+		stringify(z) = 
+		
+		Object
+		\^04{	
+			M:Object
+			{
+				q:100,
+				a:Object
+				{
+					q:101,
+					b:@(2)Object(top.M)
+				}
+			},
+			N:#Object(top.M.a)
+		}\$04	
+	</div>	
+	<p>
+		First <var>top</var> referes to the top node, in this case <var>z</var>.
+	</p>
+	<p>			
+		We first read that <var>dtype(top)</var> is <var>"Object"</var>. This doesn't mean that <var>top</var> can be any old
+		object. It precisely means that the internal prototoype of <var>top</var> is <var>Object.prototype</var>.
+		<var>top</var> is one degree away from <var>Object.prototype</var>. Likewise <var>top.M</var>, <var>top.M.a</var>,
+		and <var>top.N</var> all have <var>"Object"</var> as their <var>dtype()</var> and hence all are one degree
+		away from <var>Object.prototype</var>.
+	</p>
+	<p>
+		The <var>@</var> symbol indicates a circular reference. The right side of <var>top.M.a.b</var> indicates that <var>top.M.a.b</var>
+		is a circular reference to <var>top.M</var> an "Object" named <var>M</var> two levels up. That is
+		<var>top.M.a.b</var> and <var>top.M</var> are the same.
+
+	</p>
+	<p>
+		The <var>#</var> symbol indicates a dupiclate reference. <var>top.N</var> is a duplicate reference to <var>top.M.a</var>.
+		That is <var>top.N</var> and <var>top.M.a</var> are the same.
+	</p>
+	
+</section>
+
+<section>
+	<h2>Higher Degree Objects and Primitive Properties</h2>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Higher Degree Objects and Primitive Properties
+		</header>	
+		
+		var x = {a:1, b:2};           // one degree away from Object.prototype
+		var y = Object.create(x);		// two degrees away from Object.prototype
+		var z = Object.create(y);  // three degrees away from Object.prototype
+		
+		// Define some primitive properties
+		z.a = null;
+		z.b = undefined;
+		z.c = true;
+		z.d = 7;
+		z.e = "cat";
+		z.f = 900719925474099267n; // BigInt literal
+		z.g = Symbol("something");
+		
+		stringify(z) = 
+		
+		Object(3)
+		\^04{	
+			a:null,
+			b:undefined,
+			c:true,
+			d:7,
+			e:"cat",
+			f:BigInt(900719925474099267),
+			g:Symbol(*)
+		}\$04
+		
+	</div>	
+
+	<p>
+		The dtype of <var>z</var> is <var>"Object(3)"</var> meaning that <var>z</var> is an object three 
+		degrees from <var>Object.prototype</var>.
+		That is <var>z.__proto__.__proto__.___proto__</var> is <var>Object.prototype</var>.
+	</p>
+	<p>
+		Since it is impossible to read <var>Symbols</var>, we can only notate that <var>z.g</var> is a <var>Symbol</var>. 
+	</p>
+</section>
+<section>
+	<h2>Elementary Classes</h2>
+	<p>
+		The <dfn>elementary classes</dfn> are <var>Boolean</var>, <var>Number</var>, <var>String</var>,
+		<var>Date</var>, and <var>RegExp</var>. Stringifications of their class instances all behave
+		the same. 
+	</p>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Class Instances of Elementary Classes
+		</header>	
+		
+		var a = new Boolean(true);
+		a.x = 1;
+		a.y = "cat";
+		
+		stringify(a) =
+		
+		Boolean(true)
+		\^04{	
+			x:1,
+			y:"cat"
+		};\$04
+		
+		<p style="margin-left:1em">
+			We read that the dtype of a is Boolean. That means a is a Boolean class instance. That it has a value of
+			true is indicated. Its properties are indicated inside braces. If there were no properties, the braces
+			would be empty.
+		</p>
+		<hr>		
+		
+		var b = new Number(5);
+		b.z = a;
+		
+		stringify(b) =
+		
+		Number(5)
+		\^04{	
+			z:Boolean(true)
+			{
+				x:1,
+				y:"cat"
+			}
+		};\$04
+		<p style="margin-left:1em">
+			The dtype of b is Number, so b is a Number class instance. It has one property z which the the a we've seen
+			before. To the right of z: is the stringification of a.
+		</p>
+		<hr>
+		
+		var c = new String("cat");
+		
+		stringify(c) =
+		
+		String("cat")
+		\^04{
+			// length:3
+		};\$04
+		<p style="margin-left:1em">
+			The dtype of c is String, so c is a String class instance. Its value is indicated as "cat".			
+			 It has no properties other than the length, which we omit since it isn't needed for 
+			 informational purpposes or for deserializtion.
+		</p>
+		<hr>
+		var d = new Date();
+		
+		strinfify(d) = 
+		
+		Date(1616200219563)
+		\^04{	
+		};\$04
+		<p  style="margin-left:1em">
+			The dtype of d is Date, so c is a Date class instance. Its value is indicated next.			
+			d has no properties.
+		</p>
+		<hr>
+		
+		var e = /abc/g;
+		e.a = "cat";
+		
+		stringify(e) = 		
+		
+			RegExp(/abc/g)
+			\^04{	
+				lastIndex:0,
+				a:"cat"
+			};\^$04
+		<p  style="margin-left:1em">
+			The dtype of e is RegExp, so e is a RegExp class instance. Its value is indicated next.			
+			JavaScript gives e the lastIndex property. Our added property a is shown next.
+		</p>	
+	</div>	
+</section>
+<section>
+	<h2>Arrays</h2>
+	<p>
+		The stringification of Arrays behave in a similar manner to stringification of literal objects.
+	</p>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Arrays
+		</header>
+		
+		var x = ["cat", "dog", "hamster"];
+		x.a = Object.create(new Boolean(true));
+		
+		stringify(x) = 
+		
+		Array
+			\^04{	
+				0:"cat",
+				1:"dog",
+				2:"hamster",
+				// length:3, // neither informative, nor needed for deserialization
+				a:Boolean[Object(2)]
+				{
+				}
+			};\$04
+			
+		<p style="margin-left:1em">
+			The dtype of x is Array, so x is a class instance of Array. Of particular note, the stringification
+			of x.a is shown. The dtype of x.a is "Boolean[Object(2)]" meaning that x is an instance of Boolean
+			but not a class instance since it is 2 degrees away from Boolean.prototype. It follows type(x.a) = "Object",
+			which is written for emphasis.
+		</p>	
+	</div>	
+</section>
+<section>
+	<h2>Typed Arrays</h2>	
+	<p>
+		There are nine typed arrays: <var>Int8Array</var>, <var>Uint8Array</var>, <var>Uint8ClampedArray</var>, <var>Int16Array</var>,
+		<var>Uint16Array</var>, <var>Int32Array</var>, <var>Uint32Array</var>, <var>Float32Array</var>, <var>Float64Array</var>. 
+		The stringifications all act the same so we look at <var>Uint8Array</var>.
+	</p>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			A Typed Array
+		</header>
+		
+		var x = new Uint8Array([21, 31]);
+			x.a = 9;
+			
+			stringify(x) = 
+			
+			Uint8Array
+			\^04{	
+				0:21,
+				1:31,
+				a:9
+			};\^$04
+						
+	</div>
+</section>
+<section>
+	<h2>Maps</h2>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Stringification of a Map 
+		</header>
+		
+		var map = new Map([['key1', 'value1'], ['key2', {a:1,b:2}], 
+		[new Boolean(true), new Number(7)]]);	
+			
+			map.x = new Date();
+			
+			stringify(map) =
+			
+			Map
+			\^04{	
+				0:Object
+				{
+					key:"key1",
+					value:"value1"
+				},
+				1:Object
+				{
+					key:"key2",
+					value:Object
+					{
+						a:1,
+						b:2
+					}
+				},
+				2:Object
+				{
+					key:Boolean(true)
+					{
+					},
+					value:Number(7)
+					{
+					}
+				},
+				length:3,
+				x:Date(1616271884061)
+				{
+				}
+			};\$04		
+	</div>
+	<p>By now the reader shouldn't have any trouble understanding the stringification of a Map.</p>
+</section>	
+<section>
+	<h2>WeakMap</h2>
+	<p>
+		It is not possible to properly stringify a <var>WeakMap</var> since there is no way to obtain its keys.
+		Thus we stringify by notating that a WeakMap was found with no further details other than properties
+		that were added.
+	</p>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Proper Stringification of a WeakMap is not Possible 
+		</header>
+		
+		var map = new WeakMap([[new String('key1'), new String('value1')], 
+			[new String('key2'), {a:1,b:2}], 
+			[new Boolean(true), new Number(7)]]);
+			
+			map.a = 7;
+			
+			stringify(map)=
+			
+			WeakMap
+			\^04{	
+				a:7
+			};\$04	
+					
+	</div>
+</section>	
+<section>
+	<h2>Set</h2>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Stringification of a Set 
+		</header>
+		
+		var x = new Set(["cat", "dog", ["a", new String("b")]]);
+		
+		stringify(x) = 
+		
+		Set
+		\^04{	
+			0:"cat",
+			1:"dog",
+			2:Array
+			{
+				0:"a",
+				1:String("b")
+				{
+				},
+			},
+		};\$04
+				
+	</div>
+	
+	<p>
+		OK! This is easy to read. 
+	</p>	
+</section>	
+<section>
+	<h2>WeakSet</h2>
+	<p>
+		It is not possible to properly stringify a <var>WeakSet</var> since there is no way to iterate through
+		its members. Thus we stringify by notating that a <var>WeakSet</var> was found with no further details other than properties
+		that were added. Stringification behaves as it did with <var>WeakMap</var>.
+	</p>
+</section>
+	
+<section>
+	<h2>ArrayBuffer and DataView</h2>
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			 ArrayBuffer and DataView
+		</header>
+		
+		const buffer = new ArrayBuffer(4);
+		const view = new DataView(buffer);
+		view.setInt8(0, 127);
+		view.setInt8(1, 11);
+		view.setInt8(2, 17);
+		view.setInt8(3, -17);
+		alert(stringify(view));
+
+		stringify(buffer) = 
+		
+			ArrayBuffer
+				\^04{	
+					0:127,
+					1:11,
+					2:17,
+					3:-17,
+				};\$04
+				
+		stringify(view) = 
+		
+			DataView
+				\^04{	
+					0:127,
+					1:11,
+					2:17,
+					3:-17,
+				};\$04
+				
+	</div>		
+</section>	
+		
+		
+<section>
+	<h2>Appendix: Serialization</h2>
+	<p>
+		There are four functions that wrap <var>stringify()</var>
+	</p>
+	<ol>
+		<li><var>serializeSimpleData()</var></li>
+		<li><var>serializeFData()</var></li>
+		<li><var>compareObjects()</var></li>
+		<li><var>serializeClassData()</var></li>
+	</ol>
+	<p>
+		The following code shows the first three in action.
+		For <var>serializeClassData()</var> see the class serialization/deserialization
+		article.
+	</p>
+	
+	<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Serializing Simple Data and F-Data.<br>
+			To see this in action see the parseDataString() article, <br>
+			and the article on serializing classes.
+		</header>
+		
+		// Serialize and Deserialize Simple Data
+		// x is simple data
+		
+		const string = serializeSimpleData(x); // exception thrown if x is not simple data
+		
+		const y = parseDataString(string);
+		
+		// check that y is a deep copy of x
+		
+		console.log(compareObjects(x,y)); // logs true
+		
+		// Serialize and Deserialize F-Data
+		// x is f-data
+				
+		const string = serializeFData(x); // exception thrown if x is not fdata
+				
+		/*
+			To deserialize there must be a single evaluator e whose context can faithfully 
+			reproduce the outer context of every function and getter/setter in the object 
+			tree of x. If there is such an evaluator e then the code continues on. 
+			
+			To learn about evaluators see the first article on copying functions.
+		*/
+				
+		const y = parseDataString(x, e);
+		
+		// check that y is a deep copy of x
+		
+		console.log(compareObjects(x,y)); // logs true
+		
+	</div>	
+	
+	<dl>
+		<dt>Simple Data</dt>
+		<dd>
+			An element is <dfn></dfn>simple data<var></var> if every node in its object tree including 
+			internal nodes of <var>Sets</var> (members) and <var>Maps</var> (keys and values) are one of the following.  
+			<ol>
+				<li>a primitive, excluding <var>symbols</var></li>
+				<li>a class instance of a built in class excluding <var>WeakSets</var>, <var>WeakMaps</var> 
+					and <var>Functions</var></li>
+				<li>an object one degree away from <var>Object.prototype</var> or one degree away from <var>null</var></li>
+			</ol>
+			<p>
+				If the dtype of an element contains the symbol <var>'['</var> then the element is not simple-data.
+			</p>
+			<p>
+				If <var>x</var> and every subobject of <var>x</var> is not a <var>symbol</var>, <var>WeakSet</var>, <var>WeakMap</var> or 
+				<var>Function</var>, then <var>x</var> is simple data exactly
+				when <var>dtype(y)</var> does not contain the symbol <var>'['</var>, for <var>y = x</var>, and all subobjects <var>y</var> 
+				of <var>x</var>.
+			</p>			
+		</dd>
+	</dl>
+	<dl>
+		<dt>FData</dt>
+		<dd>
+			<dfn>FData</dfn> means the same thing as simple data, except subobjects (not the element itself)
+			may also be functions or getters/setters.
+			<p>
+				The author could not come up with a better term than <i>FData</i>.
+			</p>
+		</dd>
+	</dl>
+
+	<p class="display">
+		Warning! The results of <var>serializeFData()</var> can only be deserialized by finding
+		an approprite evaluator, which might be difficult when actually possible. 		
+	</p>
+	<p>
+		Well OK! See <a target="_blank" href="../01e-Parse-Data-String/Test.js">parseDataString Test.js file</a>
+		for serialization and deserialization of fdata. Go to the end of the file and look for 
+		<var>TestCircularFunctions()</var> and <var>TestCircularGets()</var>.
+	</p>
+	
+</section>		
+		
+<br><br><br><br><br>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

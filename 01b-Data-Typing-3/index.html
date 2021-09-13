@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">JavaScript: Quick Typing of Programmer Defined Classes</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../00-Commons/JSHTML.js"   type="text/javascript" id="script"></script>
+	<script src="../00-Scripts/typing.js"></script>	
+	<script src="test.js"></script>	
+	<script type="text/javascript">
+		window.addEventListener("load", function(){applyJSHTML();});
+	</script>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1>JavaScript: Quick Typing of Programmer Defined Classes<br>	
+</h1>
+<header id="header" style="margin-top:2em">	
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	meouzer@gmail.com</span>
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">
+		Yeah! I'm the snarky cat named Meouzer<br>
+		who does my best programming on browsers<br>
+		but after taking the internet down<br>
+		I gave a really big frown<br>
+		and said that's what happens I'm smozered<br> 	 
+		<cite style="margin-left: 28em">Meouzer</cite></div>
+</blockquote>
+
+<p>
+	See <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag">
+			Symbol.toStringTag
+		</a> at MDN,
+	which somehow just seems relevant since we actually use it.	
+</p>	
+
+<section>
+	<h2>Introduction</h2>
+	<p>
+		<i>User class</i> is short for <i>programmer defined class</i>. The <var>userType()</var> function will
+		type user classes, however it is slower than the <var>type()</var> function, which does not
+		type user classes (as of yet). For a user class <var>Baz</var>, <var>Symbol.toStringTag</var>
+		comes to the rescue in which by defining  <var>Symbol.toStringTag</var> as getter property of 
+		<span lang="en-us"></span>a class instance <var>x</var> in the constructor, we can make both <var>nativeType(x)</var> and 
+		<var>type(x)</var> evaluate to <var>"Baz"</var>.
+	</p>
+	<p>
+		There are two potential problems to ponder. 
+	</p>
+	<ol>
+		<li>
+			We already know that there is a problem in
+			distinguishing between a class instance <var>x</var> of <var>Baz</var>, and <var>y</var>
+			where <var>y.__proto__ = Baz.prototype</var> but <var>y</var> is not a class instance.
+			An example of such a <var>y</var> is <var>y = Object.create(Baz.prototype)</var>.
+			<ul>
+				<li>
+					We want to make sure that <var>nativeType(x)</var>, and <var>type(x)</var>
+					are both <var>"Baz"</var>, while <var>nativeType(y)</var> and <var>type(y)</var>
+					are both <var>"Object"</var>.
+				</li>
+			</ul>
+		</li>
+		<li>
+			Since the <var>Symbol.toStringTag</var> property of <var>x</var> is inherited, we need to make sure
+			the <var>nativeType</var> and <var>type</var> of elements deriving from <var>x</var> like 
+			<var>Object.create(x)</var> are both <var>"Object"</var>
+		</li>
+	</ol>
+</section>
+
+<section>
+	<h2>Quick Typing Example</h2>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			The makeTypeable() function
+		</header><div class="numberShield colorLightBurlywood"></div>	
+			
+			function makeTypeable(className)
+			{
+				return `Object.defineProperty(this, Symbol.toStringTag,
+				{
+					get:function()
+					{
+						return (this.__proto__ === ${className}.prototype)? 
+							'${className}':'Object';
+					}
+				});`
+			}	
+	
+			function Baz()
+			{
+				eval(makeTypeable('Baz'))	
+			}		
+			
+			const x = new Baz();
+			console.log(nativeType(x)); // "Baz"
+			console.log(nativeType(Baz.prototype)); // "Object"
+			console.log(nativeType(Object.create(baz.prototype))); // "Object"
+			console.log(nativeType(Object.create(x))); // "Object"
+			
+			console.log(type(x)); // "Baz"
+			console.log(type(baz.prototype)); // "Object"
+			console.log(type(Object.create(baz.prototype))); // "Object"
+			console.log(type(Object.create(x))); // "Object"
+
+			
+			<header class="codeSection">Expanded</header>
+			
+			// Line 7 above expands to lines 14-16 below
+			
+			function baz()
+			{
+				Object.defineProperty(this, Symbol.toStringTag,
+				{
+					get:function()
+					{
+						return (this.__proto__ === baz.prototype)? "baz":" Object";
+					}
+				});
+			}
+			 					
+	</div>
+
+	<p>
+		So <var>nativeType(x) === "Baz"</var> is definitive test on whether an element <var>x</var>
+		is a class instance of <var>Baz</var>. <var style="white-space:nowrap">type(x) === "Baz"</var> is another definitive
+		test.	
+	</p>
+
+</section>
+
+
+
+
+<br><br><br><br><br><br><br>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

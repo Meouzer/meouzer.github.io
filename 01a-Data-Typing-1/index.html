@@ -1,0 +1,1649 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">JavaScript Data Typing</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../00-Commons/JSHTML.js"   type="text/javascript" id="script"></script>	 
+	<script src="../00-Scripts/typing.js"></script> 
+	<script src="../00-Scripts/stringify.js"></script>	
+	<script src="Tests/Test-type.js"></script> 
+	<script src="Tests/Test-dtype.js"></script> 
+	<script src="Tests/Test-userType.js"></script> 
+	<script src="Tests/Test-isProgrammerClass.js"></script>
+		
+	<script type="text/javascript">
+		"use strict";
+		window.addEventListener("load", function() 
+		{
+			applyJSHTML();								 									
+		});
+		
+		
+							
+			/*
+			const fiiSymbol = Symbol("fiiSymbol")
+			
+			function fii()
+			{
+				this[fiiSymbol] = 1 ; 		
+			}
+			
+			Object.defineProperty(fii.prototype, Symbol.toStringTag,
+			{
+				get:function()
+				{
+					if(this[fiiSymbol] && this.__proto__ === fii.prototype) return "fii";
+					return "Object"; 
+				}
+			});		
+		
+		const x = new fii();
+		alert(nativeType(Object.create(x)));
+		*/
+		
+		/*get [Symbol.toStringTag]() 
+			{
+				if(this.__proto__ === foo.prototype) return 'foo';
+				return "Object"; 
+			}*/
+
+		
+		/*class fii
+		{
+			constructor()
+			{
+			}
+		}
+		
+		class Validator extends fii
+		{
+			//const idSymbol = Symbol("Validator");
+			static #ID_SYMBOL =  Symbol("Validator");
+			#idSymbol;
+					
+  			get [Symbol.toStringTag]() 
+  			{
+  				//if(this.__proto__ === Validator.prototype) 
+    			//	return 'Validator';
+    			//else return "Object";
+    			
+    			//const zzz = Symbol("testSymbol");
+    			//this[zzz] = "hello"
+    			//var S = Object.getOwnPropertySymbols(this);
+    			//alert(zzz in S);
+    			//alert(S.length);
+    			
+    			if(this.#idSymbol === Validator.#ID_SYMBOL)
+    				return "Validator"
+    			else return "Object"    			
+    		}
+  			
+  			constructor()
+  			{
+  				super();
+  				this.#idSymbol = Validator.#ID_SYMBOL;
+  				
+  				//var S = Object.getOwnPropertySymbols(this);
+  				//alert(hasOwnProperty("#idSymbol"))
+
+  			}
+  			
+  			
+  			//copy()
+  			//{
+  			//	const c = new Validator();
+  			//	c.#field = this.#field;
+  			//	return c;
+  			//}
+		}
+		
+		const x = new Validator();
+		alert(x.constructor === Validator);
+		alert(nativeType(x));
+		//alert(nativeType(Object.create(x)));
+		//alert(nativeType(Validator.prototype));
+
+		//const y = x.copy();
+		//alert(type(y));*/
+		
+		/*function ValidatorClass()
+		{		
+			Object.defineProperty(this, Symbol.toStringTag,
+			{
+				get:function()
+				{
+					if(this.__proto__ === ValidatorClass.prototype) 
+	    				return 'Validator';
+	    			else return "Object";
+    			}
+			}); 
+		} 		
+		const x = new ValidatorClass ();
+		alert(nativeType(x));
+		alert(nativeType(Object.create(x)));
+		alert(nativeType(ValidatorClass.prototype));*/
+				
+	</script>
+
+	<style type="text/css" id="style">	
+		div.codeBox.simple{background-color:rgb(255,245, 255);border-radius:20px; padding:1em;border:none}
+	</style>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1>
+	<span style="font-size:.9em">JavaScript Data Typing isn't as Simple as you Think</span><br>	
+	<i style="font-size:.7em">Think you know how to detect a String class instance? Well think again!</i><br>
+	<i style="font-size:.6em">Don't want to read the article? Well neither did our editors.</i><br>
+	<i style="font-size:.55em">Just show me the code <a target="_blank" href="../00-Scripts/typing.js">typing.js</a>. 
+		But our editors didn't want to look at that either.
+	</i>	
+</h1>
+<header  id="header" style="margin-top:2em">
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">
+		Classification cats' easy but Clasifacaiton JavaScrypt element's <br>diff9kult cuase JavaScrypt not writan by cats.	 
+		<cite style="margin-left: 28em">Meouzer</cite></div>
+</blockquote>
+
+<p class="display">
+	What about the provocative statement that the reader has no idea on how to detect a String? Well its true! 
+	You have no idea unless you have in great detail gone through some of the esoterics of JavaScript.	
+	See section <a href="#DetectingBuiltInClassInstances">Detecting Built in Class Instances</a>. <br><br>
+	
+	The fact that JavaScript doesn't provide such basic functionality as String detection or ArrayBuffer detection is evidence
+	that JavaScript has often gone down the wrong path in its youth. If JavaScript had been serious about data typing 
+	this sort of situation would never had happened. 
+</p>
+
+<section>
+	<h2>Introduction</h2>
+	<p>
+		It's a commonly expressed thought that JavaScript is classless. This may be the reason why JavaScript 
+		doesn't provide for typing class instances. 
+		As we shall see, JavaScript had the means
+		for full typing if the JavaScript architets had just been paying attention. That JavaScript needs 
+		robust typing like other languages should be obvious. If not, then consider the fact that it's only 
+		robust typing mechanisms that allow deep copying, serialization, and deserialization of complex JavaScript objects.
+	</p>
+	<p>
+		Since JavaScript lacks a robust typing system, we develop our own <var>type()</var> function. 
+		JavaScript has the <var>typeof</var> operator, but it only types primitives, functions,
+		and the general object category. It for example doesn't 
+		type <var>Booleans</var>, or any other built in class. What about 
+		the <var>instanceof</var> operator?  The problems with <var>instanceof</var> are enumerated.
+	</p>
+	<ol>
+		<li>
+			If you want to know the type of an element <var>x</var>, you have to test <var>x instanceof klass</var> 
+			against every built in class <var>klass</var>.
+		</li>
+		<li>
+			<var>instanceof</var> is preserved under derivations.
+			<ul>
+				<li>
+					if <var>x</var> is a <var>Boolean</var> then <var>x instanceof Boolean</var> is <var>true</var>.
+					So far so good. However, <var>y = Object.create(x)</var> derived from <var>x</var> is not a <var>Boolean</var>
+					yet <var>y instanceof Boolean</var> is also <var>true</var>. So <var>instanceof</var> can not distinguish between
+					<var>x</var>, which is a <var>Boolean</var>, and <var>y</var>, which is not a <var>Boolean</var>.
+				</li>
+			</ul>			
+		</li>
+		<li>
+			Even for mere testing, <var>instanceof</var>
+			fails. As we have seen, <var>y instanceof Boolean</var>  is not a test for <var>y</var> being <var>Boolean</var>.
+		</li>
+	</ol>
+	<p>
+		In conclusion, <var>instanceof</var> fails miserably as a full typing mechanism.
+	</p>
+</section>
+<section>
+	<h2>Specification of the type() Function</h2>
+	<p>
+		The specifcation of the <var>type()</var> function is given below.
+	</p>
+	<table class="web" style="margin-left:1em;">			
+		<thead>
+			<tr style="padding:.5em 0 .5em 0"><th colspan="2">The type() Type Function</th></tr>
+			<tr  style="padding:.5em 0 .5em 1em"><td>type(x)</td><td>x</td></tr>
+		</thead>
+		<tbody style="padding:.2em 1em .2em 1em">
+			<tr><th>"null"</th><td>A null primitive</td></tr>
+			<tr><th>"undefined"</th><td>An undefined primitive</td></tr>
+			<tr><th>"boolean"</th><td>A boolean primitive</td></tr>
+			<tr><th>"number"</th><td>A number primitive</td></tr>
+			<tr><th>"string"</th><td>A string primitive</td></tr>
+			<tr><th>"bigint"</th><td>A bigint primitive</td></tr>
+			<tr><th>"symbol"</th><td>A symbol primitive</td></tr>
+			<tr><th>"Date"</th><td>A class instance of Date </td></tr>
+			<tr><th>"RegExp"</th><td>A class instance of RegExp</td></tr>
+			<tr><th>"InternalError"</th><td>A class instance of InternalError</td></tr>
+			<tr><th>"Error"</th><td>A class instance of Error or proper cast to Error</td></tr>
+			<tr><th>"EvalError"</th><td>A class instance of Error or proper cast to Error</td></tr>			
+			<tr><th>"RangeError"</th><td>A class instance of RangeError or proper cast to RangeError</td></tr>
+			<tr><th>"ReferenceError"</th><td>A class instance of ReferenceError or proper cast to ReferenceError</td></tr>
+			<tr><th>"SyntaxError"</th><td>A class instance of SyntaxError or proper cast to SyntaxError</td></tr>
+			<tr><th>"TypeError"</th><td>A class instance of TypeError or proper cast to TypeError </td></tr>
+			<tr><th>"URIError"</th><td>A class instance of URIError or proper cast to URIError</td></tr>
+			<tr><th>"Number"</th><td>A class instance of Number</td></tr>
+			<tr><th>"String"</th><td>A class instance of String</td></tr>
+			<tr><th>"Boolean"</th><td>A class instance of Boolean </td></tr>
+			<tr><th>"Array"</th><td>A class instance of Array </td></tr>
+			<tr><th>"Arguments"</th><td>A function's argument list</td></tr>
+			<tr><th>"Function"</th><td>A function</td></tr>
+			<tr><th>"Int8Array"</th><td>A class instance of Int8Array</td></tr>
+			<tr><th>"Uint8Array"</th><td>A class instance of Uint8Array</td></tr>
+			<tr><th>"Uint8ClampedArray"</th><td>A class instance of Uint8ClampedArray</td></tr>
+			<tr><th>"Int16Array"</th><td>A class instance of Int16Array</td></tr>
+			<tr><th>"Uint16Array"</th><td>A class instance of Uint16Array</td></tr>					
+			<tr><th>"Int32Array"</th><td>A class instance of Int32Array</td></tr>
+			<tr><th>"Uint32Array"</th><td>A class instance of Uint32Array</td></tr>
+			<tr><th>"Float32Array"</th><td>A class instance of Float32Array</td></tr>
+			<tr><th>"Float64Array"</th><td>A class instance of Float64Array</td></tr>					
+			<tr><th>"ArrayBuffer"</th><td>A class instance of ArrayBuffer</td></tr>
+			<tr><th>"DataView"</th><td>A class instance of DataView</td></tr>
+			<tr><th>"Map"</th><td>A class instance of Map</td></tr>
+			<tr><th>"Set"</th><td>A class instance of Set</td></tr>
+			<tr><th>"WeakMap"</th><td>A class instance of WeakMap</td></tr>
+			<tr><th>"WeakSet"</th><td>A class instance of WeakSet</td></tr>
+			<tr><th>"Object"</th><td>All elements not previously categorized in this table. 
+				The complete list of such elements follows. The items overlap.
+				<ol>
+					<li style="margin-bottom:0;padding-left:1em">An instance of a built in class that is not a class instance</li>
+					<li style="margin-top:0;margin-bottom:0;padding-left:1em">A literal object</li>
+					<li style="margin-top:0;margin-bottom:0;padding-left:1em">A null object</li>
+					<li style="margin-top:0;margin-bottom:0;padding-left:1em" >A function prototype</li>
+					<li style="margin-top:0;margin-bottom:0;padding-left:1em">A member of another data type cast to Object.prototype</li>
+					<li style="margin-top:0; margin-bottom:0;padding-left:1em">A class instance or modification thereof of a programmer defined class</li>
+					<li style="margin-top:0; margin-bottom:0;padding-left:1em">A result of calling Object.create()</li>
+				</ol>						
+			</td></tr>
+		</tbody>
+		<tfoot>
+			<tr><td colspan="2">
+			<ol>
+				<li>IE11 does not define <var>Symbol</var>, <var>BigInt</var>, and <var>WeakSet</var></li>
+				<li>Edge does not define <var>BigInt</var></li>
+				<li>
+					<var>InternalError</var> is the only error class variant where the native type and method testing
+					behaves so badly that our function <var>typing()</var>, discussed later, fails to type <var>InternalErrors</var>. 
+					We will fix this oversight only if <var>InternalError</var> ever becomes standard. However, <var>userType()</var>
+					and <var>dtype()</var>, also developed later, both type <var>InternalErrors</var>.
+				</li>
+			</ol>		
+			</td></tr>
+		</tfoot>
+	</table>
+	<div class="display">	
+		<ol>
+			<li>If <var>x</var> is an member of a primitive data type then <var>type(x)</var> is the name of that primitive
+				data type.		
+			</li>
+			<li>
+				Otherwise, if <var>x</var> is a class instance of a built in class then <var>type(x)</var> is the name of that class.				
+			</li>
+			<li>Otherwise, if <var>x</var> is a host object then <var>type(x)</var> is the native type of <var>x</var></li>
+			<li>
+				Otherwise <var>type(x)</var> is <var>"Object"</var> (<var>x</var> must in fact be an object)
+			</li>
+			<li><var>type(x)</var> respects proper casting. See <a href="#ProperCasting">Proper Casting</a>.</li>
+		</ol>	
+	</div>
+	<p>The native type is discussed later.</p>	
+</section>
+
+<section>
+	<h2>On the Road to the Native Type</h2>
+	<p>
+		A <dfn>data type</dfn> is a named category of JavaScript elements. See 
+		<a target="_blank" href="https://en.wikipedia.org/wiki/Data_type">Wikipedia: Data Type</a> for more details.
+	</p>
+
+	<p class="display">
+		How easy is it to determine in code the JavaScript data type of an 
+		arbitrary element <var>x</var>? 
+		The fact of the matter is that there is no currently known means of determination. 
+	</p>
+	<p>
+		So we develop our own <var>type()</var> function, as seen in <a href="#TypeFunction">code listing 3</a>, that returns the types of the instances of the various 
+		JavaScript 
+		data types. It is based on arcane code, which shows just how far JavaScript went off into the deep end
+		of the theme <i>"Let's not support basic infrastructure if we don't want to because who's going to notice
+		anyway? Meouzer the snarky cat programming cat? Ha ha ha."</i> However, Meouzer gets the last laugh as he 
+		gently barbecues the JavaScript committee in the most delicious way possible.
+	</p>
+	<p>
+		The <var>typeof()</var> function is good only at distinguishing between primitives, functions, and the remaining objects. 
+		The remaining infrastructure supporting typing solely resides in the <var>instanceof</var> operator, which is object based. 
+		That's not good enough because JavaScript data types, except for some primitives, are classes and classes have another
+		idea for the concept of <i>instance</i>. It's therefore prudent to invent nomenclature to 
+		distinguish between object based instances and class based instances. 
+	</p>
+	<p>
+		JavaScript lands the first punch since the name of the <var>instanceof</var> operator should be respected.
+		If <var>x instanceof X</var> evaluates to <var>true</var> then <var>x</var> is an <dfn>instance</dfn> of the 
+		class/constructor <var>X</var>. What this means is that <var>x</var> derives from <var>X.prototype</var>.  
+	</p>
+	<p>
+		We get to land the second punch and define a <dfn>class instance</dfn> of a class/constructor <var>X</var>
+		to be an element <var>x</var> that is created by calling <var>X</var> with operator <var>new</var>. Exceptions are 
+		for the class/constructors <var>Symbol</var> and <var>BigInt</var> where use of <var>new</var> is not allowed.		
+		We define an <i><var>X</var> class instance</i> to be <i>a class instance of <var>X</var></i>.  
+		<u>Every built in class <var>Klass</var> is a JavaScript data type because it is by definition the set of all class instances
+		of its constructor and is therefore a named category of JavaScript objects.</u>	
+	</p>
+	<p>
+		For example, since <var>Object.create(Boolean.prototype)</var> derives from <var>Boolean.prototype</var> it 
+		is an instance of the <var>Boolean</var> class, but it's
+		not a <var>Boolean</var> class instance. Now <var>x = new Boolean(true)</var> is a <var>Boolean</var> class instance. Since <var>x</var> 
+		is a result of the constructor call, <var>x</var> automatically has signed the contract that the constructor
+		enforces and so is worthy of being called a <var>Boolean</var> class instance. 
+		Similarly <var>Symbol()</var> is a class instance of <var>Symbol</var>, and <var>BigInt(7)</var> is a
+		<var>BigInt</var> class instance.
+	</p>	
+	<p class="display">
+		Now this is very simple but worth emphasizing. Take any built in class such as <var>Boolean</var> and then ask the following
+		question. What is a <var>Boolean</var>? The only answer is that a <var>Boolean</var> is a class instance of <var>Boolean</var>.
+		For example, no one would call <var>Object.create(Boolean.prototype)</var> a <var>Boolean</var>, but everyone would call
+		<var style="white-space:nowrap">new Boolean(true)</var> a <var>Boolean</var>.
+	</p>
+	<p>
+		Before <var>BigInt</var> and <var>Symbol</var> came to be in ECMAScript-2015, you would laugh at the idea of a 
+		class constructor returning primitives. Yet now, <var>BigInt</var> and <var>Symbol</var> 
+		have decapitated their silly little heads by laughing so hard right back at you. Class instances of
+		<var>BigInt</var> and <var>Symbol</var> are primitives. OK! The inheritance article with good reason
+		argues that they are classes: but it could be wrong.
+	</p>
+	<div class="display">	
+		<p>
+			The <dfn>general type</dfn> of an object <var>x</var> is the name of the most derived built in class <var>Klass</var> for
+			which <var>x</var> is an instance of <var>Klass</var>. Then to determine if <var>x</var> is a class instance of 
+			<var>Klass</var> one may <dfn>method test</dfn> the instance. That means one uses a method of <var>Klass</var> that throws an exception
+			on instances that are not class instances. If <var>x</var> is a class instance of <var>Klass</var> then <var>type(x)</var>
+			should be <var>"Klass"</var>, but otherwise <var>x</var> is a mere instance and <var>type(x)</var> should be <var>"Object"</var>.
+			If there is no such built in class <var>Klass</var> for which x is an instance of, then <var>type(x)</var> should be
+			<var>"Object"</var>.	
+		</p>		
+		<p>
+			Determining the general type with <var>instanceof</var> is very 
+			inefficient since this involves testing <var>x instanceof Klass</var> against
+			every built in class <var>Klass</var>. Also method testing instances is 
+			inefficient since it involves throwing and catching exceptions.
+		</p>
+		<p>
+			Fortunately, there is a bit of arcane code involving the <i>native type</i> of an object that completely 
+			eliminates the 
+			need for <var>instanceof</var>. It also largely eliminates the need for method testing. 
+		</p>
+		<p style="text-align:left">
+		For any element <var>x</var>, <var>Object.prototype.toString.call(x)</var> is a string that takes
+		the form <var>"[object nativeType]"</var>. So we can extract the native type as follows.  
+		</p>
+		
+		<div id="div" class="codeBox simple centerTable">
+		
+				function nativeType(x) 
+				{
+					var str = Object.prototype.toString.call(x);			
+					return str.substring(8,str.length-1);
+				}			
+		</div>
+		<p>
+			In ECMAScript-2009, the arcane <var>nativeType()</var> is a near typing of JavaScript's data types. 
+			In fact, a simple wrapper around <var>nativeType()</var> provides full typing.
+		</p>
+		<p>
+			The JavaScript committee, probably because they are a committee who didn't take minutes in their
+			pre 2009 meetings, simply didn't realize how great the native type was, so from lack of attention to 
+			detail and not reading seven year old notes, and because they don't have cats, the committee seriously 
+			degraded the typing capabilities of <var>nativeType()</var> for ECMA-2015.  So more work is required to 
+			obtain a typing wrapper. Worst of all, 
+			method testing is required for the following data types:
+			<var>ArrayBuffer</var>, <var>DataView</var>, <var>Map</var>, <var>Set</var>, <var>WeakMap</var>, and <var>WeakSet</var>.
+			These data types are called the <dfn>quirk classes</dfn> because the native type behaves so badly when they are
+			involved.
+		</p>
+	</div>	
+	<p>
+		We won't mention it further, but <var>nativeType()</var> and <var>type()</var> both type the host objects.
+		For example <var>nativeType(window) = type(window) = "Window"</var> and 
+		<var>nativeType(document) = type(document) = "HTMLDocument"</var>. 
+	</p>
+</section>
+<section>
+	<h2>Coding the type() Function Yourself</h2>
+	<p>
+			First use <var>typeof()</var> to type the primitives. 
+			Then to type the built in classes use the following table.		
+		</p>
+		<p>
+			The instances column refers to <dfn>mere instances</dfn>, which are instances of the class but not
+			class instances of the class.
+		</p>
+		<style>
+				table#quirk td.ri{background-color: rgb(255,240,240);}
+				table#quirk td{font-style:italic}
+				table#quirk tbody.qrk td{background-color:rgb(240,240,255); font-style:italic}
+			</style>	
+			<table id="NativeTypesTable" class="web" id="quirk">
+				<thead>
+					<tr>
+						<th colspan="6">
+							Native Types of class instances, remaining instances, and the prototype<br>
+							<span style="font-size:.9em">(IE11 native type in red if different)<br>
+							(Edge native type in blue if different)</span><br>
+						</th>
+					</tr>
+				</thead>
+				<thead>
+					<tr><td>Group</td><td>Klass</td><td>Class instances</td><td>Klass.prototype</td><td>Instances</td>
+				</thead>
+				<tbody>
+					<tr>
+						<th rowspan="5">Group 1</th><th>Date</th><td>"Date"</td>
+						<td class="ri">"Object"</td><td class="ri">"Object"</td>		
+					</tr>
+					<tr><th>RegExp</th><td>"RegExp"</td><td class="ri">"Object"</td><td class="ri">"Object"</td></tr>			
+					<tr><th>Int8Array</th><td>"Int8Array"</td><td class="ri">"Object"</td><td class="ri">"Object"</td></tr>
+					<tr>
+						<th>Error</th>
+						<td>
+							"Error"</td><td class="ri">"Object"<br><span style="color:red">"Error"</span>
+							<span style="color:blue">"Error"</span>
+						</td>	
+						<td class="ri">"Object"</td>				
+					</tr>
+					<tr>
+						<th>RangeError</th>
+						<td>"Error"</td>
+						<td class="ri">
+							"Object"<br><span style="color:red">Error</span> <span style="color:blue">"Error"</span>
+						</td>
+						<td class="ri">"Object"</td></tr>
+				</tbody>
+				<tbody>
+					<tr>
+						<th rowspan="4">Group 2</th><th>Boolean</th><td>"Boolean"</td><td>"Boolean"</td>
+						<td class="ri">"Object"</td>
+					</tr>
+					<tr><th>Number</th><td>"Number"</td><td>"Number"</td><td class="ri">"Object"</td></tr>
+					<tr><th>String</th><td>"String"</td><td>"String"</td><td class="ri">"Object"</td></tr>			
+					<tr><th>Array</th><td>"Array"</td><td>"Array"</td><td class="ri">"Object"</td></tr>
+				</tbody>
+				<tbody>
+					<tr>
+						<th rowspan="2">Primitve Class</th><th>Symbol</th><td>"Symbol"</td><td>"Symbol"</td><td>"Symbol"</td>							
+					</tr>
+					<tr><th>BigInt</th><td>"BigInt"</td><td>"BigInt"</td><td>"BigInt"</td>				
+				</tbody>	
+				<tbody class="qrk">
+					<tr>
+						<th rowspan="6">Quirk Classes</th><th>ArrayBuffer</th><td>"ArrayBuffer"</td><td>"ArrayBuffer"</td><td>"ArrayBuffer"</td>
+					</tr>
+					<tr>
+						<th>DataView</th>
+						<td>"DataView"<br><span style="color:red">"Object"</span></td>
+						<td>"DataView"<br><span style="color:red">"Object"</span></td>
+						<td>"DataView"<br><span style="color:red">"Object"</span></td>					
+					</tr>
+					<tr>
+						<th>Set</th>
+						<td>"Set"<br><span style="color:red">"Object"</span></td>
+						<td>"Set"<br><span style="color:red">"Object"</span></td>
+						<td>"Set"<br><span style="color:red">"Object"</span></td>
+					</tr>
+					<tr>
+						<th>Map</th>
+						<td>"Map"<br><span style="color:red">"Object"</span></td>
+						<td>"Map"<br><span style="color:red">"Object"</span></td>
+						<td>"Map"<br><span style="color:red">"Object"</span></td>
+						</tr>
+					<tr><th>WeakSet</th><td>"WeakSet"</td><td>"WeakSet"</td><td>"WeakSet"</td></tr>
+					<tr>
+						<th>WeakMap</th>
+						<td>"WeakMap"<br><span style="color:red">"Object"</span></td>
+						<td>"WeakMap"<br><span style="color:red">"Object"</span></td>
+						<td>"WeakMap"<br><span style="color:red">"Object"</span></td>
+						</tr>
+				</tbody>
+				<tfoot>
+					<tr><th></th><td style="background-color:yellow" colspan="5">Int8Array is representative of all typed arrays.</td></tr>
+					<tr><th></th><td style="background-color:yellow" colspan="5">RangeError is 
+					representative of all error classes other than Error.</td></tr>
+					<tr><th></th><td style="background-color:yellow" colspan="5">IE11 does not define 
+					Symbol, BigInt, and WeakSet.</td></tr>
+					<tr><th></th><td style="background-color:yellow" colspan="5">Edge does not define BigInt</td></tr>
+					<tr><th></th><td style="background-color:yellow" colspan="5">
+						The JavaScript committee and Microsoft together nearly made full typing impossible 
+						by the design of the native type 
+						for these classes. Only by sheer luck does method testing work for these classes,
+						and so we barely escape living in a world without typing and infrasctruture that
+						results from typing such as copying and deep copying. 
+						</td></tr>
+				</tfoot>
+			</table>
+			<p class="display">
+				Believe it or not, you now have everything you need to code <var>type()</var>.	
+				There are three pertinent class entities to deal with: class instances, mere instances (which are instances
+				but not class instances), and the class prototype.
+				The <var>type()</var> function should map built in class instances to the name of the class, while mapping mere instances
+				and the class prototype to <var>"Object"</var>. Explanatory examples follow.			
+			</p>
+			<p>
+				For the <var>Int8Array</var> class, <var>nativeType()</var> works perfectly as it yields the type
+				across class instances, the class prototype, and mere instances: <var>nativeType(x) = "int8Array" = type(x)</var>
+				if <var>x</var> is a class instance, but <var>nativeType(x) = "Object" = type(x)</var> if <var>x</var>
+				is a mere instance or the prototype <var>Int8Array.prototype.</var>
+			</p>
+			<p>
+				For the <var>Boolean</var> class, <var>nativeType()</var> fails to distinguish between class instances 
+				and the prototype. If <var>x</var> is a <var>Boolean</var> class instance then 
+				<var>nativeType(x)</var> and <var>nativeType(Boolean.prototype)</var> are both <var>"Boolean"</var>.
+				However, <var>type()</var> code can simply ask if <var>x</var> is the prototype and if so return
+				<var>"Object"</var>.
+			</p>
+			<p>
+				For the <var>Symbol</var> class, all class instances <var>x</var> are primitives with <var>typeof(x)</var> being
+				<var>"symbol"</var>, which <var>type(x)</var> returns.  When <var>type()</var> sees that the native type
+				of some element <var>x</var> is <var>"Symbol"</var>, <var>type()</var> knows that <var>x</var> is either 
+				<var>Symbol.prototype</var> or a mere instance of <var>Symbol</var>, whence <var>"Object"</var>
+				is returned.
+			</p>
+			
+			<p>The native type significantly degrades for the Quirk classes of ECMA-2015.</p>
+			<p style="margin-left:2em">
+				For the <var>ArrayBuffer</var> class, <var>nativeType(x)</var> fails to distinguish between
+				class instances, mere instances, and the class prototype: you always get <var>"ArrayBuffer"</var>
+				for the native type. The <var>type()</var> function can again just ask if <var>x</var> is the prototype
+				to return <var>"Object"</var>. Then we need to distinguish between class instances of <var>ArrayBuffer</var>
+				and mere instances of <var>ArrayBuffer</var>: this is done through method testing. <var>x.byteLength</var>
+				will throw an exception if <var>x</var> is a mere instance, in which case <var>type()</var> returns <var>"Object"</var>.
+				Otherwise <var>type()</var> returns <var>"ArrayBuffer"</var>.
+			</p>
+			<p style="margin-left:2em">
+				The other quirk classes follow a discussion similar to that for <var>ArrayBuffer</var> except in IE11.
+				In IE11 the trick that works is to use method testing as before but replacing <var>nativeType(x)</var>
+				with <var>x.__proto__.constructor.name</var>. Another near escape!				
+			</p>
+			<p>
+				The reader is invited to investigate what <var>type()</var> should do for the eight error classes.
+			</p>
+			<p>
+				OK! You are ready to have some real fun by coding <var>type()</var> yourself. If you don't have the time
+				and just want to enjoy the show, then read on.
+			</p>
+
+</section>
+<section>
+	<h2>The Built in Type Function typeof()</h2>
+	<p>
+		The <var>typeof()</var> function/operator is a good start on the road to the <var>type()</var> function.
+	</p>
+	<table class="web">
+		<thead>
+			<tr><th colspan="3">Data Types Recognized by the typeof Operator</th></tr>
+			<tr><th style="white-space:nowrap">Primitive Data Type</th><td>Categorization</td><td>Test <var>x</var> for Membership</td></tr>
+		</thead>
+			<tbody>
+				<tr><th>null</th><td>The literal <var>null</var> or variable set to such</td><td><var>x === null</var></td></tr>
+				<tr><th>undefined</th><td>The literal <var>undefined</var> or variable set to such
+					<td><var>typeof(x) == "undefined"</var></td></tr>
+				<tr><th>boolean</th><td>The literals <var>true</var>, <var>false</var> or variable set to such</td>
+					<td><var>typeof(x) == "boolean"</var></td></tr>
+				<tr><th>number</th><td>A literal number or variable set to such<td><var>typeof(x) == "number"</var></td></tr>
+				<tr><th>string</th><td>A literal string or variable set to such<td><var>typeof(x) == "string"</var></td></tr>
+				<tr><th>BigInt</th><td>A literal BigInt or variable set to such. <br>Or a class instance of BigInt<td><var>typeof(x) == "bigint"</var></td></tr>
+				<tr><th>Symbol</th><td>A class instance of Symbol<td><var>typeof(x) == "symbol"</var></td></tr>
+			</tbody>
+		<thead>			
+			<tr><th style="white-space:nowrap">Object Data Type</th><td>Categorization</td><td>Test <var>x</var> for Membership</td></tr>			
+		</thead>
+		<tbody>
+			<tr><th>function</th><td>A function</td><td><var>typeof(x) == "function"</var></td></tr>
+			<tr><th>object</th><td>An object</td><td><var>typeof(x) == "function" || <br> typeof(x) == "object"</var></td></tr>
+		</tbody>	
+	</table>
+	<p>
+		The <var>typeof</var> operator recognizes nine data type which are all inclusive: every element must be of one
+		of these data types. They are mutually exclusive except for function and object because the latter contains
+		the former.
+	</p>
+	<p>
+		There are two object data types: <dfn>object</dfn>, and <dfn>function</dfn>, 
+		which respectively refer to the set of all objects and the set of all functions	
+		Every function is in fact an object, so function is more specified than object. With these two additions, 
+		<var>typeof</var> is a typing
+		function of the nine data types: it will return the most specific of the nine data types of an element. 			
+	</p>
+	<p style="margin-left:2em">
+		If <var>x</var> is a function then <var>typeof(x)</var> is <var>"function"</var>. However, if <var>x</var> is an object
+		that is not a function then <var>typeof(x)</var> is <var>"object"</var>. 
+	</p>
+</section>
+
+<section>
+	<h2>Typing with nativeType() in ECMAScript-2009</h2>
+	<p>
+		In ECMAScript-2009, the arcane <var>nativeType()</var> is a near typing of JavaScript's data types. 
+		In fact, a simple wrapper
+		<var>otype()</var> around <var>nativeType()</var> provides full typing.
+	</p>		
+	<section>
+		<h3>Typing with otype()</h3>
+		<p>
+			The <var>oType(x)</var> function gives the "original type" of its argument <var>x</var>, which is determined
+			at definition of <var>x</var>. Nothing, including atomic explosions, or change 
+			of the internal prototype of <var>x</var> can change the value of <var>oType(x)</var>. 
+		</p>
+
+		<div class="codeBox colorLightPink rounded">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				The otype() Function
+			</header>		
+			 	
+		 	function otype(x)
+		    {
+		        if (x === null) return null;
+		        if (typeof(x) != 'object' &amp;&amp; typeof(x) != 'function') return typeof (x);		
+		        var t = nativeType(x);		        					     
+		        if(t == "Arguments") return t; 		        	
+				return (x == window[t].prototype)? "Object" : t;			        
+		    } 	
+		    <p style="margin-left:1em">
+		    	If you want otype(x) to be "Object" when x is the argument list of a function then delete
+		    	the line referencing "Arguments".	   
+		    </p>			    
+		    <table class="web" style="margin-left:1em">			
+				<thead>
+					<tr style="padding:.5em 0 .5em 0"><th colspan="2">The otype() Type Function for ECMAScript-2009</th></tr>
+					<tr style="padding:.5em 0 .5em 1em"><td>otype(x)</td><td>x at time of definition</td></tr>
+				</thead>
+				<tbody  style="padding:.2em 0 .2em 1em">
+					<tr><th>"null"</th><td>a null</td></tr>
+					<tr><th>"undefined"</th><td>an undefined</td></tr>
+					<tr><th>"boolean"</th><td>a boolean</td></tr>
+					<tr><th>"number"</th><td>a number</td></tr>
+					<tr><th>"string"</th><td>a string</td></tr>
+					<tr><th>"Date"</th><td>a class instance of Date </td></tr>
+					<tr><th>"RegExp"</th><td>a class instance of RegExp</td></tr>
+					<tr><th>"Error"</th><td>a class instance of Error</td></tr>
+					<tr><th>"Number"</th><td>a class instance of Number</td></tr>
+					<tr><th>"String"</th><td>a class instance of String</td></tr>
+					<tr><th>"Boolean"</th><td>a class instance of Boolean </td></tr>
+					<tr><th>"Array"</th><td>a class instance of Array </td></tr>
+					<tr><th>"Arguments"</th><td>a function's argument list</td></tr>
+					<tr><th>"Function"</th><td>a function</td></tr>
+					<tr><th>"Object"</th><td>
+						All elements not previously categorized in this table. 
+					The complete list of such elements follows. The items overlap.
+							<ol>
+								<li style="margin-top:1em;margin-bottom:0;padding-left:1em">An instance of a built in class 
+								that is not a class instance</li>
+								<li style="margin-top:0;margin-bottom:0;padding-left:1em">A literal object</li>
+								<li style="margin-top:0;margin-bottom:0;padding-left:1em">A null object</li>
+								<li style="margin-top:0;margin-bottom:0;padding-left:1em" >A function prototype</li>
+								<li style="margin-top:0; margin-bottom:0;padding-left:1em">A class instance or modification thereof of a programmer defined class</li>
+								<li style="margin-top:0; margin-bottom:0;padding-left:1em">A result of calling Object.create()</li>
+							</ol>
+					</td></tr>
+				</tbody>
+			</table>		
+			<p style="margin-left:1em">
+				For example, <var>otype(x)</var> is <var>"Error"</var> precisely when <var>x</var> is 
+				originally defined as an
+				<var>Error</var>
+				class instance. 
+			</p>
+			<p style="margin-left:1em">
+				A modification of a class instance of a class X may no longer be a class instance of X. 
+			</p>					
+		</div>
+		<p>			
+			During the reign of ECMAScript-2009, <var>nativeType()</var> and consequently its wrapper <var>otype()</var>
+			were immutable, meaning that there was nothing one could do to change the value of <var>nativeType(x)</var>
+			or <var>otype(x)</var> for any element <var>x</var>. 
+		</p>			
+	</section>	
+	<section>
+		<h3>Typing with ctype()</h3>
+		<p>
+			We want to modify <var>otype()</var> so that it respects proper casting: see <a href="#ProperCasting">Proper Casting</a>.
+			If <var>x</var> is a built in class
+			instance then the only proper cast of <var>x</var> is <var>x.__proto__ = Object.prototype</var>. This cast is
+			easy to detect and so <var>ctype()</var> is a barely visible modification of <var>otype()</var>.
+		</p>
+		<div class="codeBox colorLightPink rounded">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				The ctype() Function
+			</header>		
+		 	
+		 	function ctype(x)
+		    {
+		        if (x === null) return "null";
+		        if (typeof (x) != 'object' &amp;&amp; typeof (x) != 'function') return typeof (x);		
+		        const t = nativeType(x);		        					     
+		        if(t == "Arguments") return t;		        	
+				return (x == window[t].prototype || 
+				x.__proto__ == Object.prototype)? "Object" : t;			        
+		    } 	
+		    <p style="margin-left:1em;margin-right:1em">
+		    	If you want ctype(x) to be "Object" when x is the argument list of a function then delete
+		    	the line referencing "Arguments".	   
+		    </p>			    
+		    <table class="web" style="margin-left:1em;">			
+				<thead>
+					<tr style="padding:.5em 0 .5em 0"><th colspan="2">The ctype() Type Function for ECMAScript-2009</th></tr>
+					<tr  style="padding:.5em 0 .5em 1em"><td>ctype(x)</td><td>x</td></tr>
+				</thead>
+				<tbody style="padding:.2em 0 .2em 1em">
+					<tr><th>"null"</th><td>a null</td></tr>
+					<tr><th>"undefined"</th><td>an undefined</td></tr>
+					<tr><th>"boolean"</th><td>a boolean</td></tr>
+					<tr><th>"number"</th><td>a number</td></tr>
+					<tr><th>"string"</th><td>a string</td></tr>
+					<tr><th>"Date"</th><td>a class instance of Date </td></tr>
+					<tr><th>"RegExp"</th><td>a class instance of RegExp</td></tr>
+					<tr><th>"Error"</th><td>a class instance of Error</td></tr>
+					<tr><th>"Number"</th><td>a class instance of Number</td></tr>
+					<tr><th>"String"</th><td>a class instance of String</td></tr>
+					<tr><th>"Boolean"</th><td>a class instance of Boolean </td></tr>
+					<tr><th>"Array"</th><td>a class instance of Array </td></tr>
+					<tr><th>"Arguments"</th><td>a function's argument list</td></tr>
+					<tr><th>"Function"</th><td>a function</td></tr>
+					<tr><th>"Object"</th><td>All elements not previously categorized in this table. 
+					The complete list of such elements follows.
+							<ol>
+								<li style="margin-bottom:0;padding-left:1em">An instance of a built in class that is not a class instance</li>
+								<li style="margin-top:0;margin-bottom:0;padding-left:1em">A literal object</li>
+								<li style="margin-top:0;margin-bottom:0;padding-left:1em">A null object</li>
+								<li style="margin-top:0;margin-bottom:0;padding-left:1em" >A function prototype</li>
+								<li style="margin-top:0;margin-bottom:0;padding-left:1em">A member of another data type cast to Object.prototype</li>
+								<li style="margin-top:0; margin-bottom:0;padding-left:1em">A class instance or modification thereof of a programmer defined class</li>
+								<li style="margin-top:0; margin-bottom:0;padding-left:1em">A result of calling Object.create()</li>
+							</ol>						
+					</td></tr>
+				</tbody>
+			</table>		
+		</div>
+		<p>
+			As noted, <var>ctype()</var> respects (proper) casting.  For example, 
+			if <var>x = new Boolean(true)</var> and <var>x</var> is cast to <var>Object</var>, then
+			<var>ctype(x)</var> is <var>"Object"</var>. If instead <var>x</var> were cast to <var>Number</var>
+			then <var>ctype(x)</var> does not become <var>"Number"</var> nor is it required to do so since the
+			cast is improper. No programmer ever has the rational
+			to make an improper cast because doing so always results in a broken instance. 
+			<var>ctype()</var> has every right to do whatever it wants with improper
+			casting. What <var>ctype()</var> actually does is to simply ignore improper casting. So the <var>ctype</var>
+			of a <var>Boolean</var> cast to <var>Number</var> remains <var>"Boolean"</var>.  
+		</p>
+		<p>
+			Warning: <var>otype()</var> and <var>ctype()</var> are created for ECMA-2009. You can still use them today 
+			but must be aware that both will return erroneous information, in a browser specific way, for instances 
+			and prototypes of the ECMA-2015 quirk classes. 
+		</p>
+		<p style="margin-left:2em">
+			For example even today, the test <var>ctype(x) == "String"</var> 
+			is a valid detection test for Strings, and	the test <var>ctype(x) == "Int8Array"</var>	is a valid detection
+			test for Int8Arrays even though Int8Array is a ECMA-2015 class.	
+		</p>
+		<p style="margin-left:2em">
+			However, the test test <var>ctype(x) == "Set"</var> is not a valid detection set for Sets, because <var>Set</var> is
+			a quirks class. For instance, in Firefox if <var>x</var> is <var>Object.create(Object.create(Set.prototype))</var> then
+			<var>ctype(x)</var> is <var>"Set"</var> even though <var>x</var> is not a class instance of <var>Set</var>.
+		</p>
+	</section>			
+</section>
+<section>
+	<h2><a id="DetectingBuiltInClassInstances">Detecting Built in Class Instances</a></h2>
+	<p class="display">
+		Impress your friends. Ask them how to test if an element <var>x</var> is a <var>String</var>.
+		They will surely tell you to use the <var>instanceof</var> operator. You can then amaze them by telling them that
+		they are dead wrong. You can then doubly amaze them by telling them that they will never find a correct test.<br><br>
+		Look at the <var>isKlass()</var> functions in <a target="_blank" href="../00-Scripts/typing.js">typing.js</a>
+		and in particular look at the <var>isString()</var> function for the very best test for detecting a <var>String</var>
+		class instance.
+	</p>
+	<p style="text-align:left">
+		By now the reader knows that a <var>String</var> and a class instance of <var>String</var> are synonymous. Also 
+		by now the reader knows the expression <var>x instanceof String</var> is useless because if it evaluates to true
+		all you know is that <var>x</var> derives from <var>String.prototype</var>. For example <var>x instanceof String</var> 
+		evaluates to true if <var>x</var> is <var>Object.create(Object.create(String.prototype))</var>,
+		which certainly isn't a <var>String</var>. Here <var>x</var> is two degrees from <var>String.prototype</var>. 
+	</p>
+	<p>
+		Closely examining the <var>isKlass()</var> functions, the <a href="#NativeTypesTable">Native Types table</a>, and the
+		<var>QuirksInstance</var> object which provides
+		method testing for detection of class instances of the quirks classes, should help prepare you for the next section.
+	</p>		
+</section>
+<section>
+	<h2 id="TypeFunction">A Direct but Grungy Way to Code the type() Function</h2>
+	<p>
+		ECMA-2015 adds quite a number of new built in classes. If the native type was handled as it was in ECMA-2009,
+		then the <var>ctype()</var> function or a mild modification of it would work out of the box to provide full typing.
+		However, instead the typing capabilities of the native type were so seriously degraded we end up with a 
+		somewhat complicated typing function, even though it is short.
+	</p>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			The type_grungy() Function<br>
+		</header><div class="numberShield "></div>
+		
+		function type_grungy(x) 
+	    {
+	        if (x === null) return "null";
+	        if (typeof(x) != 'object' &amp;&amp; typeof(x) != 'function') return typeof(x);
+	        
+	        const t = nativeType(x);
+	        if(t == "Arguments") return t;
+	        
+	        if(x == window[t].prototype || x.__proto__ == Object.prototype 
+	        	|| x.__proto__ == undefined || t == "BigInt" || t == "Symbol") 
+	        	return "Object";        
+	        
+	        if (t == "Error") return (x == x.constructor.prototype)? 
+	        	"Object" : x.__proto__.constructor.name; 
+	        
+	        if(QuirksInstance[t]) return QuirksInstance[t](x)? t : "Object";        
+	        
+	        	// For IE11
+	        	const ct = x.__proto__.constructor.name;
+	        	if(QuirksInstance[ct]) return QuirksInstance[ct](x)? ct : "Object";
+	        
+	        return t;
+	    } 
+	    
+		const QuirksInstance = 
+		{
+			ArrayBuffer:function (x) {
+				try { ArrayBuffer.prototype.slice.call(x,0,0)}
+				catch (e) { return false; }	// x is a mere instance of ArrayBuffer	
+				return true; // x is a class instance of ArrayBuffer
+			},
+			DataView: function (x) {
+					try { DataView.prototype.getUint8.call(x,0)}
+					catch (e) { return false;}		
+					return true;
+			},			
+			Map: function (x) {
+				try { Map.prototype.has.call(x,{})}
+				catch (e) {	return false; }		
+				return true;
+			},			
+			Set:function (x) {
+				try {Set.prototype.has.call(x,{});}
+				catch (e) {	return false;}		
+				return true;
+			},				
+			WeakMap:function(x)
+			{
+				try { WeakMap.prototype.has.call(x,"key"); }
+				catch (e) { return false; }		
+				return true;
+			},			
+			WeakSet:function(x){
+				try {WeakSet.prototype.has.call(x,"value");}
+				catch (e) { return false;}		
+				return true;
+			}				
+		}	
+	    			
+	</div>	
+	<section>
+		<h3>Explanation of type_grungy() Code</h3>
+		<p>
+			Lines 2 and 3 return the recognized types of the primitives. It is a mistake by JavaScript that
+			<var>typeof(null)</var> is <var>"object"</var> because <var>null</var> is a primitive, not an object.
+			Thus we have to set the type of <var>null</var> to <var>"null"</var> by hand. Also of particular note,
+			if <var>x</var> is a class instance of <var>Symbol</var> or <var>BigInt</var> then <var>x</var> is a primitive
+			and <var>"symbol"</var> and <var>"bigint"</var> are respectively returned.
+		</p>
+		<p>
+			Starting on line 4 we know <var>x</var> is an object. If JavaScript had not engaged is so much ad-hoc
+			randomness, we would just be able to return the native type.
+		</p>
+		<p>
+			On line 5, <var>"Arguments"</var> is returned if <var>x</var> is the 
+			argument list of a function. If instead you prefer <var>"Object"</var> to be returned then delete line 5.
+		</p>
+		<p>
+			Lines 6-8 checks for special cases where <var>"Object"</var> should be returned. The native type often does 
+			not distinguish between a class instance and the prototype: so if <var>x</var> is the prototype, <var>"Object"</var>
+			is returned. Next if <var>x</var> has been cast to <var>Object.prototype</var> the cast is respected by
+			returning <var>"Object"</var>. If the <var>__proto__</var> attribute is <var>undefined</var> then <var>x</var> is a null
+			object and <var>"Object"</var> is returned. Now if the native type is <var>"BigInt"</var> or <var>"Symbol"</var>
+			then <var>x</var> is an instance of <var>BigInt</var> or <var>Symbol</var> but not a class instance, 
+			whence <var>"Object"</var> is returned.
+		</p>
+		<p>
+			For lines 9 and 10, if the native type is <var>"Error"</var> then necessarily <var>x</var> is a class instance
+			or the prototype of one of the following classes: <var>Error</var>, <var>EvalError</var>, <var>InternalError</var>,
+			<var>RangeError</var>, <var>ReferenceError</var>, <var>SyntaxError</var>, <var>TypeError</var>, or <var>URIError</var>.
+			If <var>x</var> is a prototype return <var>"Object"</var>. Otherwise return the name of the class as determined
+			by the name of the constructor.		
+		</p>
+		<p>
+			Consider line 11 outside IE11. If <var>QuirksInstance[t]</var> is defined then the nativeType <var>t</var>
+			corresponds to a quirk class, say <var>Set</var>. For <var>Set</var>, class instances, mere instances, and
+			the prototype all have <var>"Set"</var> as the native type.
+			The possibility that <var>x</var> is <var>Set.prototype</var> was weeded out on line 6. The method
+			test <var>QuirksInstance["Set"](x)</var> returns true if <var>x</var> is a class instance of <var>Set</var>
+			but <var>false</var> is <var>x</var> is a mere instance of <var>Set</var>. Thus line 11 returns
+			<var>"Set"</var> or <var>"Object"</var> depending on whether <var>x</var> is a class instance or a mere instance. 
+			This discussion applies to the other quirk classes including <var>ArrayBuffer</var>.
+		</p>
+		<p>
+			Consider IE11. All possibilities for the quirks class <var>ArrayBuffer</var> have been taken care of on
+			lines 6 and 11 as the nativeType works with <var>ArrayBuffer</var> like it does with the other browsers. 
+			Let's take a look at the quirk class <var>Set</var>. Class instances of <var>Set</var>, mere instances of
+			<var>Set</var>, and <var>Set.prototype</var> all have native type <var>"Object"</var>. If <var>x</var> is
+			<var>Set.prototype</var> then code falls through line 13 so that <var>"Object"</var> is returned on line 14.
+			If <var>x</var> is a <var>Set</var> class instance then <var>ct</var> is <var>"Set"</var>, and on
+			line 13 <var>x</var> passes the method test so <var>ct = "Set"</var> is returned. If <var>x</var> is a mere
+			<var>Set</var> instance then either method testing fails on line 13 and <var>"Object"</var> is returned or
+			code falls through line 13 and <var>"Object"</var> is returned on line 14. 		
+		</p>
+		<p>
+			Oh by the way! Line 11 can be deleted. Can you figure out why?
+		</p>		
+	</section>
+</section>	
+<section>
+	<h2>The Official Way to Code the type() Function</h2>
+	<p>
+		By direct coding of the <var>type()</var> function we mean that no prototyping is involved.
+		For other direct ways of coding <var>type()</var> see 
+		<a href="#Other-Ways">Other Ways to Code type()</a>. Direct ways are necessarily complicated because
+		the native type behaves so badly in EMCA-2015. 
+		Do this and do that, test this and test that, and yada yada yada it's a <var>Boolean</var>.
+		Typing built in class instances
+		is too slow. By prototyping, most of the complexities go away, while <var>Booleans</var>,
+		<var>ArrayBuffers</var> and the other built in class instances are quickly recognized as are 
+		the other objects derived from the built in class prototypes. Host objects are also quickly
+		typed. So the whole world is quickly typed.		 
+	</p>
+	<p>
+		We for example don't create a <var>Boolean.prototype.type()</var> function because the name  <i>type</i> 
+		could easily conflict with other libraries. Instead we prototype a Symbol. The symbol is <var>typeSymbol = Symbol("type")</var>
+		and  <var>Boolean.prototype[typeSymbol]()</var> is the function that types all objects
+		derived from <var>Boolean.prototype</var>. Do this for all the other built in classes.
+		Then the <var>type()</var> function will wrap all the prototyped versions. 		
+	</p>
+	<p>
+		The <var>type()</var> function is then especially simple.
+	</p>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			The type() Function<br>
+			(from <a target="_blank" href="../00-Scripts/typing.js">typing.js</a>)
+		</header><div class="numberShield colorLightBlue" ></div>
+			
+		function type(x)
+		{
+			if (x === null) return "null";
+		    if (typeof(x) !== 'object' &amp;&amp; typeof(x) !== 'function') return typeof (x);
+			if(x.__proto__ === undefined) return "Object";	// handle null objects	
+			return x[typeSymbol](); // handle standard objects
+		}
+
+	</div>
+	<p>
+		Let's now see how prototyping <var>typeSymbol</var> goes with some examples.
+	</p>
+	<p>Simply refer to the native type table for <var>Booleans</var> to get the following code.</p>
+	<div class="codeBox simple">	
+		Object.defineProperty(Boolean.prototype, typeSymbol,
+		{
+			value:function()
+			{
+				if(this === Boolean.prototype) return "Object";
+				return nativeType(this);			
+			}
+		}); 
+		<p>
+			nativeType() types correctly for mere instances and class instances of the Boolean class.
+			However, nativeType() incorrectly types Boolean.prototype. 
+		</p>
+	</div>
+	
+	<div class="codeBox simple">	
+		Object.defineProperty(RegExp.prototype, typeSymbol,
+		{
+			value:function()
+			{
+				return nativeType(this);   			
+			}
+		}); 
+		<p>
+			nativeType() correctly types RegExp.prototype, class instances of RegExp and mere instances
+			of RegExp. 
+		</p>
+	</div>
+
+	<div class="codeBox simple">	
+		Object.defineProperty(URIError.prototype, typeSymbol,
+		{
+			value:function()
+			{
+				if(this === URIError.prototype) return "Object";
+				return nativeType(this) === "Error"? "URIError":"Object";	  			
+			}
+		}); 
+		<p>
+			nativeType() incorrectly types URIError.prototype. An instance of
+			URIError is a class instance of URIError precisely when the
+			native type is "Error".
+		</p>
+	</div>
+	<div class="codeBox simple">	
+		Object.defineProperty(BigInt.prototype, typeSymbol,
+		{
+			value:function()
+			{
+				if(typeof(this) === "bigint") return "bigint";
+				return "Object";					
+			}
+		}); 
+		<p>
+			Return "bigint" precisely when a primitive. 
+			Otherwise, its an object and "Object" is returned. 
+		</p>
+	</div>
+
+	<div class="codeBox simple">	
+		Object.defineProperty(Map.prototype, typeSymbol,
+		{
+			value:function()
+			{
+				if(this === Map.prototype) return "Object";
+				try {Map.prototype.has.call(this,{}) } catch (e) { return "Object"; }	
+				return "Map";			
+			}
+		});
+		<p>
+			The native type incorrectly types Map.prototype.
+			The native type also incorrectly types class
+			instances and mere instances. So we method test.
+			An exception is thrown precisely when a mere instance.			 
+		</p>
+	</div>
+
+	<div class="codeBox simple">	
+		Object.defineProperty(Object.prototype, typeSymbol,
+		{
+			value:function()
+			{
+				return nativeType(this);		
+			}
+		});
+		<p>
+			The default implementation of typeSymbol. It does the
+			right thing for host objects, and the remaining standard
+			objects that don't derive from a built in class
+			prototype.	 
+		</p>
+	</div>
+
+
+</section>
+<section>
+	<h2><a id="userType">The userType() Function: Another way to code type()</a></h2>	
+	<p>Here the user is the programmer.</p>
+	<p>	
+		The <var>userType()</var> function is basically equivalent to the <var>type()</var> function. Here's the comparison.
+		The call <var>userType(x)</var> will insure <u>proper</u> user/programmer defined data types are returned if found.
+		Otherwise the calls <var>userType(x)</var> and <var>type(x)</var> return the same value. 		
+	</p> 
+	<div class="display">	
+		<p>
+			A <dfn>proper class/constructor</dfn> is a class <var>Klass</var> for which <var>Klass.prototype.constructor</var> is <var>Klass</var>.
+			A <dfn>proper prototype</dfn> is a prototype <var>P</var> for which <var>P = P.constructor.prototype</var>.
+		</p>
+		<p style="margin-left:2em">
+			User defined derived classes tend not to be proper because the programmer usually doesn't bother to correctly set
+			the constructor.
+		</p>
+		<p style="margin-left:2em">
+			If the programmer doesn't bother to make some user class <var>Klass</var> proper by setting 
+			<var>Klass.prototype.constructor = Klass</var>, then some code in our library may not work as 
+			the programmer expects. Basically, improper classes are ignored. 
+		</p>
+
+	</div>
+	<p>
+		In the next article we show how to decorate the <var>userType()</var> function to give more information suitable for use
+		in <var>stringify(x)</var> which dumps the object <var>x</var>.
+	</p>
+		
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			The userType() Function			
+		</header><div class="numberShield colorLightBlue"></div>	
+		
+			function userType(x) 
+		    {    
+				const t = type(x);
+				if(t !== "Object") return t;
+				try { x.constructor; } catch(e) { return "CrossOriginObject";} 
+				const P = getClassPrototype(x).classPrototype;
+				if(P === null) return "Object";   // x is null object
+				if(P === x) return "Object";   	  // x is function prototype		
+		    	if(Object.getPrototypeOf(x) !== P ) return "Object"; 
+				return isNativeCode(P.constructor)? "Object": P.constructor.name;
+			}
+			
+			function getClassPrototype(x)
+		    {
+		    	// Returns most derived proper class prototype from which x derives,
+		    	// and the number of degrees to it.	
+		    	
+		    	var P = x; var n = 0;     
+				while(!isClassPrototype(P) &amp;&amp; P != null)
+		        {   
+		        	n++;     	
+		        	P = Object.getPrototypeOf(P);
+		        }
+		        
+		        return {classPrototype:P, degree:n};
+		    }
+		    
+		    <header class="codeSection">Examples</header>
+       	\numbersRestart
+       	
+       	function foo(){}
+		    function bar(){}
+		    function foobar(){};
+
+		    // Derive bar from foo but don't set the constructor.
+		    bar.prototype = Object.create(foo.prototype);
+		
+		    // Derive foobar from foo and correctly set the construtor to foobar. 
+		    foobar.prototype = Object.create(foo.prototype,
+		    {
+		        constructor:
+		        {
+		            value:foobar
+		        }
+		
+		        // other properties of foobar.prototype here.
+		    });
+		
+		    // All logs, log true.
+
+		    const x = new foobar();
+		    console.log(type(x) == "Object");		   
+		    console.log(userType(x) == "foobar");  // foobar is a proper class.
+		
+		    const y = new bar();
+		    console.log(type(y) == "Object");		  
+		    console.log(userType(y) == "Object");  //  "Object" not "bar" because 
+		    &nbsp;                                                  //bar is not a proper class.
+
+			// Now here's a problem with user defined classes
+			
+			// z is one degree away from foobar.prototype.
+			const z = Object.create(foobar.prototype); 
+			console.log(userType(z) == "foobar");       // incorrectly reports that 
+			&nbsp;                                                       // z is a foobar class instance.
+
+				  		
+	</div>	
+	
+	<p style="margin-left:2em">
+		The problem with erroneous <var>foobar</var> class instance detection is not quite as bad as it sounds.
+		For example let <var>x = new foobar(...)</var> and <var>y = Object.create(foobar.prototype)</var>. Both <var>x</var>
+		and <var>y</var> are instances of <var>foobar</var> one degree from <var>foobar.prototype</var>. However, there is no
+		test that can determine that <var>x</var> is a <var>foobar</var> class instance and that <var>y</var> is not
+		a <var>foobar</var> class instance. So both are reported as <var>foobar</var> class instances with a reporting error for <var>y</var>.
+	</p>
+	<p  style="margin-left:2em">
+		Now chances are that <var>y</var> will come from the class derivation process as in 
+		<var>y = foobar.prototype = Object.create(foo.prototype)</var> and where <var>foobar.prototype.constructor</var>
+		is set to <var>foobar</var>. Then <var>type(y)</var> is <var>"Object"</var> and there is no reporting error.			
+	</p>
+	<p  style="margin-left:2em">
+		Also <var>y</var> might be turned into an actual <var>foobar</var> class instance via <var>foobar.call(y,...)</var>
+		in which case there is no reporting error for <var>y</var>.
+	</p>
+	<p style="margin-left:2em">
+		If <var>y = Object.create(foobar.prototype)</var> is just left dangling, there may not be much use for <var>y</var> 
+		so with common programming practices, chances are there will be no reporting error because <var>y</var> wouldn't
+		be created in such a way in the first place.
+	</p>
+	<p class="display">
+		In summary, if <var>foobar()</var> is a proper programmer defined class then <var>userType(z)</var> returns <var>"foobar"</var> 
+		precisely when <var>z</var> is an instance of <var>foobar</var> one degree away from <var>foobar.prototype</var>, and
+		<var>z</var> itself is not a proper prototype.   
+	</p>
+	
+	<section>
+		<h3>Is an Element a Host Object?</h3>
+		<p>
+			The host objects are <var>window</var>, <var>document</var> and the 
+			HTML elements, which are links, metas, scripts, styles, divs, ..., as seen by JavaScript.
+			For example, as seen by JavaScript, a div is a class instance of <var>HTMLDiv</var>. 
+		</p>
+		<div class="codeBox simple" style="font-size:.8em">		
+			function isHostObject(x)
+			{
+				return nativeType(x) == "Window" || nativeType(x).substring(0,4) == "HTML"; 
+			}				
+		</div>
+		<p>
+			Now here's a warning that probably isn't necessary. We are not interested
+			in ever examining the prototypes, derivations, or properties, of the top level host objects,
+			and it's assumed the programmer will never apply <var>isHostObject()</var> to such objects.
+		</p>
+		<p style="margin-left:2em">
+			The main problem with typing such objects mostly resides with IE11 where constructors of host objects are not
+			functions. There are other browser inconsistencies that make typing such exotic objects problematical.
+		</p>		
+	</section>
+</section>
+<section>
+	<h2>The isKlass() Functions</h2>
+	<p>
+		Be sure to look at the <var>isKlass()</var> functions at the end of <a target="blank" href="../00-Scripts/typing.js">typing.js</a>.
+		For any specified built in class <var>Klass</var>, an element <var>x</var> is a class instance of <var>Klass</var> 
+		precisely when <var>isKlass(x)</var> evaluates to true. We just give a few examples.
+	</p>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			Just a few Examples of the isKlass() Functions from <a target="blank" href="../00-Scripts/typing.js">typing.js</a>
+		</header><div class="numberShield colorLightBlue"></div>
+		
+		function isDate(x) // Is x a class instance of Date?
+		{
+			return nativeType(x) == "Date";
+		}
+		
+		function isNumber(x) // Is x a class instance of Number?
+		{
+			return typeof(x) == "object" &amp;&amp; nativeType(x) == "Number" 
+			&amp;&amp; x != Number.prototype;
+		}
+
+		function isRangeError(x) // Is x a class instance of RangeError?
+		{
+			return nativeType(x) == "Error" &amp;&amp; 
+			x.__proto__.constructor.name == "RangeError";
+		}
+
+		function isArrayBuffer(x) // Is x a class instance of ArrayBuffer?
+		{
+			return isObject(x) &amp;&amp; Object.getPrototypeOf(x) === ArrayBuffer.prototype 
+				&amp;&amp; QuirksInstance["ArrayBuffer"](x);
+		}
+
+		function isBigInt(x) // Is x a class instance of BigInt? 
+		{
+			return typeof(x) == "bigint";
+		}
+		
+		// Written only for contrast with isBigInt(). 
+		function isMereBigInt(x) // Is x a mere instance of BigInt? 
+		{
+			return nativeType(x) == "BigInt"  &amp;&amp; x != BigInt.prototype;
+		}
+		
+	</div>
+	
+</section>
+<section>
+	<h2>Appendices</h2>
+	<section>
+		<h3><a id="ProperCasting">Proper Casting</a></h3>		
+			<p>
+				Our <var>type()</var> function respects proper casting of one class to another. Examples of proper casting
+				follow.
+			</p>	
+			<ol>
+				<li>
+					Consider a built in class <var>Klass</var> instance <var>x</var>. 
+					<ul>
+						<li>
+							The upwards cast <var>x.__proto__ = Object.prototype</var>
+							is proper and <var>type(x)</var> should change from <var>"Klass"</var> to <var>"Object"</var>.
+						</li>
+						<li>
+							If <var>x</var> is then downwards cast back to <var>Klass</var> via <var>x.__proto__ = Klass.prototype</var>,
+							then <var>type(x)</var> should change back to <var>"Klass"</var>.
+						</li>
+					</ul>
+				</li>
+				<li>
+					Consider a specialized <var>Error</var> class such as <var>RangeError</var>. 
+					<ul>
+						<li>
+							If <var>x</var> is a class instance of <var>
+							<span lang="en-us"></span>RangeError</var> then the upwards cast <var>x.__proto__ = Error.prototype</var>
+							should change <var>type(x)</var> from <var>"RangeError"</var> to <var>"Error"</var>
+						</li>
+						<li>
+							If <var>x</var> is a class instance of <var>
+							<span lang="en-us"></span>Error</var> then the downwards cast <var>x.__proto__ = RangeError.prototype</var>
+							should change <var>type(x)</var> from <var>"Error"</var> to <var>"RangeError"</var>.
+							<ul>
+								<li>
+									In the browsers <var>RangeError</var> inherits all its properties from <var>Error</var>,
+									whence the downward cast makes sense. However, if they ever meet the specs and give
+									<var>RangeError</var> its own message property, the downwards cast is problematic
+									and so wouldn't be considered proper. However, everything is good. If the cast is proper
+									then <var>type()</var> respects it. If the cast is improper <var>type()</var> can do
+									anything it wants, in this case respecting it.  
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</ol>	
+			<p>
+				The above two points list all possible proper casts between built in classes. Any other cast between classes must be sidewise, and
+				therefore improper since it results in a broken object. For example if the <var>Boolean</var> class instance
+				<var>x = new Boolean(true)</var> is cast to <var>Number</var> via <var>x.__proto__ = Number.prototype</var>
+				then <var>x</var> is a broken <var>Number</var>. 
+			</p>
+			<p>
+				No programmer ever has the rational to make an improper cast because doing so always results in a broken instance. 
+				Therefore the <var>type()</var> function can return whatever it wants with an object that has been improperly cast.
+			</p>			
+	</section>	
+	<section>
+		<h3>Prior to ECMAScript-2015, the Native Type was so Nice</h3>
+		<p>
+			Let's go back in time to ECMAScript-2009, the version previous to ECMAScript-2015. The native type then was a great
+			useful concept.
+		</p>
+		<p>
+			In the general version of EMCA, the only way to change the native type of an element is to cast the element.
+			So immutability of the native type is equivalent to invariance of the native type with respect to casting.
+			</p>
+		<ul style="list-style:upper-roman">
+		
+			<li>
+				<var>undefineds</var>, and <var>nulls</var> vacuously have
+				immutable native types because they have no internal prototype and one can't be set.
+			</li>
+			<li>
+				<var>booleans</var>, <var>numbers</var>, 
+				<var>strings</var>, and <var>host objects</var> all vacuously have
+				immutable native types because they have internal prototypes, which can't be reset.	
+			</li>
+			<li>
+				<var>Object.prototype</var> has immutable native type since resetting its internal prototype throws
+				an error. 
+			</li>
+			<li>
+				All other ECMAScript-2009 objects have immutable native types because if an attempted change to 
+				their internal prototype is successful, the change simply leaves the native type alone.
+			</li>
+		</ul>						
+		<p>
+			It is very clear that prior to ECMAScript-2015, immutability of the native type was an iron clad principle 
+			made by intentional design. Either that, or the JavaScript committee enforced, in a comprehensive and consistent 
+			way across the full gamut of possibilities, something completely by dumb luck. 
+		</p>	
+		<p>
+			Immutability of the native type allows a typing function to detect improper casts and throw exceptions on such.
+			In ECMAScript-2015, the native type is no longer immutable.
+		</p>
+		<p>
+			The great thing about ECMAScript-2009 was that the native type distinguished between class instances of <var>Klass</var>
+			and mere instances of <var>Klass</var> where <var>Klass</var> is a built in class. The native type of the former is <var>"Klass"</var>
+			while the native type of the latter is <var>"Object"</var>. This is no longer true in ECMAScript-2015, where the native
+			type behaves in an random ad-hoc manner.
+		</p>
+		<ol>
+			<li>
+				<ol style="list-style: lower-latin">
+					<li>If <var>nativeType(x)</var> is <var>"Undefined"</var>, <var>x</var> was originally and still must be an undefined.</li>	
+					<li>If <var>nativeType(x)</var> is <var>"Null"</var>, <var>x</var> was originally and still must be a null.</li>
+					<li>If <var>nativeType(x)</var> is <var>"Date"</var>, <var>x</var> was originally a <var>Date</var>. </li>	
+					<li>If <var>nativeType(x)</var> is <var>"RegExp"</var>, <var>x</var> was originally a <var>RegExp</var>. </li>
+					<li>
+						If <var>nativeType(x)</var> is <var>"Error"</var>, <var>x</var> was originally an <var>Error</var>.
+					</li>
+				</ol>			
+			</li>
+			<li>
+				<ol  style="list-style: lower-latin">
+					<li>If <var>nativeType(x)</var> is <var>"Number"</var>, then originally  <var>x</var> was a <var>number</var>, 
+					a <var>Number</var>, or <var>Number.prototype</var>. 
+					</li>
+					<li>If <var>nativeType(x)</var> is <var>"Boolean"</var>, then originally <var>x</var> was a <var>boolean</var>, 
+					a <var>Boolean</var>, or <var>Boolean.prototype</var>. 
+					</li>
+					<li>If <var>nativeType(x)</var> is <var>"String"</var>, then originally <var>x</var> was a <var>string</var>, 
+						a <var>String</var>, or <var>String.prototype</var>. 
+					</li>
+					<li>If <var>nativeType(x)</var> is <var>"Array"</var>, then originally <var>x</var> was an <var>Array</var>, 
+						or <var>Array.prototype</var>. 
+					</li>
+				</ol>			
+			</li>
+			<li>
+				If <var>nativeType(x)</var> is <var>"Arguments"</var>, then originally <var>x</var> was the argument
+				list of a function.
+			</li>	
+			<li>
+				If <var>nativeType(x)</var> is <var>"Function"</var>, then originally <var>x</var> was <var>Object</var>,
+				<var>Function</var>, <var>Function.prototype</var>, a built in function, or a programmer defined function. 
+			</li>	
+			<li>If <var>nativeType(x)</var> is <var>"Object"</var>, then originally <var>x</var> was <var>Object.prototype</var>,
+				<var>Date.prototype</var>, <var>RegExp.prototype</var>, <var>Error.prototype</var>, 
+				a literal object, a null object, a prototype or instance of a programmer defined function, or an object created 
+				using <var>Object.create()</var>.
+			</li>	
+		</ol>			
+	</section>
+	<section>
+		<h3><a id="Object">Object, Object.prototype, and objects</a></h3>
+		<p>
+			Let's set straight some common misconceptions about objects. 
+			By definition an <dfn>object</dfn> is any element that is not a primitive. Small <var>object</var> is not a concept that
+			derives from large <var>Object</var> in any way: These two concepts are very independent. 
+		</p>
+		<p class="display">
+			There is no <var>Object</var> class. The <var>Object</var> function, even though used with operator <var>new</var>,
+			is not a constructor and in fact is both wacky and nearly useless.
+		</p>
+		<p style="margin-left:2em">
+			<var>Object</var> certainly violates the internal prototype rule required of constructors, which says
+			that when called with new the constructor must set the internal prototype of the return object to 
+			the functions prototype. 
+			It also often copies its argument rather than return  
+			a newly created object. Thus there is no class associated with the <var>Object</var> function: That's right, 
+			there is no <var>Object</var>
+			class! Those who think/say otherwise ignore well established semantics on what it 
+			means to be a class in JavaScript. 
+		</p>
+		<p>
+			The best one can do is to think of <var>Object</var> as a <dfn>broken/quasi/pseudo/etc</dfn> class.
+			The only thing truly useful about <var>Object</var> is its prototype from which so many objects derive,
+			and therefore inherit the many properties/methods of <var>Object.prototype</var>. 
+			JavaScript could easily have hidden or eliminated <var>Object</var> and exposed only its prototype.
+			To maintain patterns involving class inheritance, JavaScript wanted <var>Object.prototype</var> to in fact be 
+			a prototype and so had to invent the <var>Object</var> function as a placeholder for an 
+			actual constructor.
+		</p>
+		<section>
+			<h4>The instanceof operator</h4>
+			<p>
+				So what does <var>x instanceof Object</var>
+				mean? It means the same thing as if <var>Object</var> were any other function used as a constructor or not.		
+				It means that <var>x</var> derives from <var>Object.prototype</var> and nothing more. Even with a direct derivation
+				where  <var>x.__proto__</var> is <var>Object.prototype</var>, <var>x</var> can not be a member of the non existing
+				<var>Object</var> class. 
+			</p>
+			<p>
+				There are objects that do not derive from <var>Object.prototype</var>: for example a
+				null object such as <var>Object.create(null)</var>. The set of all objects is 
+				partitioned into the standard
+				objects and the null objects. The <dfn>standard objects</dfn> are <var>Object.protoype</var> and
+				all objects deriving from it. The <dfn>null objects</dfn> are the objects neither being <var>Object.prototype</var>
+				nor deriving from it. 
+			</p>
+			<p>
+				It follows that <var>x instanceof Object</var> is not a test for <var>x</var> being an object. It fails for null
+				objects <var>x</var>, and it fails for <var>x = Object.prototype</var> the most important object of all.
+				However, it is a valid test for <var>x</var> being a standard object not equal to <var>Object.prototype</var>. 
+			</p>
+		</section>
+	</section>	
+	<section>
+		<h3>Is there an Arguments Class?</h3>
+		<p>
+			Meouzer says no, well maybe, and there might be one, but there isn't. 
+		</p>
+		
+		<div class="codeBox simple" data-codeNumbers="true">		
+			var arguments = (function(){
+			return arguments;
+			})();		
+			
+			alert(nativeType(arguments)); // Arguments
+			var Arguments = arguments.__proto__;
+			alert(Arguments == Object.prototype);
+		</div>		
+		<p>	
+			Line 3 says there might be an Arguments class. As a proto class it would be given by Arguments in line 4.
+			However, line 5 says as proto classes any Arguments class is the same as Object.prototype. So there's
+			not much new under the sun.
+		</p>
+		<p>
+			Since <var>arguments</var> derives directly from <var>Object.prototype</var>, it behaves similarly 
+			to a literal object with some dressing on it.
+		</p>		
+	</section>
+	<section>
+		<h3 id="Other-Ways">Other Ways to Code type()</h3>
+		<div class="codeBox colorLightPink rounded">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				The Simplest Direct Way to Code type()
+			</header>
+							
+			function type(x) 
+			{
+				if (x === null) 
+				{
+					return "null";
+				}
+				else if (typeof (x) != 'object' &amp;&amp; typeof (x) != 'function') 
+				{
+					return typeof (x);
+				}
+			
+				var nt = nativeType(x);
+			
+				if(nt === "BigInt" || nt === "Symbol") 
+				{
+					return "Object";
+				}		
+				else if (nt == "Arguments") 
+				{
+					return "Arguments";
+				}
+				else if (nt == "Error") 
+				{
+					return x.__proto__.constructor.name;
+				}
+				else if (window[nt] &amp;&amp; (x != window[nt].prototype)) 
+				{
+					if(QuirksInstance[nt])
+					{
+						if (QuirksInstance[nt](x))
+						{
+							return nt;
+						} 
+						else
+						{
+							return "Object";
+						}
+					}
+					else
+					{
+						return nt;
+					}		
+				}
+				else 
+				{
+					return "Object";
+				}
+			} 
+			
+		</div>		
+		<div class="codeBox colorLightPink rounded">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			A Direct Way to Code the userType() Function<br>			
+		</header>	
+			
+		function userType(x) 
+	    {    
+	        if (x === null) return "null";
+	        if (typeof (x) != 'object' &amp;&amp; typeof (x) != 'function') return typeof (x);
+	        try { x.constructor; } catch(e) { return "CrossOriginObject";} 
+	        
+	        // Needed because for IE11, host constructors are not functions
+	    	// and so getClassPrototype(P) must not be allowed to execute.  
+	        if(isHostObject(x)) return nativeType(x); 
+	        
+	        if(nativeType(x) == "Arguments") return "Arguments";
+	         
+	        // Get most derived proper class prototype from which x derives. 
+	       	const P = getClassPrototype(x);
+	        
+	        if(P == null) return "Object";   // x is null object
+	    	if(P == x) return "Object";   	 // x is function prototype
+	
+	    	// x is at least two degrees from prototype
+	    	if((Object.getPrototypeOf(x) != P) ) return "Object";
+	     	
+	        if(isNativeCode(P.constructor))
+	        {         
+	        	const name = P.constructor.name; 
+				if(name == "BigInt" || name == "Symbol") return "Object";
+	        	if(QuirksInstance[name]) return QuirksInstance[name](x)? name: "Object";
+	        	if(nativeType(x) == "Error"){return x.__proto__.constructor.name}  	
+	        	return nativeType(x);
+	        }
+	       	
+	       	// x is a class instance of a programmer defined function
+	       	// If "Object" is returned instead then userType() is equivalent to type()
+	       	return P.constructor.name;	       
+	    } 
+	  		
+	</div>		
+	</section>	
+</section>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

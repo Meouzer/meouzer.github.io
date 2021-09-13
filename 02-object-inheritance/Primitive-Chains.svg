@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 693 262" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-53.5273,-96.7386)">
+        <g>
+            <g transform="matrix(1,0,0,1,8,-66)">
+                <g transform="matrix(1,0,0,1,162.5,-24.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Number<tspan x="140.035px 146.703px " y="209.191px 209.191px ">.p</tspan>rototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,507,-24.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Object.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-346,-197.554)">
+                    <text x="391px" y="381.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">7</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-73.25,-154.054)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,271.25,-154.054)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,8,-113.5)">
+                <g transform="matrix(1,0,0,1,179,81.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Boolean<tspan x="142.035px 146.703px " y="209.191px 209.191px ">.p</tspan>rototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,507,81.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Object.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-346,-91.5543)">
+                    <text x="391px" y="381.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">true</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-48.5,-48.0543)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,279.5,-48.0543)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,8,-136)">
+                <g transform="matrix(1,0,0,1,179,162.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">String.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,507,162.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Object.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-346,-10.5543)">
+                    <text x="391px" y="381.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">cat</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-48.5,32.9457)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,279.5,32.9457)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,11,-183.5)">
+                <g transform="matrix(1,0,0,1,210.5,268.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Symbol.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,504,268.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Object.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-346,95.4457)">
+                    <text x="391px" y="381.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">Symbol()</text>
+                </g>
+                <g transform="matrix(1,0,0,1,0.25,138.946)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,293.75,138.946)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,11,-203)">
+                <g transform="matrix(1,0,0,1,209,346.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">BigInt.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,504,346.5)">
+                    <text x="56px" y="209.191px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:24px;">Object.prototype</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-346,173.446)">
+                    <text x="391px" y="381.489px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:30px;">BigInt(4)</text>
+                </g>
+                <g transform="matrix(1,0,0,1,-2,216.946)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,293,216.946)">
+                    <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,556,-56)">
+                        <path d="M388,305L395,319L381,319L388,305Z" style="fill:rgb(0,0,255);"/>
+                    </g>
+                    <g transform="matrix(0.463768,0,0,1,66.2029,-44.5)">
+                        <rect x="254" y="376" width="138" height="1" style="fill:rgb(0,0,255);"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

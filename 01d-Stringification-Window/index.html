@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">Stringification</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../00-Commons/JSHTML.js"></script>
+	<script src="../00-Scripts/typing.js"></script>	
+	<script src="../00-Scripts/Stringify.js"></script> 
+		
+	<script>
+		function show()
+			{
+				try
+				{
+					document.getElementById('showWindow').innerHTML = stringify(window, {doHost:true});	
+				}
+				catch(e)
+				{
+					alert(e.message + "\n" + e.lineNumber + "\n" + e.stack);
+				}
+			}			
+	</script>
+	<script>
+		window.addEventListener("load", function()
+		{
+			applyJSHTML();							
+		});						
+	</script>
+
+	<style>	
+		div.codeBox.simple{background-color:rgb(255,245, 255);border-radius:20px; padding:1em;border:none}
+	</style>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1>Stringification of Objects</h1>
+<header id="header" style="margin-top:2em">	
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">
+		<p>We demonstrate the amazing stringify() function that will stringify any object, nicely formatted, even if that object has 
+		circular references.</p> <p>This function is
+		found in <a target="_blank" href="../00-Scripts/Stringify.js">Stringify.js</a> which depends on 
+		<a target="_blank" href="../00-Scripts/typing.js">typing.js</a>.
+		We put stringiyfy() to the test by dumping the window object.</p>	
+		<cite style="margin-left: 28em">Meouzer</cite>
+	</div>
+</blockquote>
+
+<p class="centerTable">
+	Meouzer looks like a sleepy type guy. Always takes his time. <br>
+	Soon I know you'll be changing your mind. Wait till you see him <br>
+	use a gun boys! He keeps the varmits on the run. Always aloof. <br>
+	Always cool. Always carries his Colt 45.
+</p>
+<button onclick="show()">Show me the Window</button> 
+
+<pre id="showWindow">
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
