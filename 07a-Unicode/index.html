@@ -1,0 +1,1153 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title>An Elementary First Glance at Unicode</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<style type="text/css">
+		blockquote {border-left: thin blue solid;padding-left: 1em;font-style: italic;}
+		dfn {color: rgb(0,0,255);font-style: oblique;}
+		var {font-style: italic;color: purple;}
+		mark {color: red;font-weight: bold;border: thin blue solid;}
+		.display {background-color:rgb(255,225,200);border:thin maroon solid;padding:1em;}
+	</style>
+</head>
+
+<!-- 
+	ISO/IEC 2022 equval to EMCA35
+	https://wiki2.org/en/ISO/IEC_2022
+	
+	C0 set of ISO 6429 / ECMA-48, i.e. the ASCII control codes, doesn't look correct.
+-->
+
+<body class="GPeachBlue" style="font-size:16px;width:800px; line-height:1.5em;" onload="loadBody();">
+<header>
+	<h1 style=" lin">An Elementary First Glance at Unicode Space</h1>
+	<span class="centerTable" style="font-size: 1.3em;color:maroon">Meouzer</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>	
+</header>	
+	
+<blockquote style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;padding:1em ;">
+	<img alt="loading" src="Images/Meouzer.jpg" style="width: 100px; display: inline-block; float:left;margin-right:1em">
+		<p>
+			Tentacles of the enigmatic Unicode Consortium constrict the globe in 
+			their merciless grip to enforce 
+			with nefarious intent conformity of data encoding at the highest level. The consortium is thus able to
+			control the governments and industries that rely on encoded interchange. Members recognize
+			and communicate with each other through UTF-8 decoder rings, which appear to be completely ordinary
+			for anyone without maleficent intent. Non members have 
+			infiltrated the Consortium with varying degrees of success. One such source, before he was eliminated
+			by the Unicode Technical Committee, discovered the Consortium 
+			finesses its publications with great skill. Just enough is said to make it appear that the Consortium
+			knows what it's talking about, but not so clearly that anyone actually understands. This makes the
+			world dependent upon the normative yet inscrutable publications the Consortium releases
+			on a well timed basis, and thus guarantees the Consortium an 
+			unprecedented degree of influence. 
+			Therefore, anyone wishing to learn Unicode 	must be aware of the dangers and do so at their peril.
+		</p>			
+		<span style="margin-left: 35em">Meouzer</span><span style="font-size:2em">&#x1F640;</span>		
+</blockquote>		
+<!-- PAGE 100
+		Some  important  normative  character  properties  of  the  Unicode  Standard  are  listed  inTa b l e 3 - 2, 
+		with an indication of which sections in the standard provide a general descrip-tion  of  the  properties  and  
+		their  use.  Other  normative  properties  are  documented  in  theUnicode  Character  Database.  In  all  cases,  
+		the  Unicode  Character  Database  provides  thedefinitive  list  of  character  properties  and  the  exact  
+		list  of  property  value  assignments  foreach version of the standard.
+		-->		
+<!-- 
+http://www.unicode.org/versions/Unicode8.0.0/ch03.pdf#M9.31409.Heading.33.Characters.and.Coded.Representations
+-->
+<p>
+		The three most important references follow.		
+	</p> 
+	<ol>
+		<li>
+			<a target="_blank" href="References/UnicodeData-13.0.txt">Unicode Data Base 13.0</a>			
+		</li>		 
+		<!-- <li>
+			<a target="_blank" href="http://www.unicode.org/versions/Unicode8.0.0/ch02.pdf#page=42">
+					Unicode: Allocation on the BMP §2.9 𝕡49
+		</a>
+		</li>	 -->
+		<li>
+			<a target="_blank" href="References/UnicodeStandard-13.0.pdf">Unicode Standard 13.0</a>
+		</li>
+		<li>
+			<a target="_blank" href="http://www.unicode.org/charts/">Scripts Organized By Block</a>
+		</li>	
+	</ol>	
+	<p>
+		Mouzer got to writing after he read these and quit coughing up hairballs.
+	</p>
+<section>
+	<h2>Introduction</h2>
+	<p>
+		This article is limited to introducing core concepts of Unicode Space and Space Flight.	
+		Covered are, Unicode Space as an intermediary encoding space, character encodings, surrogates, scalar values, 
+		planes, general and minor categories, types, blocks and scripts. 
+	</p>	
+</section>
+<section>
+	<h2>Before there was Unicode there was Space Flight</h2>
+	<p>
+		The year is 1963 and the cold war is red hot. President 
+		Kennedy in his speech to the German nation on June 6th declares
+		himself to be a Jelly Donut, and the Germans go ecstatic. Not to be outdone, Kruchev declares that he has a 1,000 
+		megaton atomic bomb, but no one really cares. Alcatraz, a federal Prison on an island in San Francisco Bay, 
+		closes because of the large number
+		of escapes by wardens. The first push-button telephone goes into service.  	
+	</p>
+	<p>
+		In space flight, Chuck Yeager becomes the first pilot to make an emergency 
+		ejection in the full pressure suit needed for high altitude flights after getting permission from Houston over a push button
+		telephone. The final Mercury mission, Mercury-Atlas 9 with astronaut L. Gordon Cooper on board is 
+		launched. He becomes 
+		the first American to spend more than a day in outer space. On their way down Yeager and Cooper wish each other 
+		good luck. Vostok-6 Mission Cosmonaut Valentina Tereshkova becomes the first woman in space, but ground control forgets to
+		pack her toothbrush. Two weeks later Joseph A. Walker flies a 
+		North American X-15 to a record altitude of 106,010 meters (347,800 feet) on X-15 Flight 90, which was originally booked 
+		for thirty by Delta airlines. Exceeding an altitude of 100 km, this flight qualifies as a human spaceflight under international 
+		convention. More on international conventions later.
+	</p>
+	<p>
+		The <i>Business Equipment Manufactures Association</i> publishes the first version of the <i>American Standard Code for Information 
+		Interchange</i> (<a target="_blank" href="References/ASCII%201963%20Standard.pdf">ASCII</a>). 
+	</p>
+	
+	
+	<div style="display:flex">	
+	<table class="web" style="font-size:.9em">	
+		<thead>
+			<tr><th colspan="9">ASCII Code Chart<br>First Version ASCII (1963)</th></tr>
+			<tr><td></td><th>000</th><th>001</th><th>010</th><th>011</th><th>100</th><th>101</th><th>110</th><th>111</th></tr>	
+		</thead>
+		<tbody>		
+			<tr><th>0000</th><td>NULL</td><td>DC<sub>0</sub></td><td>SP</td><td>0</td><td>@</td><td>P</td><td></td><td></td></tr>		
+			<tr><th>0001</th><td>SOM</td><td>DC<sub>1</sub></td><td>!</td><td>1</td><td>A</td><td>Q</td><td></td><td></td></tr>
+			<tr><th>0010</th><td>EOA</td><td>DC<sub>2</sub></td><td>"</td><td>2</td><td>B</td><td>R</td><td></td><td></td></tr>
+			<tr><th>0011</th><td>EOM</td><td>DC<sub>3</sub></td><td>#</td><td>3</td><td>C</td><td>S</td><td></td><td></td></tr>
+			<tr><th>0100</th><td>EOT</td><td>DC<sub>4</sub></td><td>$</td><td>4</td><td>D</td><td>T</td><td></td><td></td></tr>
+			<tr><th>0101</th><td>WRU</td><td>ERR</td><td>%</td><td>5</td><td>E</td><td>U</td><td></td><td></td></tr>
+			<tr><th>0110</th><td>RU</td><td>SYNC</td><td>&amp;</td><td>6</td><td>F</td><td>V</td><td></td><td></td></tr>
+			<tr><th>0111</th><td>BELL</td><td>LEM</td><td>'</td><td>7</td><td>G</td><td>W</td><td></td><td></td></tr>
+			<tr><th>1000</th><td>FE<sub>0</sub></td><td>S<sub>0</sub></td><td>(</td><td>8</td><td>H</td><td>X</td><td></td><td></td></tr>
+			<tr><th>1001</th><td>HT/SK</td><td>S<sub>1</sub></td><td>)</td><td>9</td><td>I</td><td>Y</td><td></td><td></td></tr>
+			<tr><th>1010</th><td>LF</td><td>S<sub>2</sub></td><td>*</td><td>:</td><td>J</td><td>Z</td><td></td><td></td></tr>
+			<tr><th>1011</th><td>V<sub>TAB</sub></td><td>S<sub>3</sub></td><td>+</td><td>;</td><td>K</td><td>[</td><td></td><td></td></tr>
+			<tr><th>1100</th><td>FF</td><td>S<sub>4</sub></td><td>,</td><td>&lt;</td><td>L</td><td>\</td><td></td><td>ACK</td></tr>
+			<tr><th>1101</th><td>CR</td><td>S<sub>5</sub></td><td>-</td><td>=</td><td>M</td><td>]</td><td></td><td>①</td></tr>
+			<tr><th>1110</th><td>SO</td><td>S<sub>6</sub></td><td>.</td><td>&gt;</td><td>N</td><td>↑</td><td></td><td>ESC</td></tr>
+			<tr><th>1111</th><td>SI</td><td>S<sub>7</sub></td><td>/</td><td>?</td><td>O</td><td>←</td><td></td><td>DEL</td></tr>		
+		</tbody>	
+	</table>
+	
+	<table class="web" style="border:1px solid black;font-family: Arial, Helvetica, sans-serif;font-size:.9em;margin-left:2em">		
+		<thead>
+			<tr><th colspan="6">Control Codes</th></tr>
+			<tr><td>Abbr</td><td>Name</td><td>Abbr</td><td>Name</td></tr>
+			
+		</thead>		
+		<tbody>			
+			<tr>
+				<td style="background-color:aqua">NULL</td>
+				<td>Null/Idle</td><td style="background-color:aqua">DC<sub>0</sub>
+				</td>
+				<td style="white-space:nowrap">Device control <br>(reserved for data link escape)</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">SOM</td><td>Start&nbsp;of&nbsp;Message</td><td style="background-color:aqua">DC<sub>1</sub></td>
+				<td style="white-space:nowrap">Device control</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">EOA</td><td>End&nbsp;of&nbsp;Address</td><td style="background-color:aqua">DC<sub>2</sub></td>
+				<td style="white-space:nowrap">Device control</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">EOM</td><td>End&nbsp;of&nbsp;Message</td><td style="background-color:aqua">DC<sub>3</sub></td>
+				<td style="white-space:nowrap">Device control</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">EOT</td><td>End&nbsp;of&nbsp;Transmission</td><td style="background-color:aqua">DC<sub>4</sub></td>
+				<td style="white-space:nowrap">Device control (STOP)</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">WRU</td><td>Who&nbsp;are&nbsp;you?</td><td style="background-color:aqua">Err</td>
+				<td style="white-space:nowrap">Error</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">RU</td><td>Are you ...?</td><td style="background-color:aqua">SYNC</td>
+				<td style="white-space:nowrap">Synchronous idle</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">BELL</td><td>Audible signal</td><td style="background-color:aqua">LEM</td>
+				<td style="white-space:nowrap">Logical end of media</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">FE<sub>0</sub></td><td>Format effector</td><td style="background-color:aqua">S<sub>n</sub></td>
+				<td style="white-space:nowrap">Separator information</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">HT/SK</td><td>Horizontal Tab/<br>Skip (punch card) </td><td style="background-color:aqua">ACK</td>
+				<td style="white-space:nowrap">Acknowledge</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">LF</td><td>Line Feed</td><td style="background-color:aqua">&#x2460;</td>
+				<td style="white-space:nowrap">Unassigned Control</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">V<sub>TAB</sub></td><td>Vertical Tab</td><td style="background-color:aqua">ESC</td>
+				<td style="white-space:nowrap">Escape</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">FF</td><td>Form Feed</td><td style="background-color:aqua">DEL</td>
+				<td style="white-space:nowrap">Delete/Idle</td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">CR</td><td>Carriage Return</td><td></td>
+				<td style="white-space:nowrap"></td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">SO</td><td>Shift Out</td><td></td>
+				<td style="white-space:nowrap"></td>
+			</tr>
+			<tr>
+				<td style="background-color:aqua">SI</td><td>Shift In</td><td></td>
+				<td style="white-space:nowrap"></td>
+			</tr>						
+		</tbody>
+	</table>
+	</div>	
+	<p>
+		ASCII was developed with computers, their peripherals, and telecommunications in mind by the ASA-X3 
+		space flight committee because flying an ASA-X3 is just too problematic and they needed something
+		better to do. 	 	
+		To understand the need for ASCII see the short article
+		<a target="_blank" href="http://edition.cnn.com/TECH/computing/9907/06/1963.idg/">Debut of ASCII</a>.
+		If you want, see Tom Jenning's amazing history on the predecessors of ASCII 
+		<a target="_blank" href="https://www.sr-ix.com/Archive/CharCodeHist/index.html#ASCII-1967">
+		An annotated history of some character codes</a>. After ASCII but before Unicode there have been
+		hundreds of codes.
+	</p>	
+	<p>
+		ASCII is a <i>coded character</i> set or more simply a <i>code</i>. A <dfn>coded character set</dfn> is a specific 
+		set of machine-bit patterns, which both specific graphic and control meanings have been assigned. Any of the bit patterns
+		in the set is called a <dfn>bit code</dfn>. ASCII is a <dfn>7-bit</dfn> code because every one of its bit codes
+		has exactly 7 bits. 
+	</p>
+	<!-- <p>
+		Now days we could call ASCII a <dfn>concrete encoding space</dfn> because any one of its bit codes (ideally)
+		has a specific meaning, graphic or control, across machines and software utilizing ASCII. Contrast this with Unicode, which is a <dfn>virtual 
+		intermediary encoding space</dfn>. This means any Unicode bit-code has to be further translated (by UTF-8, UTF-16, or UTF-32)
+		to get a bit pattern that software understands. Machines don't understand UTF-8, UTF-16, or UTF-32. So the main purpose 
+		of Unicode is to represent the written language(s) for software that supports Unicode. However, Unicode is backward compatible 
+		to some encoding spaces that machines do understand including the final 1967 version of ASCII. 
+	</p> -->
+	<p>
+		According to Mackenzie's 
+		<a target="_blank" href="References/Mackenzie_CodedCharSets.pdf">Coded Character Sets, History and Development</a>,
+		<dfn>control</dfn> refers to a particular function or operation that controls hardware or 
+		software products of systems. He lists a few types of controls. <dfn>Format effectors</dfn> control 
+		the formatting of data on a printed page, or on a display. <dfn>Information separators</dfn> 
+		separate and block data. 
+		<dfn>Device controls</dfn>
+		control actions within a device. <dfn>Transmission controls</dfn> control intercommunications on data
+		transmission lines. <dfn>Mode changes</dfn> are functions to set or change some particular mode of operation.
+		Then there are <dfn>miscellaneous controls </dfn>not listed in any of these categories.
+		<a target="_blank" href="https://web.archive.org/web/20140227190425/http://www.nadcomm.com/ascii_code.htm">
+			Understanding ASCII Codes
+		</a> indicates how control codes might be entered via keyboard in a later version of ASCII.
+	</p>	
+	<p>
+		In 1963, <i>byte</i>  had a different meaning than it does today. In a 7-bit code such as ASCII, a byte
+		was 7 bits. In a 5-bit code such as ITA2, a byte was 5 bits. Once the 
+		innumerable 8-bit codes started to 
+		rule two things happened. (1) The definition of a byte permanently became 8-bits (unless codes are in context). 
+		(2) Hexadecimal notation was invented to abbreviate bit patterns in the code charts.
+	</p>	
+</section>
+<section>
+	<h2>ASCII (1963) vs Unicode</h2>
+	<img alt="picture not available" src="Images/Codes.png" style="width:100%">
+	<p>
+		In both ASCII and Unicode the basic types of characters, to be sent to machines or software in encoded form
+		that machines or software can understand, are listed as follows.
+	</p>
+	<ol>
+		<li>
+			Graphic Characters
+			<ul>
+				tell the machine or software to display a graphic or glyph.
+			</ul>
+		</li>
+		<li>
+			Control Characters
+			<ul>
+				<li>refer to  particular functions or operations that controls hardware or software products of systems.</li>
+			</ul>
+		</li>
+		<li>
+			Format Characters
+			<ul>
+				<li>control the formatting of data on a printed page, or on a display.</li>
+			</ul>
+		</li>
+	</ol>
+	
+	<p>
+		The character <i>Latin LATIN CAPITAL LETTER A</i> (as in Unicode) or more simply <i>A</i> (as in ASCII)
+		to be sent to machine(as in ASCII) or software (as in Unicode), must be encoded into a stream of bits:
+		shown as the first arrow in the two diagrams above. 
+	</p>
+	<p style="margin-left:2em">
+		In ASCII, you read the ASCII code chart to get the encoding. So the encoding of <i>A</i> in machine bits
+		is the 7-bit stream 1000001. Since 1000001 is the encoding of a character it is called an <dfn>encoded character</dfn>.
+		It is the encoding of <i>A</i>. Because binary streams are hard to read, hexadecimal notation was invented.
+		1000001 in hexadecimal is 0x41, which is much easier to read.  
+	</p>
+	<p style="margin-left:2em">
+		In Unicode, you read the Unicode database to get the encoding. So open up the 
+		<a target="_blank" href="http://www.unicode.org/Public/12.0.0/ucd/UnicodeData.txt">Unicode Data Base</a>	
+		and scroll down to <i>LATIN CAPITAL LETTER A</i>, in the second column, and refer to the first column,
+		to see that it is encoded as 0x0041, which is just shorthand for the actual binary stream 1000001 that it represents.			
+	</p>
+	<p style="margin-left:2em">
+		In ASCII, the encoded character is sent to the machine as is. So the machine gets the stream
+		1000001, knows what to do with it, and displays the letter A in some way. 
+	</p>
+	<p style="margin-left:2em">
+		In Unicode, the encoded characters is further encoded into another bit stream, by one of  the
+		encodings UTF-32, UTF-16, or UTF-8 to get a final encoding, which is what the machine gets. 
+		Since machines don't understand Unicode, the job of the machine is to transmit the final 
+		encoding to software, which does understand Unicode. 
+	</p>	
+	<p>
+		A <dfn>code space</dfn> is simply a range of integers (representing binary streams) that
+		contains all the encoded characters. 
+	</p>
+	<p style="margin-left:2em">
+		The ASCII (1963) code space consists of the range 0000000 to 1111111, which is
+		0x00 to 0x41 or 0 to 127. The range is usually notated as [0x00, 0x41] or
+		[0,127]. The encoding of every character lies in this range.
+	</p>
+	<p style="margin-left:2em">
+		The Unicode code space, or more simply Unicode space is
+		[0x0000, 0x10FFFF].	This is so large that a ton of characters can be encoded, including
+		all the characters in all the alphabets of all languages in the world, and more. More
+		Unicode characters are added the Unicode database all the time.			
+	</p>
+	<p>
+		Members of a code space are called <dfn>code points</dfn>. For example 110000 = 0x30
+		is an ASCII (1963) code point but it is not an encoded character. No ASCII (1963)
+		character has 0x30 as its encoding. Also 1000001 = 0x41 is a ASCII code point, which is
+		an encoded character. It is the encoding of the letter A.
+	</p>
+</section>
+<section>
+	<h2>Partition &#x4E50; of Unicode Space and Review</h2>
+	<table class="web">
+		<thead style="padding:.5em">
+			<tr>
+				<th colspan="4"> Partition of Unicode space [0x0000, 0x10FFFF] into<br>
+					BMP, Surrogate, and Astral Code Point Ranges
+				</th>
+			</tr>
+		</thead>
+		<tbody style="padding:.5em">
+			<tr>
+				<th rowspan="4">BMP Code Points<br>[0x0000,&nbsp;0xFFFF]</th>
+				<td  style="background-color:rgb(220,220,255)">Low BMP Code Points</td>	
+				<td colspan="2">[0x0000, 0xD7FF]</td>			
+			</tr>
+			<tr>
+				<td rowspan="2" style="background-color:rgb(220,220,255)">
+					Surrogate Code Points<br>
+					[0xD800, 0xDFFF]
+			</td>
+				<td style="background-color:rgb(220,255,220)">High Surrogate Code Points</td><td>[0xD800,&nbsp;0xDBFF]</td>
+			</tr>
+			<tr>
+				<td style="background-color:rgb(220,255,220)">Low Surrogate Code Points</td>
+				<td>[0xDC00, 0xDFFF]</td>
+			</tr>
+			<tr>
+				<td style="background-color:rgb(220,220,255)">High BMP Code Points</td><td colspan="2">[0xE000, 0xFFFF]</td>
+			</tr>
+			<tr>
+				<th rowspan="7">Astral Code Points<br>[0x10000, 0x10FFFF]</th>
+				<td style="background-color: aqua">Astral Plane 1 </td><td colspan="2">[0x10000, 0x1FFFF]</td>
+			</tr>
+			<tr><td style="background-color: aqua">Astral Plane 2</td><td colspan="2">[0x20000, 0x2FFFF]</td></tr>
+			<tr><td style="background-color: aqua">...</td><td colspan="2">...</td></tr>
+			<tr><td style="background-color: aqua">Astral Plane 9</td><td colspan="2">[0x90000, 0x9FFFF]</td></tr>
+			<tr><td style="background-color: aqua">Astral Plane 10</td><td colspan="2">[0xA0000, 0xAFFFF]</td></tr>
+			<tr><td style="background-color: aqua">Astral Plane 15</td><td colspan="2">[0xF0000, 0xFFFFF]</td></tr>
+			<tr><td style="background-color: aqua">Astral Plane 16</td><td colspan="2">[0x100000, 0x10FFFF]</td></tr>
+		</tbody>
+	</table>
+	<p>
+		<dfn>Unicode space</dfn> is the set of integers from <var>0x0000</var> to <var>0x10FFFF</var> inclusive, 
+		and may be denoted as <var style="white-space:nowrap">[0x0000, 0x10FFFF]</var> since square brackets denote
+		inclusivity of endpoints. 
+	</p>
+	<p>
+		The members of Unicode space are <dfn>Unicode numbers</dfn> as a factual statement, but they 
+		are officially called <dfn>code points</dfn>. So a code point is nothing more than an integer in the range 
+		<var>[0x0000, 0x10FFFF]</var>. 
+	</p>	
+	<p>
+		Unicode space <var>[0x0000, 0x10FFFF] </var>is divided into 17 planes <var>[0xN0000, 0xNFFFF]</var>, 
+		where the zero based index N from 0 to 16 is to be replaced by its 
+		hexadecimal digit(s).	
+	</p>	
+	<p>	
+		Plane 0 or <var>[0x0000, 0xFFFF]</var> is the most important plane and is called the <dfn>Basic Multilingual Plane</dfn>. It's where
+		the most common scripts are placed. The most important partition of Unicode Space is seen in the table above. 
+	</p>	
+	<p>
+		To avoid ambiguity with integers in general, <dfn>Unicode notation</dfn>, which is the convention, may be used. 
+		That is the hexadecimal prefix <var>0x</var> is replaced with 
+		<var>U +</var> to denote the Unicode context. So the code point <var>U + FFAC</var> is the integer <var>0xFFAC</var>
+		in Unicode context. Unicode space itself is <var>[U + 0000, U + 0FFFF]</var>. Plane 0, or the Basic 
+		Multilingual Plane is <var>[U + 0000, U + FFFF]</var>. 		
+	</p>
+	<!-- <p>
+		We need to introduce scalar now values now because therir importance will be seen shortly. A <dfn>scalar value</dfn>
+		is a code point that is not a surrogate, i.e., is neither a high surrogate nor a low surrogate. 
+	</p> -->
+	<section>
+		<h3>Encoding Characters</h3>
+		<p>
+		An  <dfn>character</dfn> is an abstract/logical unit of "textual" information
+		used for the organization, control or representation of textual data. 
+		</p>
+		<p>
+			A mapping of a set of characters to a code space is called an <dfn>encoding</dfn>. 
+			The result of encoding an character is called its <dfn>encoded character</dfn>. 
+			A coded character is always a scalar value but there will be scalar values
+			that are not coded characters.
+		</p>			
+		<p>
+			In Unicode, the set of characters that it uses is called the set of <dfn>Unicode characters</dfn>
+			and the code space is Unicode space = <var>[U + 0000, U + 10FFFF]</var>. The Unicode characters together
+			with their encoded characters are listed in the database.  
+		</p>
+				
+	</section>	
+	<section>
+		<h3>Scalar Values</h3>
+		<p>
+		A <dfn>scalar value</dfn> is a code point that is not a surrogate. Referring to the partition
+		of Unicode space above, this means a scalar value is any code point outside the range <var>[0xD800, 0xDFFF]</var>.
+	</p>
+	<p>
+		The mathematics required for UTF-16 requires that encoded characters be scalar values, 
+		i.e., ever
+		character encodes as a scalar value. Unicode itself insures that encoded characters are always scalar values. 
+		When a new character is entered into the database Unicode will always encode
+		it as a scalar value. Surrogates are not scalar values and so will never be entered into the database
+		as the encoding of an character.		 
+	</p>	
+	<p>
+		 Unicode space is a <dfn>virtual intermediary encoding</dfn> space between characters and 
+		 bits of machine code because it sits dab in the middle of two encodings required to send a character
+		 to a machine bit stream: the first encoding is the database encoding; the second encoding is the
+		 UTF-32 encoding, the UTF-16 encoding, or the UTF-8 encoding. 
+		 <img alt="unavailable" src="Images/UnicodeEncoding.png" style="margin:2em 0 2em 0">
+	</section>	
+	<p>Come back to this picture after you read the next section about the Unicode database.</p>
+			
+</section>
+<section>
+	<h2>The Unicode Database</h2>
+	<p>Each record of the <a target="_blank" href="http://www.unicode.org/Public/12.0.0/ucd/UnicodeData.txt">Unicode Data Base</a>	
+		contains fifteen fields, separated by semicolons, but we are primarily
+		interested in the first three fields.</p>
+	<p>
+		The first field of the database is the encoded character as a 
+		hexadecimal digit. The second or eleventh field is
+		the name of the Unicode character which it encodes, and the third field is the general category of the
+		abstract character. Both Unicode abstract characters and coded characters will occur 
+		exactly once in the database, together in pairs.	
+	</p>
+	<table class="web" style="font-size:.9em;text-align:left">
+		<thead>
+			<tr>
+				<td>Unicode Database entry</td>
+				<td>Encoded<br>Character</td>
+				<td>Character</td>
+				<td>Category</td>
+				<td>Glyph<br>(if&nbsp;any)</td>
+			</tr>
+		</thead>	
+		<tbody>				
+			<tr>
+				<th style="width:20em">0040;COMMERCIAL AT;Po;0;ON;;;;;N;;;;;</th>
+				<td>U + 0040</td><td>COMMERCIAL AT</td><td>Po</td>
+				<td>&#x0040;</td>
+			</tr>
+			<tr>
+				<th style="width:20em">12422;CUNEIFORM NUMERIC SIGN FIVE GESHU;Nl;0;L;;;;5;N;;;;;</th>
+				<td>U + 12422</td><td>CUNEIFORM NUMERIC SIGN FIVE GESHU</td><td>Nl</td>
+				<td>&#x12422;</td>
+			</tr>
+					
+			<tr>
+				<th style="width:20em">1F638;GRINNING CAT FACE WITH SMILING EYES;So;0;ON;;;;;N;;;;;</th>
+				<td>U + 1F638</td><td>GRINNING CAT FACE WITH SMILING EYES</td><td>So</td>
+				<td>&#x1F638;</td>
+			</tr>
+			<tr>
+				<th style="width:20em">22FF;Z&nbsp;NOTATION&nbsp;BAG&nbsp;MEMBERSHIP;Sm;0;ON;;;;;Y;;;;</th>
+				<td>U + 22FF</td><td>Z&nbsp;NOTATION&nbsp;BAG&nbsp;MEMBERSHIP</td><td>Sm</td>
+				<td>&#x22FF;</td>
+			</tr>
+		</tbody>
+	</table>
+	<p>
+		A <dfn>glyph</dfn> is a visual representation an abstract character. Most but not all
+		Unicode abstract characters have visual representations. Format and 
+		control characters have no visual representation.
+	</p>
+	<p style="margin-left:2em">
+		For example, the code point <var>U + 0040</var> encodes the character named 
+		<var>COMMERCIAL AT</var> and the glyph is &#x0040;. The category is <var>Po</var>, 
+		which stands for <var>Punctuation Other</var>.
+	</p>
+	<p style="margin-left:2em">
+		 	<var>U + 12422</var> encodes <var>CUNEIFORM NUMERIC SIGN FIVE GESHU</var>, which
+		 	has category <var>Nl</var> for <var>Number letter</var>.
+	</p>
+	<p style="margin-left:2em">
+		<var>U + 1F638</var> encodes <var>GRINNING CAT FACE WITH SMILING EYES</var> of category <var>So</var> for
+		<var>Symbol other</var>.
+	</p>
+	<p style="margin-left:2em">
+		<var>U + 22FF</var> encodes the character <var>Z&nbsp;NOTATION&nbsp;BAG&nbsp;MEMBERSHIP</var>,
+		which has category <var>Sm</var> for <var>Symbol math</var>.
+	</p>
+	<!-- <section>
+		<h5>The Character Encoding Map Defined by the Database</h5>
+		<img alt="unavailable" src="Images/EncodingMap.svg" style="margin-top:2em;margin-bottom:2em">
+		<p>
+			Let's talk about what this diagram is saying. First every Unicode abstract character is
+			an abstract character but not conversely. Every encoded character is a scalar value lying
+			in Unicode space.
+		</p>
+		<p>
+			The double arrows represent the fact that Unicode abstract characters and encoded characters 
+			appear exactly once in the database in pairs as the second and first fields. 							
+		</p>
+	-->			
+</section>	
+
+<section>
+	<h2>Basic, General and Minor Categories of Unicode Code Points</h2>
+	<p>Imagine combining the following tables into one. We can't because the result wouldn't fit
+	on the page. </p>
+	<div style="display:flex">
+		<table class="web" style="display:inline-block;font-size:.77em;margin-top:2em">
+	<thead style="padding:.4em">
+		<tr><td>General<br>Category</td><td>Minor<br>Category</td><td>Abbreviation</td></tr>
+	</thead>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="5">Letter</th><td>uppercase</td><td>Lu</td></tr>
+			<tr><td>lowercase</td><td>Ll</td></tr>
+			<tr><td>titlecase</td><td>Lt</td></tr>
+			<tr><td>modifier</td><td>Lm</td></tr>
+			<tr><td>other</td><td>Lo</td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="3">Mark</th><td>nonspacing</td><td>Mn</td></tr>
+			<tr><td>spacing combining</td><td>Mc</td></tr>
+			<tr><td>enclosing</td><td>Me</td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="3">Number</th><td>decimal digit</td><td>Nd</td></tr>
+			<tr><td>letter</td><td>Nl</td></tr>
+			<tr><td>other</td><td>No</td></tr>
+		</tbody>		
+		<tbody style="padding:.5em">
+			<tr><th rowspan="7">Punctuation</th><td>connector</td><td>Pc</td></tr>
+			<tr><td>dash</td><td>Pd</td></tr>
+			<tr><td>open</td><td>Ps</td></tr>
+			<tr><td>close</td><td>Pe</td></tr>
+			<tr><td>initial quote <br>(may behave like Ps or Pe depending on usage)</td><td>Pi</td></tr>
+			<tr><td>final quote <br>(may behave like Ps or Pe depending on usage)</td><td>Pf</td></tr>
+			<tr><td>other</td><td>Po</td></tr>
+		</tbody>	
+	</table>
+	
+	<table class="web" style="display:inline-block;font-size:.77em;vertical-align:top;margin-left:2em;margin-top:2em">
+		<thead style="padding:.4em">
+		<tr><td>General<br>Category</td><td>Minor<br>Category</td><td>Abbreviation</td></tr>
+	</thead>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="4">Symbol</th><td>math</td><td>Sm</td></tr>
+			<tr><td>currency</td><td>Sc</td></tr>
+			<tr><td>modifier</td><td>Sk</td></tr>
+			<tr><td>other</td><td>So</td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="3">Separator</th><td>space</td><td>Zs</td></tr>
+			<tr><td>line</td><td>Zl</td></tr>
+			<tr><td>paragraph</td><td>Zp</td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="5">Other</th><td>control</td><td>Cc</td></tr>
+			<tr><td>format</td><td>Cf</td></tr>
+			<tr><td>surrogate</td><td>Cs</td></tr>
+			<tr><td>private use</td><td>Co</td></tr>
+			<tr><td>not assigned <br>(including noncharacters)</td><td>Cn</td></tr>
+		</tbody>		
+	</table>
+	</div><table class="web" style="text-align:left;font-size:.77em;">
+		<thead>
+			<tr><td>Basic Type</td><td>Brief Description</td><td>General<br>Category</td><td>Character<br>Status</td>
+			<td>Code Point Status</td></tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Graphic</td>
+				<td>Letter, mark, number,<br>punctuation, symbol, and<br>spaces</td>
+				<td>L, M, N, P, S, Zs</td>
+				<td rowspan="4">Assigned to <br>character</td>
+				<td rowspan="6">Designated<br>(assigned) code<br>point</td>
+			</tr>
+			<tr>
+				<td>Format</td>
+				<td>Invisible but affects neigh-<br>boring characters;<br>includes line/paragraph separators</td>
+				<td>Cf, Zl, Zp</td>
+			</tr>
+			<tr>
+				<td>Control</td>
+				<td>Usage defined by protocols<br>or standards outside the<br>Unicode Standard</td>
+				<td>Cc</td>
+			</tr>
+			<tr>
+				<td>Private-use</td>
+				<td>Usage defined by private<br>agreement outside the<br>Unicode Standard</td>
+				<td>Co</td>
+			</tr>
+			<tr>
+				<td>Surrogate</td>
+				<td>Permanently reserved for<br>UTF-16; restricted inter<br>-change</td>
+				<td>Cs</td>
+				<td>Cannot be assigned<br>to character</td>
+			</tr>
+			<tr>
+				<td>Noncharacter</td>
+				<td>Permanently reserved for<br>internal usage; restricted<br>interchange</td>
+				<td>Cn</td>
+				<td>Will never be assigned<br>to character</td>
+			</tr>
+			<tr>
+				<td>Reserved</td>
+				<td>Reserved for future assign-<br>ment; restricted inter-<br>change</td>
+				<td>Cn</td>
+				<td>Not assigned to<br>character</td>
+				<td>Undesignated<br>(unassigned)<br>code point</td>
+			</tr>			
+		</tbody>
+	</table>
+	<p>
+		Lets see what information is gleaned from these two tables for the code point U + 22FE.
+		Open the <a target="_blank" href="http://www.unicode.org/Public/12.0.0/ucd/UnicodeData.txt">Unicode Data Base</a>	
+		and scroll down to 22FE in the first column. Its character is SMALL CONTAINS WITH OVERBAR, and its
+		category is Sm. S is the general category and from  the basic type table we know	22FE encodes a 
+		graphic character. Form the general and minor category tables we know the graphic character is a 
+		math symbol. 
+	</p>
+	<section>
+		<h3>Control Category Cc</h3>
+		<p>
+			Control Codes. Sixty-five   code   points  <var>[U+0000, U+001F]</var>   and   <var>[U+007F, U+009F]</var> 
+			are defined specifically as control codes for compatibility with the C0 and C1 control 
+			codes of the ISO/IEC 2022 framework. A few of these control codes are given specific 
+			interpretations by the Unicode Standard. 
+		</p>	
+		<table class="web">
+			<thead><tr><th colspan="3">Control Codes Specified/Understood by the Unicode Standard</th></tr></thead>
+			<tbody>
+				<tr><th>Code Point</th><th>Abbreviation</th><th>ISO/IEC 6429 Name</th></tr>
+				<tr><th>U+0009</th><td>HT</td><td>character tabulation (tab)</td></tr>
+				<tr><th>U+000A</th><td>LF</td><td>line feed</td></tr>
+				<tr><th>U+000B</th><td>VT</td><td>line tabulation (vertical tab)</td></tr>
+				<tr><th>U+000C</th><td>FF</td><td>form feed</td></tr>
+				<tr><th>U+000D</th><td>CR</td><td>carriage return</td></tr>
+				<tr><th>U+001C</th><td>FS</td><td>information separator four</td></tr>
+				<tr><th>U+001D</th><td>GS</td><td>information separator three</td></tr>
+				<tr><th>U+001E</th><td>RS</td><td>information separator two</td></tr>
+				<tr><th>U+001F</th><td>US</td><td>information separator one</td></tr>
+				<tr><th>U+0085</th><td>NEL</td><td>next line</td></tr>
+			</tbody>
+		</table>	
+		<p>
+			The corresponding Unicode database records follow. The eleventh field
+			gives the ISO/IEC 6429 Name.
+		</p>
+		<ul>
+			<li>0009;&lt;control&gt;;Cc;0;S;;;;;N;CHARACTER TABULATION;;;;</li>
+			<li>000A;&lt;control&gt;;Cc;0;B;;;;;N;LINE FEED (LF);;;;</li>
+			<li>000B;&lt;control&gt;;Cc;0;S;;;;;N;LINE TABULATION;;;;</li>
+			<li>000C;&lt;control&gt;;Cc;0;WS;;;;;N;FORM FEED (FF);;;;</li>
+			<li>000D;&lt;control&gt;Cc;0;B;;;;;N;CARRIAGE RETURN (CR);;;;</li>
+			<li>001C;&lt;control&gt;;Cc;0;B;;;;;N;INFORMATION SEPARATOR FOUR;;;;</li>
+			<li>001D;&lt;control&gt;;Cc;0;B;;;;;N;INFORMATION SEPARATOR THREE;;;;</li>
+			<li>001E;&lt;control&gt;;Cc;0;B;;;;;N;INFORMATION SEPARATOR TWO;;;;</li>
+			<li>001F;&lt;control&gt;;Cc;0;S;;;;;N;INFORMATION SEPARATOR ONE;;;;</li>
+			<li>0085;&lt;control&gt;;Cc;0;B;;;;;N;NEXT LINE (NEL);;;;</li>
+		</ul>
+		<p>
+			What's interesting for example is that from the database there is no way to 
+			tell that the code point 0009 is understood by Unicode. You
+			actually have to read the  
+			<a target="_blank" href="References/UnicodeStandard-13.0.pdf">Unicode Standard</a>
+			and look for the needle in the haystack to tell.
+		</p>
+	
+	</section>	
+	<section>
+		<h3>Private Use Category Co</h3>		
+		<p>
+			The designated use of private use code points, is for private use by parties outside the standard.
+			Two or more parties by mutual agreement may decide to assign these code points to their own
+			abstract characters, not necessarily recognized by anyone else.
+		</p>		
+		<table class="web" style="margin-left:auto;margin-right:auto;margin-top:1em;margin-bottom:1em;font-size:.9em;" >
+			<thead style="padding:.4em">
+			<tr>
+			<th colspan="4">Private Use Code Points by Plane</th></tr>				
+				<tr><td>Containing Plane</td><td>Range</td><td>Name</td><td>Contains</td></tr>
+			</thead>
+			<tbody style="text-align:left;padding:.4em">
+				<tr>
+					<td>
+						BMP (plane 0)</td><td><var>[U + E000, U + F8FF]</var></td><td>Primary Private Use Area<br>
+						<a target="_blank" href="https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf#page=916">Reference</a>
+						<td>6,400 private use characters. 
+						
+					</td>
+				</tr>
+				<tr>
+					<td>
+						plane 15</td><td><var>[U&nbsp;+&nbsp;F0000,&nbsp;U&nbsp;+&nbsp;FFFFD]</var>
+					</td>
+					<td>
+						Supplementary  Private  Use  Area-A <a target="_blank" href="https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf#page=917">Reference</a>
+
+					</td>
+					<td>65,534 private use characters</td></tr>
+				<tr><td>plane 16</td><td><var>[U&nbsp;+&nbsp;100000,&nbsp;U&nbsp;+&nbsp;10FFFD]</var></td>
+				<td>Supplementary  Private  Use  Area-B</td><td>65,534 private use characters</td></tr>
+			</tbody>	
+		</table>		
+	</section>
+	<section>
+		<h3>Surrogate Category Cs</h3>
+		<p>
+			The Surrogate category is permanently reserved for UTF-16; restricted interchange.
+			This means that use of code points in Cs have a designated purpose only in the 
+			UTF-16 encoding scheme. UTF-16 unlike UTF-8 or UTF-32 will map surrogates to machine bits.
+		</p>
+	</section>	
+	<section>
+		<h3>Cn</h3>
+		<p>
+			This is the category of scalar values <!-- code points --> that have not been assigned to a character. You will
+			never find a code point of category Cn in the database.
+		</p>
+		<p>
+			There are two reasons why a Cn code point is not assigned.
+		</p>
+		<ol>
+			<li>
+				The standard will never allow it to be assigned. Such a code point is called a <dfn>noncharacter</dfn>.
+				<ul>
+					<li>
+						There are 66 <dfn>Noncharacter</dfn> code points permanently designated for internal use. 
+						They will never be encoded characters: they will never encode characters. 
+						<br><br>
+						Noncharacters consist of the range of the range <var>[U+FDD0,U+FDEF]</var> in the BMP
+						together with the last two code points of all 17 planes: <var>[0xnFFFE , 0xnFFFF]</var>, 
+						where <var>n</var> is a hexadecimal number from <var>0</var> to <var>10<sub>16</sub></var>. 
+					</li>
+				</ul>
+			</li>
+			<li>
+				The code point is not currently assigned to an abstract character, but is reserved by Unicode for future
+				use as the encoding of an abstract character. Such a code point is called a <dfn>reserved</dfn>
+				code point. <!-- <mark>put in planes 1,2,14 explicitly</mark> -->
+				<ul>
+					<li>
+						<table class="web" style="text-align:left;" >
+						<thead style="padding:.5em">
+							<tr><th colspan="3">Reserved Code Points by Plane</th></tr>
+							<tr><td>index</td><td>name</td><td>Reserved code points</td></tr>
+						</thead>
+						<tbody style="padding:.5em">
+							<tr>
+								<td>Plane 3 to Plane 13</td><td>Unassigned Supplementary Planes</td>
+								<td>All code points are reserved except for the last two which are noncharacters</td>
+							</tr>
+							<tr>
+								<td>Planes 15 and 16</td><td>No W3 official Name</td><td>Contain no reserved code points</td>
+							</tr>
+							<tr>
+								<td>All other planes</td><td>Various names</td>
+								<td>All code points which have not been assigned</td>
+							</tr>
+												
+						</tbody>
+						</table>
+					</li>
+				</ul> 
+			</li>
+		</ol>
+		<p>
+			While you will never find a code point of category Cn in the database, all noncharacters and 
+			reserved code points
+			will occur in the code charts. In the code charts, noncharacters are indicated with a totally black field, while a reserved code point
+			is indicated with a diagonal pattern.
+		</p>		
+	</section>
+	
+	
+</section>
+<section>
+	<h2>The Blocks of Unicode</h2>
+	<p>
+		A block is a range of Unicode code points, thematically that are related in serving a common
+		purpose. See <a target="_blank" href="https://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt">Blocks.txt</a>
+		to get a list of all the blocks and their ranges.
+	</p>
+	<p>
+		Scroll down till you see the Ethiopic block, which is [U + 1200, U + 137F] 
+		Scroll down a little bit further till you see the  Ethiopic Supplement block, which is
+		[U + 1380, U + 139F]. You can find the specifics of these blocks by looking at the
+		 <a target="_blank" href="http://www.unicode.org/charts/">Scripts Organized By Block</a>
+		 page. Open the Ethiopic Supplement block and you will see the code point
+		 U + 1380 is assigned to the character ETHIOPIC SYLLABLE SEBATBEIT MWA whose glyph
+		 is &#x1380;.  Shaded cells indicate that the code point has not be assigned to 
+		 a character, i.e., the code point is not the encoding of any character. So for
+		 example U + 1390 is a code point that has not been assigned to a character.
+	</p> 
+	
+</section>
+
+<section>
+	<h2>Appendices</h2>
+	<section>
+	<h3>Planes</h3>
+		<!--
+		<p>
+			Approved readings of the Meouzer Consortium.	
+		</p>
+		<ol class="pt5Em" >
+			<li><a target="_blank" href="https://en.wikipedia.org/wiki/Plane_%28Unicode%29">Wikipedia: Planes</a></li>
+			<li><a target="_blank" href="https://en.wikipedia.org/wiki/Plane_%28Unicode%29#Unassigned_planes">Wikipedia: Unnasigned Planes</a></li>
+			<li>
+				<a target="_blank" href="http://www.unicode.org/versions/Unicode8.0.0/ch02.pdf#page=37">Unicode: &sect;2.8 &#x1D561; 44</a>
+			</li>
+			<li>
+				<a target="_blank" href="https://en.wikipedia.org/wiki/Unicode_block">Wikipedia: Blocks</a>
+			</li>
+		</ol>
+		<p>
+			Some of Wikipedia's unicode charts 
+			will didplay <span style="color:red">᪾</span> garbage for an entry, while the corresponding Unicode.org chart doesn't. 
+			The explantion is that Wikipedia uses character references that aren't yet supported by the browsers, while Unicode.org charts 
+			uses images or else uses a customized web font.
+		</p>-->
+		<!-- 
+		https://en.wikipedia.org/wiki/Plane_%28Unicode%29#Unassigned_planes<br>
+		https://en.wikipedia.org/wiki/Tags_%28Unicode_block%29<br>
+		https://en.wikipedia.org/wiki/Variation_Selectors_Supplement<br>
+		<mark>2.8 Unicode Allocation is great</mark> -->
+		<p>
+			Unicode space is divided into 17 planes <code>[U + 0xN0000, U +0xNFFFF]</code>, where 
+			N is to be replaced by the hexadecimal digits of an integer between <code>0 = 0X0</code> 
+			and <code>16 = 0x10</code>.
+		</p>
+		
+		<table class="web" style="font-family:inherit">
+			<thead>
+				<tr><th colspan="2">The 17 Unicode Planes</th></tr>
+				<tr><td>Index</td><td>Range</td></tr>
+			</thead>
+			<tbody style="text-align:left">
+				<tr><th>0</th><td>
+					<dfn>Basic Multilingual Plane (BMP)[U + 0000, U + FFFF]<br></dfn>
+					<p>Contains the vast majority of coded characters including all the most common ones.
+					Prior to Unicode 3.1, no characters were encoded in any other plane.</p>
+				</td></tr>
+				<tr><th>1</th>
+					<td><dfn>Supplementary Multilingual Plane (SMP) [U + 10000, U + 1FFFF]</dfn>
+					<p>Contains characters from archaic or obsolete writing 
+					systems. Used by those who
+					study these systems. Various specialized collections of symbols will also go into
+					this plane.</p>
+					</td></tr>
+				<tr><th>2</th>
+					<td><dfn>Supplementary Ideographic Plane (SIP)[U + 20000, U + 2FFFF]</dfn>
+						<p>
+						SIP is an extension of the CJK Area from the BMP to contain rare and unusual
+						Chinese characters.</p>
+					</td>
+				</tr>
+				<tr>
+					<th>3-13</th>
+					<td>
+						<dfn>Unassigned Supplementary Planes [U + 30000, U + 3FFFF] to [U + D0000, U+ DFFFF]</dfn>
+						<p style="margin-bottom:0">All code points in each plane has category Cn.
+						In each plane all code points are reserved except for the last two which are noncharacters.
+						</p>
+					</td>					
+				</tr>								
+				<tr><th>14</th>
+					<td>
+						<dfn>Supplementary Special Purpose Plane (SSP) [U + E0000, U + EFFFF]</dfn><br><br>												
+						<p>
+							Reserved for special-purpose characters that don't encode characters as such but are used by
+							higher level protocols or as signals to processes 
+							operating on Unicode text.
+						</p>
+						<a target="_blank" href="http://www.unicode.org/versions/Unicode8.0.0/ch02.pdf#page=38">&sect;2.8 &#x1D561; 45</a>
+						<blockquote>
+							The Supplementary Special-purpose Plane 
+							(SSP, or Plane 14) is the spillover allocation
+							area for format control characters that do not
+							fit into the small allocation areas for format
+							control characters in the BMP. (Here format
+							control character is a synonym for format character)						
+						</blockquote>
+						<p>
+							Only a small handful of code points in this plane are 
+							listed in the Unicode database.	They all have general category Cf or Mn,
+							except for the last two which are non characters.							
+						</p>
+					</td>
+				</tr>				
+				<tr>
+					<th>15</th>					
+					<td>
+						<dfn>Supplementary Private Use Area (SPUA-A) [U + F0000, U + FFFFF]</dfn>
+						<p style="margin-bottom:0">
+							An extension of the private use area of the BMP.
+							All code points in this plane, except for the last two,<br> has category Co
+							(private use). The last two have <br>category Cn and are non 
+							characters.
+						</p>
+					</td>
+				</tr>				
+				<tr>
+					<th>16</th>
+					<td>
+						<dfn>Supplementary Private Use Area (SPUA-B) [U&nbsp;+&nbsp;100000,&nbsp;U&nbsp;+&nbsp;10FFFF]</dfn>
+						<p style="margin-bottom:0">
+								Another extension of the private use area of the BMP.
+								All code points in this plane has category <br>Co
+								(private use), except for the last two <br>which are non 
+								characters.
+						</p>	
+					</td>
+				</tr>				
+			</tbody>
+		</table>
+		<p>
+			Planes other than the BMP are <dfn>supplementary</dfn> or <dfn>astral planes</dfn>. Any code point
+			in one of these planes is an <dfn>astral code point</dfn>.
+		</p>		
+	</section>
+	<section>
+		<h2>Blocks And Scripts</h2>
+		<p>
+			Approved big-time readings of the Meouzer consortium.
+		</p> 
+		<ol><!-- 
+			<li>
+				<a href="http://www.unicode.org/reports/tr24/#Scripts_and_Blocks">Scripts and Blocks</a>
+			</li> -->
+			<li>
+				<a target="_blank" href="References/Blocks.txt">Blocks.txt</a>
+			</li>
+			<li>
+				<a target="_blank" href="http://www.unicode.org/charts/">Scripts in Blocks in Code Charts</a>       
+			</li>
+			<li>
+				<a target="_blank" href="https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf#page=283">Writing Systems</a>
+			</li>
+		</ol>		
+		<p>
+			A <dfn>character block</dfn> or more simply <dfn>block</dfn> is a named range of code points used 
+			<span lang="en-us"></span>for organization. They are named after the general types of characters they encode. Blocks are 16 bit
+			aligned and do not overlap. Almost always there is no space between 
+			consecutive blocks.
+			The BMP and SMP each have one exception. The third plane has six blocks with spaces between all
+			consecutive blocks.  Blocks are normatively defined at 
+			<a target="_blank" href="References/Blocks.txt">Blocks.txt</a> 					  
+		</p>
+		<p>
+			Blocks won't contain surrogates since surrogates do not encode characters. 
+			For the same reason, blocks won't contain noncharacters. They also do not overlap with private use areas. 
+		</p>		
+		<!-- <p style="text-decoration:line-through">
+			Colloquially, one may speak of characters or representative glyphs lying in a Block. For example, the
+			abstract character ARMENIAN CAPITAL LETTER H0 and its glyph &#x0540; belong to the <i>Armenian block</i>
+			[0530, 058F] because its encoded character <var>0540</var> does.
+		</p>	-->	
+		<p>
+			Blocks are used to organize the following.
+		 </p>
+		<ol>
+			<li>The allocation of characters
+				<ul>
+					<li>
+						Every encoded character is the member of exactly one block.						
+					</li>
+				</ul>
+			</li>
+			<li>
+				The code charts
+				<ul>
+					<li> Every code chart is a chart of all the characters in a specific block.
+					 More accurately a code chart gives the map from the coded characters in a specific block
+					 to the Unicode abstract characters that they encode.  					  
+					</li>
+				</ul>
+			</li>				
+			<li>
+				The Unicode scripts
+				<ul>
+					<li>The abstract characters of a script are spread out over a number of blocks (perhaps just one)
+					solely dedicated to that script. However, there are exceptions where part of the script
+					lies in another block dedicated to a common purpose for use by more than one script.
+					</li>
+					<li>
+						There are blocks dedicated for use by more than one script, such as Punctuation blocks, 
+						CJK Compatibility Forms, and Combining Marks blocks.
+					</li>
+				</ul>
+			</li>
+			
+			<li>
+				Miscellaneous symbols
+				<ul>
+					<li>
+						Hundreds of miscellaneous symbols, not related to scripts, are categorized by block.
+					</li>
+				</ul>
+			</li>
+		</ol>		
+		<p>
+			<dfn>Unicode scripts</dfn> are normatively defined: See 
+			<a target="_blank" href="https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf#page=288">List of Scripts</a>
+			categorized by type of writing system.
+			 A script is a collection
+			of characters from a writing system(s) or notational system. In order for it to include a
+			number of writing systems, the systems must be closely related. 
+		</p>
+		<section>
+			<h3>Examples <a target="_blank" href="http://www.unicode.org/charts/">Scripts Organized By Block</a></h3>
+			<ol>
+			<li>
+				The Latin script includes abstract characters from English, German, 
+				French, Vietnamese, Italian, and Latin 	itself. All of which use the pretty much the 
+				same alphabet and glyphs, and so are closely related.
+				<ul>
+					<li>
+						Latin fits into 14 blocks, twelve of which are 
+						solely dedicated to Latin. The first Latin block
+						is solely dedicated to control codes and Latin. Latin ligatures you observe is typed at a slant,
+						which means  Latin ligatures lie within another block dedicated for a more general purpose
+						than supporting Latin ligatures. That block is named <i>Alphabetic Presentation Forms</i>, which
+						is used by multiple scripts.
+					</li>
+				</ul>
+			</li>
+			<li>
+				The writing system for Armenian isn't like anything else, so there is one script dedicated solely to
+				Armenian. The name of the script is <i>Armenian</i>.
+				<ul>
+					<li>
+						The Armenian script fits into a single block 
+						dedicated solely to the Armenian
+					    script, which in turn is dedicated solely to Armenian characters.
+					</li>
+				</ul>
+			</li>
+			<li>
+				Cyrillic fits into five blocks that are dedicated solely to Cyrillic. These blocks are scattered
+				throughout Unicode space, i.e., not contiguous. 
+			</li>
+			<li>
+				The Coptic script has two blocks dedicated solely to Coptic. However, part of its script lies
+				in the Greek and Coptic block, which is dedicated solely to Greek and Coptic.
+			</li>
+			<li>
+				There is always a block in each plane that contains the two noncharacters at the end of the plane.
+				The remaining non characters <var>[U + FDD0, U + FDEF]</var> lie in the <i>Arabic Presentation Forms-A</i> block,
+				in the BMP.
+			</li>
+		</ol>
+		</section>
+		
+			
+		<!-- 
+		<p style="margin-left:2em">
+			Blocks won't contain surrogates since surrogates do not encode characters. For the same reason,
+			blocks won't contain noncharacters. They also do not overlap with private use areas. 
+		</p>
+		<p>
+			That's it for blocks but there is a complicated relationship between Blocks and Scripts and Scripts
+			and writing systems.
+		</p>
+		
+		<br><br><br><br><br><br><br><br><br><br><br><br>
+		See 
+			<a target="_blank" href="https://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt">Blocks.txt</a>
+			for a list of all the blocks. 	
+			See <a target="_blank" href="http://www.unicode.org/charts/">http://www.unicode.org/charts/</a>
+			for a list of scritps and their code charts.
+		<p>
+			Thematically, each block has a specialized purpose such as encoding all the characters in a language.
+			That certainly appears to be the case if you look at last link.
+			However, <a target="_blank" href="http://www.unicode.org/versions/Unicode8.0.0/ch02.pdf#page=38">Unicode: §2.8 𝕡 45</a>
+			says it aint necessarily so. One example given is the <i>Mathematical Operators</i> block. There is no technical
+			Unicode standard that says it must contain only mathematical operators, though it actually does in this case.
+			Also there are mathematical operators that appear in other seperate blocks. 			 
+		</p>	-->
+			
+	<section>
+		<h3>Blocks in Planes</h3>
+		<p style="font-style:italic">
+			The blockbuster movie where the unsuspecting occupants of flight 227 are 
+			terrorized by animate blocks, with Decepticon like capabilities and attitudes, 
+			devishly placed by a member of the Unicode consortium. 
+			The consortiure misfortunately leaves 
+			himself on board, but makes do by sabotaging the efforts of the passengers 
+			to save themselves from the Decepticons without the aid of the usual Autobot 
+			protagonists. 
+			All the highly annoying passengers meet gruesome fates as they did something untoward to deserve it.
+			The remaining passengers pull themselves together and throw the consortiure
+			off the plane in a brilliant and dramatic maneuver. The Decepticons are disabled by a 
+			precocious
+			child with a Phillips screwdriver whose insatiable curiosity wants to know if they contain jelly 
+			beans.
+			On the ground, in the aftermath of their peril, 
+			the children of Mr. and Mrs. Smith are ecstatic that their separated parents
+			after relying on each other begin to realize that they still belong together.
+		</p>
+	</section>
+</section>
+</section>
+<section>
+	<h2>Safe from the Unicode Consortium</h2>
+	<img alt="missing image" src="Images/MeouzerBox.jpg" style="margin-top:2em">
+</section>
+
+<br><br><br><br><br><br><br><br><br>
+
+</body>
+
+</html>
