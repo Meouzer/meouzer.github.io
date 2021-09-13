@@ -1,0 +1,115 @@
+﻿ 
+	/*Body*/
+	body.peach{font-family:'Book Antiqua, Times New Roman, Times';color:rgb(0,0,0);background-color:rgb(255,204,153); text-align:justify}	
+	
+	
+	
+	/*----------------------------------- GPeachBlue Theme --------------------------------------------------------------------*/
+		/*body*/
+		body.GPeachBlue{font-size:18px;font-family: Georgia ;text-align:justify; width:1000px;margin-left:4.5%;
+			background:-moz-linear-gradient(to right, rgb(176,196,222), white 5%, rgb(255,204,153) 60%, rgb(140,160,200));
+			background: linear-gradient(to right, rgb(176,196,222), white 5%, rgb(255,204,153) 60%, rgb(140,160,200));
+			background: -webkit-linear-gradient(left, rgb(176,196,222), white 5%, rgb(255,204,153) 60%, rgb(140,160,200));}
+						
+		/*Headers*/	
+		h1, h2, h3, h4, h5, h6{margin-bottom:0}			
+		body.GPeachBlue h1, h2, h3, h4, h5, h6{font-family:'Book Antiqua, Times New Roman, Times'}
+		body.GPeachBlue h1{color:rgb(102,0,0);font-size:2em;}	
+		body.GPeachBlue h2{	color:rgb(102,102,0);font-size:1.8em;margin-top:2em;}		
+		body.GPeachBlue h3{color:rgb(204,51,0); font-size:1.6em;margin-top:2em;}		
+		body.GPeachBlue h4{	color:rgb(153,102,0);font-size:1.5em;margin-top:1.5em;}
+		body.GPeachBlue h5{	color:maroon;font-size:1.3em;} /*rgb(204,51,51);*/
+		body.GPeachBlue h6{	color:rgb(102,0,102);font-size:1.2em;}
+		body.GPeachBlue h1.documentTitle{font-size:2.5em;text-align:left;background-color:rgb(255,204,153);border:0pt;}	
+		
+	/*---------------------------------------------------------------------------------------------------------------------*/
+	a{color:green}
+	
+	blockquote {border-left: thin blue solid;padding-left: 1em;font-style: italic;}
+	dfn {color: rgb(0,0,255);font-style: italic;}
+	var {font-style: italic;color: purple;}	
+	mark {color: red;font-weight: bold;border: thin blue solid;}
+	.display {background-color:rgb(255,225,200);border:thin maroon solid;padding:1em;}	
+	
+	/*Definitin Lists*/	
+	/*dl{margin-left:2em;}*/
+	dd{margin-top:.4em;}
+	dl dt{text-decoration:underline;margin-top:1em; font-size:1.1em;color:purple}
+	dl dl dt{text-decoration:underline;margin-top:1em; font-size:1.05em}
+	dl dl dl dt{text-decoration:underline;margin-top:1em; font-size:1em}
+	
+	/*Sections*/
+	section section{margin-left:2em}
+	article section{margin-left:2em}
+	
+	/*Spans*/
+	span.tab{display:inline-block;}
+	span.tabCenter{display:inline-block;text-align:center;}
+	/*span.center{display:table;margin-left:auto;margin-right:auto;}*/
+	span.block{display:block;}
+	
+	/*Horizontal Centering*/
+	.centerTable{display:table;margin-left:auto;margin-right:auto;margin-top:1em;margin-bottom:1em}	
+	/* header span.centerTable{color:green;display:table;margin-left:auto;margin-right:auto;}*/ /* Does not override previous rule */
+
+	div.center{margin-left:auto;margin-right:auto; text-align:center}
+	span.center{margin-left:auto;margin-right:auto; text-align:center; margin-bottom:1em; margin-top:1em; display:block}
+	
+	/*Fraction Class*/	
+	span.fraction{text-align:center;vertical-align:middle;display:inline-table;}
+	span.fraction span.numerator{display:table-row;}
+	span.fraction span.denominator{display:table-row;}		
+	span.fraction span.numerator span.value{padding-bottom:3px;display:table-cell;;border-bottom:2px black solid;}
+	span.fraction span.denominator span.value{display:table-cell;}
+	
+	/*Example class*/
+	p.Example{text-indent:-2em;}
+	p.Example:first-line{font-size:1.05em;color:rgb(0,70,0);}
+	p.Example:first-letter{font-size:1.2em;}	
+	p.Example{margin-left:2em; margin-top:1em}
+	p.Example span{text-indent:0px;} /*correct unintended consequences for span.fraction*/
+	
+	/*Lists*/	  	
+	ol{margin-top:0px} /*Needed so Opera is conistent with other browsers*/
+	ul{margin-top:0px} /*Needed so Opera is conistent with other browsers*/
+	li{margin-top:1em;margin-bottom:1em;}
+	
+	ol.pt5Em li {margin-top:.5em;margin-bottom:.5em;}
+	ul.pt5Em li {margin-top:.5em;margin-bottom:.5em;}			
+	
+	
+	
+	.display {background-color:rgb(255,225,200);border:thin maroon solid;padding:1em;}
+	var {font-style: italic;color: purple;}
+
+	
+	/*Divs*/		
+	div.background{background-repeat:no-repeat;background-size:100% 100%;}
+	div.aspectSpacer {width:0px;visibility:hidden;border-width:0px;position:relative} /*use padding-bottom to set aspect ratio;*/	
+	div.svgMaxContainer{position:absolute;left:0%;top:0%;width:100%;height:100%;}
+	
+	/*Table Elements*/
+	table{margin-top:1em;margin-bottom:1em;}
+	thead, tbody{padding-left:0.5em;padding-right:0.5em;}
+	tr, td, th {/*tr inherit from tbody or thead: td th inherit from tbody, thead or tr*/	
+		padding-left:inherit;padding-right:inherit;padding-top:inherit;padding-bottom:inherit;
+		font-size:inherit;
+		text-align:inherit;
+		text-decoration:inherit;
+		visibility:inherit;
+		font-family:inherit;
+		color:inherit;
+		border:inherit;} 		
+		
+	/*Table Web Class*/	
+	table.web {border:1px solid black;font-family: Arial, Helvetica, sans-serif;}
+	table.web tr{border:1px solid black}
+	table.web td,th{color:black;font-weight:normal;}  
+	table.web th{background-color:#C6FFC6;text-align:inherit;}		
+	table.web thead tr{background-color:#DDFFFF;font-size:1.1em;} /*Same as doing all cells in row at once*/				
+	table.web thead tr th{text-align:center;font-size:1.15em;}  		
+	table.web tbody tr{background-color: #FFFFCC;}
+	table.web tbody th{background-color: #FFD9FF;}
+	
+	
+

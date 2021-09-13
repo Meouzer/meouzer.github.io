@@ -1,0 +1,412 @@
+﻿ <!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Dell Menu</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<script src="PrettyCSS.js"></script>
+	<script src="PrettyHTML.js"></script>
+	<script>		
+		window.addEventListener('load', function() 
+		{			
+			var innerCSS = document.getElementById("menuStyle").outerHTML;
+			var pretty = prettyHTML(innerCSS);
+			document.getElementById("showCSS").innerHTML = pretty;
+			
+			//---------------------------------------------------------------
+			
+			var menu = document.getElementById("menu");
+			var showMenu = document.getElementById("showMenu");			
+			var html = menu.outerHTML;			
+			var x = prettyHTML(html);			
+			showMenu.innerHTML = x;
+			
+			var items = document.querySelectorAll("ul.menu>li");
+			for(var i = 0; i < items.length; i++)
+			{					
+				items[i].onmouseover=function(){dim(true); }
+				items[i].onmouseout=function(){dim(false); }
+			}
+		});
+					
+		function dim(doDim)
+		{return;
+			var dimmer = document.getElementById("dimmer");
+			if(doDim)
+			{				
+				dimmer.style.display = "block";				
+			} 
+			else
+			{
+				dimmer.style.display = "none";				
+			}
+		}		
+	</script>
+	
+	<style id="menuStyle">		
+		
+		/* The Basics**********************************************************/
+		ul.menu {font-size:15px;}	
+		ul.menu, ul.menu ul {padding:0; list-style:none;}	
+		ul.menu li > ul {visibility:collapse; position:absolute; left:100%;  
+			top:0; border-left:0px rgba(255, 0, 0, 0) solid;}
+		ul.menu li:hover > ul {visibility:visible}		
+		ul.menu li {margin:0; position:relative;border:thin black solid;white-space:nowrap;
+			padding:0.5em;text-align:left}
+		ul.menu.row, ul.menu ul.row {display:flex;}
+		ul.menu.row > li > ul, ul.menu ul.row > li > ul {left:0;top:100%;}		
+		/*********************************************************************/
+		
+		/* For Dell Particulars: Format the top level menu*****************************/
+		ul.menu {display:flex;justify-content:space-around;align-items:center;
+			background-color:rgb(150,150,255);}		
+			
+		/* *****************************************************************************/
+		
+	</style> 				
+</head>
+
+<body style="z-index:1;padding-right:1em;width:800px;font-size:16px;" class="GPeachBlue" >
+<div id="dimmer"></div>		
+<ul class="menu row" id="menu">
+ 	<li>
+		Products
+		<ul>
+			<li>
+				Laptops
+				<ul class="row">
+					<li>												
+							<img alt="" src="Png/LapTopsForHome.bmp" data-break="ntttt"	>																				
+					</li>
+					<li>						
+							<img alt="" src="Png/LaptTopsForWork.png">						
+					</li>
+				</ul>
+			</li>
+			<li>
+				Desktops &amp; All-in-One PCs 
+				<ul class="row" >
+					<li>
+						<div>
+							<img alt="" src="Png/DeskTopForHome.png">							
+						</div>						
+					</li>
+					<li>						
+							<img alt="" src="Png/DeskTopForWork.png">							
+					</li>
+				</ul>
+			</li>
+			<li>
+				Tablets &amp; 2-in-One Laptops 
+				<ul class="row">
+					<li>						
+							<img alt="" src="Png/TabletsForHome.bmp">											
+					</li>
+					<li>						
+							<img alt="" src="Png/TabletsForWork.bmp">										
+					</li>
+				</ul>
+			</li>
+			<li>
+				Gaming
+				<ul class="row">
+					<li>						
+							<img alt="" src="Png/GamingAlienware.png">										
+					</li>
+					<li>					
+							<img alt="" src="Png/GamingDell.png">											
+					</li>
+				</ul>
+			</li>
+			<li>
+				Work Stations
+			</li>
+			<li>
+				Thin Clients
+			</li>
+			<li>
+				Servers and Storage
+			</li>
+			<li>
+				Networking
+				<ul class="row">
+					<li>						
+						<img alt="" src="Png/NetworkingForHome.png">																
+					</li>
+					<li>						
+						<img alt="" src="Png/NetworkingForWork.bmp">
+					</li>
+				</ul>
+			</li>
+			<li>
+				Monitors
+				<ul class="row">
+					<li>						
+						<img alt="" src="Png/MonitorsForHome.bmp">								
+					</li>
+					<li>
+						<img alt="" src="Png/MonitorsForWork.bmp">
+					</li>
+				</ul>
+			</li>
+			<li>
+				Printers &amp; Ink
+				<ul class="row">
+					<li>
+						<img alt="" src="Png/PrintersForHome.bmp">
+					</li>
+					<li>
+						<img alt="" src="Png/PrintersForWork.bmp">
+					</li>
+				</ul>
+			</li>
+			<li>
+				Software
+				<ul class="row">
+					<li>
+						<img alt="" src="Png/SoftwareForHome.png">
+					</li>
+					<li>
+						<img alt="" src="Png/SoftwareForWork.png">
+					</li>
+				</ul>
+			</li>	
+			<li>
+				Electronics and Acessories
+				<ul class="row">
+					<li>
+						<img alt="" src="Png/ElectronicsForHome.bmp">
+					</li>
+					<li>
+						<img alt="" src="Png/ElectronicsForWork.png">
+					</li>
+				</ul>
+			</li>
+			<li>
+				Gateways &amp; Embedded PCs
+			</li>			
+		</ul>		
+	</li>
+	<li>
+		Solutions
+		<ul>
+			<li>
+				View all Solutions
+			</li>
+			<li>
+				Industries
+				<ul style="border-left:thin blue dotted;">
+					<li >Education</li>
+					<li>Federal&nbsp;Government</li>
+					<li>Health Care</li>
+				</ul>
+			</li>
+			<li>
+				Small Business Solutions &emsp;
+				<ul style="border-left:thin blue dotted">
+					<li>Small Business Central</li>
+					<li>Dell Expert Network</li>
+					<li >Dell Professional<br>Associations&nbsp; and non Profits</li>
+					<li>Dell for Entrepreneurs</li>
+				</ul>
+			</li>
+			<li>
+				Big Data
+			</li>
+			<li>
+				Cloud
+			</li>
+			<li>
+				Data Center
+				<ul>
+					<li>Data Center - Servers</li>
+					<li>Data Center - Storage</li>
+					<li>Data Center - Networking</li>
+					<li>Data Center - Modular<br>Ifrastructure</li>
+				</ul>
+			</li>
+			<li>
+				Desktop Virtualization
+			</li>
+			<li>Internet of Things</li>
+			<li>PC as a Serivice (PCaas)for<br>Business</li>
+			<li>Training &amp; Certification</li>
+			<li>
+				Unified Workspace
+			</li>
+			<li>Dell EMC Solutions</li>
+		</ul>
+	</li>
+	<li>
+		Services
+		<ul>
+			<li>View All Services</li>
+			<li>Warranty Extension</li>
+			<li>Services for Home</li>
+			<li>Services for Small Business</li>
+			<li>Support Services for Commercial</li>
+			<li>Consulting</li>
+			<li>Managed Services</li>
+			<li>Deployment Services</li>
+		</ul>
+	</li>
+	<li>
+		Support
+		<ul>
+			<li>View All Support</li>
+			<li>Product Support</li>
+			<li>Knowledge Base</li>
+			<li>Warranty &amp; Contracts</li>
+			<li >Service Requests</li>
+			<li>Order Support</li>
+			<li>Contact Us</li>
+		</ul>
+	</li>   
+	<li>
+		Deals
+		<ul>   
+			<li>
+				Laptop Deals
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/LapTopsForHome.bmp">
+					</li>
+					<li>	
+							<img alt="" src="Png/LaptTopsForWork.png">
+					</li>
+				</ul>
+			</li>
+			<li>
+				Desktop Deals
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/DeskTopForHome.png">
+					</li>
+					<li>
+							<img alt="" src="Png/DeskTopForWork.png">
+					</li>
+				</ul>
+			</li>
+			<li>Workstatation Deals</li>
+			<li>Server Deals</li>
+			<li>Storage &amp; Networking Deals &emsp;</li>
+			<li>
+				Electronics &amp;<br> Accessories Deals
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/DealElectronicForHome.bmp">
+					</li>
+					<li>
+							<img alt="" src="Png/DealElectronicForWork.png">
+					</li>
+				</ul>
+			</li>
+			<li>
+				Monitor Deals
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/DealMonitorForHome.bmp">
+					</li>
+					<li>
+							<img alt="" src="Png/DealMonitorForWork.bmp">
+					</li>
+				</ul>
+			</li>
+			<li>
+				TV Deals
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/DealTVForHome.bmp" >
+							<span>For Home</span>
+							<span>View all TV Deals for Home</span>
+					</li>
+					<li>
+							<img alt="" src="Png/DealTVForWork.png">
+					</li>
+				</ul>
+			</li>
+			<li>
+				Dell Outlet
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/DealDellOutletForHome.png" >
+					</li>
+					<li>
+							<img alt="" src="Png/DealDellOutlookForWork.bmp" >
+					</li>
+				</ul>
+			</li>
+			<li>
+				Dell Rewards
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/DellRewardsForHome.png" >
+					</li>
+					<li>
+							<img alt="" src="Png/DellRewardsForWork.png" >
+					</li>
+				</ul>
+			</li>
+			<li>
+				Employee, Military, Student<br>
+				Discounts
+			</li>
+			<li>
+				Coupons
+				<ul class="row">
+					<li>
+							<img alt="" src="Png/DealsCouponsForHome.png" >
+					</li>
+					<li>
+							<img alt="" src="Png/DealsDellCouponsForWork.png" >
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</li>
+	<li>
+		Financing
+		<ul>
+			<li>
+				For Home Purposes
+				<ul style="border-left:thin blue dotted">
+					<li>Learn about Financing</li>
+					<li>Exclusive Financing Offers</li>
+					<li>Apply for Credit</li>
+					<li>Get Pre-Qualified</li>
+				</ul>
+			</li>
+			<li>
+				For Business Purposes
+				<ul style="border-left:thin blue dotted">
+					<li>Small Business Financing &amp;<br>Leasing</li>
+					<li>Apply for Dell Business<br>Credit</li>
+					<li>Medium Business 
+						&amp; large<br>Enterprise</li>					
+				</ul>
+			</li>
+			<li>Pay Bill &amp; Manage Account</li>
+		</ul>
+	</li>	
+</ul>
+	
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>	
+	
+<section>
+	<h2>The Menu CSS and HTML</h2>	
+	<br>
+	<div style="text-align:left;display:table;background-color:rgb(255,245,525);padding:0 2em 2em 2em;border-radius:20px;border:thin black solid">
+		<span class="centerTable">CSS for the Menu </span>
+		<div id="showCSS" style="font-size:14px;" ></div>
+	</div>
+	<br><br><br><br><br><br>
+	
+	<div style="text-align:left;display:table;background-color:rgb(255,245,525);padding:0 2em 2em 2em;border-radius:20px;border:thin black solid">
+		<span class="centerTable">HTML for the Menu</span>	
+		<div id="showMenu"></div>
+	</div>
+
+	
+</section>	
+</html>
+

@@ -1,0 +1,90 @@
+﻿ <!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Dell Menu</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<script src="PrettyCSS.js"></script>
+	<script src="PrettyHTML.js"></script>
+	<script>		
+		window.addEventListener('load', function() 
+		{			
+			var innerCSS = document.getElementById("menuStyle").outerHTML;
+			var pretty = prettyHTML(innerCSS);
+			document.getElementById("showCSS").innerHTML = pretty;
+			
+			//---------------------------------------------------------------
+			
+			var menu = document.getElementById("menu");
+			var showMenu = document.getElementById("showMenu");			
+			var html = menu.outerHTML;			
+			var x = prettyHTML(html);			
+			showMenu.innerHTML = x;
+			
+			var items = document.querySelectorAll("ul.menu>li");
+			for(var i = 0; i < items.length; i++)
+			{					
+				items[i].onmouseover=function(){dim(true); }
+				items[i].onmouseout=function(){dim(false); }
+			}
+		});
+					
+		function dim(doDim)
+		{
+			var dimmer = document.getElementById("dimmer");
+			if(doDim)
+			{				
+				dimmer.style.display = "block";				
+			} 
+			else
+			{
+				dimmer.style.display = "none";				
+			}
+		}		
+	</script>
+	
+	<style id="menuStyle">		
+		
+		/* The Basics**********************************************************/
+		ul.menu {font-size:15px;}	
+		ul.menu, ul.menu ul {padding:0; list-style:none;}	
+		ul.menu li > ul {visibility:collapse; position:absolute; left:100%;  
+			top:0; border-left:0px rgba(255, 0, 0, 0) solid;}
+		ul.menu li:hover > ul {visibility:visible}		
+		ul.menu li {margin:0; position:relative;white-space:nowrap;
+			padding:0.5em;text-align:left}
+		ul.menu.row, ul.menu ul.row {display:flex;}
+		ul.menu.row > li > ul, ul.menu ul.row > li > ul {left:0;top:100%;}		
+		/*********************************************************************/
+		
+			
+	</style> 				
+</head>
+
+<body style="z-index:1;padding-right:1em;width:800px;font-size:16px;" class="GPeachBlue" >
+<div id="dimmer"></div>		
+<ul class="menu row" id="menu">
+ 	
+		
+</ul>
+<header>
+	<h1>The Dell Menu<br>May the Flex be with You!</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>	
+	<span class="centerTable" style="font-size: 1.0em; margin-top:.5em;color: maroon">© 2019 Meouzer Consortium</span>	
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+	Programmers ask me all the time. Meouzer!  
+	How do I make a great professional Menu that I can be proud of?
+	I say it's just just six lines of CSS that form the basis of every great looking Menu!<br>
+	<span style="float:right">Meouzer</span>
+	</div>
+</blockquote>
+	
+	
+	
+</html>
+
