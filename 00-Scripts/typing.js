@@ -4,13 +4,6 @@
 	// uses: no other js file
 	
 		
-	// This file: typing.js includes typing functions
- 	// needed by the whole library but includes other 
- 	// functions needed in multiple places of the library. 
- 	// So it's more than just typing, and a possible rename 
- 	// is in order.
- 	
-	
 	function nativeType(x)
     {
         const str = Object.prototype.toString.call(x);
