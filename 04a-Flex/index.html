@@ -1,0 +1,1520 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta content="text/html;" charset="utf-8">
+<title>Flex Box</title>	
+
+	<link href="../00-Commons/Main.css" rel="stylesheet" >
+	<style type="text/css">
+		div.flex > div {border-radius:20px; padding:0 1em 1em 1em;position:relative;
+			min-width:160px; min-height:100px;} /*  */
+		div.flex> div:nth-child(1){background-color:rgb(241, 61, 152);} /*carnation*/
+		div.flex> div:nth-child(2){background-color:rgb(228, 79, 58);} /*cherry*/
+		div.flex> div:nth-child(3){background-color:rgb(245, 123, 59);} /*tangerine*/
+		div.flex> div:nth-child(4){background-color:rgb(248, 160, 53)} /*orange*/		
+		div.flex> div:nth-child(5){background-color:rgb(253, 212, 82);} /*cantaloupe*/
+		div.flex> div:nth-child(6){background-color:rgb(253, 243, 44)} /*lemon*/
+		div.flex> div:nth-child(7){background-color:rgb(184, 217, 148)} /*HoneyDew*/
+		div.flex> div:nth-child(8){background-color:rgb(52, 184, 120)} /*Clover*/
+		div.flex> div:nth-child(9){background-color:rgb(42,187, 244)} /*Sky*/
+		div.flex> div:nth-child(10){background-color:rgb(128, 147, 211)} /*Blueberry*/
+		div.flex> div:nth-child(11){background-color:rgb(156, 113, 192)} /*Orchid*/		
+		div.flex {width:750px;display:flex;border: thin #000000 solid;height:450px;}
+		section{margin-left:3em;}
+	</style>
+	
+	<script type="text/javascript">	
+		
+		var X = new (function dom ()
+		{	
+			var quizzing = false;
+			var target; 							
+			var flexDirection; 		
+			var justifyContent; 
+			var alignContent;	
+			var alignItems; 		
+			var flexWrap; 					
+			var flexDirectionValue = "row";
+			var justifyContentValue = "flex-start";
+			var alignItemsValue = "start";
+			var displayAxesButton;
+			var randomizeButton;
+			var numberItemsList;
+											
+			window.addEventListener("load", function()
+			{				
+				target = document.getElementById("target");					
+				flexDirection = document.getElementById("flex-direction");
+				justifyContent = document.getElementById("justify-content");
+				alignContent = document.getElementById("align-content");
+				alignItems = document.getElementById("align-items");	
+				flexWrap = document.getElementById("flex-wrap");
+				displayAxesButton = document.getElementById("display-axes");
+				randomizeButton = document.getElementById("randomize");
+				numberItemsList = document.getElementById("number-items");
+				
+				initializeDisplay();				
+			});			
+			
+			function initializeDisplay()
+			{
+				target.style.justifyContent = justifyContent.value = "flex-start";
+				target.style.alignItems =   alignItems.value = "flex-start";
+				target.style.flexDirection =  flexDirection.value = "row";				
+				target.style.flexWrap = flexWrap.value = "nowrap";
+				numberItemsList.value = 3;
+				X.showAxes(true);
+			
+				var selections = document.querySelectorAll("select");
+						
+				for(var i = 0; i < selections.length; i++)
+				{	
+					var sel = selections[i];				
+					var attrib = sel.previousSibling.previousSibling.innerHTML;				
+					if(attrib == "") attrib = sel.previousSibling.previousSibling.previousSibling.innerHTML;
+									
+					switch(attrib)
+					{					
+						case "align-self:":
+							sel.value = "";	
+							break;							
+					}
+				}				
+			}
+			
+			this.updateJustifyContent = function()
+ 			{	 		
+ 				if(!quizzing)
+ 				{ 								
+					target.style.justifyContent = justifyContent.value;
+				}
+				else
+				{
+					if(justifyContent.value == target.style.justifyContent)  // justifyContentValue
+					{						
+						justifyContent.style.backgroundColor = "lime";
+					}
+					else
+					{
+						justifyContent.style.backgroundColor = "red";
+					}
+				}			
+			}
+			
+			this.updateAlignContent= function()
+ 			{	 		
+ 				if(!quizzing)
+ 				{ 								
+					target.style.alignContent = alignContent.value;
+				}
+				else
+				{
+					if(alignContent.value == target.style.alignContent)  // justifyContentValue
+					{						
+						alignContent.style.backgroundColor = "lime";
+					}
+					else
+					{
+						alignContent.style.backgroundColor = "red";
+					}
+				}			
+			}
+
+			
+			//updateAlignContent
+				
+			this.updateAlignItems = function()
+			{				
+				if(!quizzing)
+				{							
+					document.getElementById("target").style.alignItems = alignItems.value;												
+				}
+				else
+				{
+					if(alignItems.value ==  target.style.alignItems)  // alignItemsValue
+					{						
+						alignItems.style.backgroundColor = "lime";
+					}
+					else
+					{
+						alignItems.style.backgroundColor = "red";
+					}
+				}
+			}			
+			
+			this.updateFlexDirection = function()
+			{		
+				if(!quizzing)
+				{			
+					target.style.flexDirection = flexDirection.value;
+					this.updateWrap(); // firefox buggy
+					this.showAxes(null);
+					updateAlignmentBoundries();
+				}
+				else
+				{
+					if(flexDirection.value ==   target.style.flexDirection ) //flexDirectionValue 
+					{						
+						flexDirection.style.backgroundColor = "lime";
+					}
+					else
+					{
+						flexDirection.style.backgroundColor = "red";
+					}
+				}	
+			}
+			this.updateWrap = function()
+			{								
+				target.style.flexWrap = flexWrap.value;			
+				this.showAxes(null);
+				updateAlignmentBoundries();
+			}	
+			
+			function setNumberFlexItems(n)
+			{			
+				var target = document.getElementById("target");
+				var childdivs = target.getElementsByTagName("div");
+				var count = childdivs.length;
+				
+				if(count < n )
+				{
+					for(var i = 0; i < n - count; i++)
+					{
+						var div = document.getElementById("test").cloneNode(true);							
+						document.getElementById("target").appendChild(div);
+					}
+				} 
+				else if (n < count )
+				{
+					for(var i = 0; i < count - n; i++)
+					{
+						target.removeChild(childdivs[childdivs.length - 1]);
+					}
+				}
+			}
+			
+			this.upDateNumberItems = function(list)
+			{			
+				if(list.value == 5)
+				{
+					document.getElementById("test4").style.display = "block";
+					document.getElementById("test5").style.display = "block";
+				}
+				else
+				{
+					document.getElementById("test4").style.display = "none";
+					document.getElementById("test5").style.display = "none";
+
+				}
+			
+				//setNumberFlexItems(list.value);	
+				//updateAlignmentBoundries();					
+			}		
+			
+			
+			this.showAxes = function(doShow, disable ) // doShow: true|false|undefined|null    //////= false
+			{
+				// Two way between axes shown and displayAxesButton	
+				// true: show axes and update displayAxesButton
+				// false: hide axes and update displayAxesButton
+				// undefined: toggle axes visibility and update displayAxesButton
+				// null: dont toggle axes visibility but updateAxes based on flex-direction and flex-wrap. 		
+			
+				function clear()
+				{
+					var axes = document.querySelectorAll("#container img");
+				
+					for(var i = 0; i < axes.length; i++)
+					{
+						axes[i].style.display = "none";
+					}	
+				}					
+			
+				function refresh()
+				{		
+				
+					switch(target.style.flexWrap)
+					{
+						case "nowrap":
+						case "wrap":
+							switch(target.style.flexDirection)
+							{
+								case "row":								
+									document.getElementById("Axis-Top-Main-Right").style.display = "block";						
+									document.getElementById("Axis-Left-Cross-Down").style.display = "block";		
+									break;
+								case "row-reverse":		
+									document.getElementById("Axis-Top-Main-Left").style.display = "block";						
+									document.getElementById("Axis-Right-Cross-Down").style.display = "block";			
+									break;	
+								case "column":											
+									document.getElementById("Axis-Left-Main-Down").style.display = "block";	   				
+									document.getElementById("Axis-Top-Cross-Right").style.display = "block";	  	
+									break;	
+								case "column-reverse":									
+									document.getElementById("Axis-Bottom-Cross-Right").style.display = "block";  						
+									document.getElementById("Axis-Left-Main-Up").style.display = "block";				
+									break;						
+							}	
+							break;
+						case "wrap-reverse":
+							switch(target.style.flexDirection)
+							{
+								case "row":								
+									document.getElementById("Axis-Bottom-Main-Right").style.display = "block";						
+									document.getElementById("Axis-Left-Cross-Up").style.display = "block";		
+									break;
+								case "row-reverse":		
+									document.getElementById("Axis-Bottom-Main-Left").style.display = "block";						
+									document.getElementById("Axis-Right-Cross-Up").style.display = "block";			
+									break;	
+								case "column":											
+									document.getElementById("Axis-Right-Main-Down").style.display = "block";	   				
+									document.getElementById("Axis-Top-Cross-Left").style.display = "block";	  	
+									break;	
+								case "column-reverse":									
+									document.getElementById("Axis-Bottom-Cross-Left").style.display = "block";  						
+									document.getElementById("Axis-Right-Main-Up").style.display = "block";				
+									break;						
+							}
+							break;
+					}					
+				}			
+			
+				if(doShow === undefined)
+				{					
+					this.showAxes(displayAxesButton.innerHTML == "Show Axes");
+				}
+				else if (doShow === null)
+				{
+					if(displayAxesButton.innerHTML == "Hide Axes")
+					{
+						clear();
+						refresh();						
+					}
+					else
+					{
+						clear();						
+					}					
+				}					
+				else if(doShow === false)
+				{
+					displayAxesButton.innerHTML = "Show Axes";
+					clear();
+				}
+				else
+				{	
+					displayAxesButton.innerHTML = "Hide Axes";	
+					clear();																	
+					refresh();	
+				}	
+				
+				// try  displayAxesButton.disabled = disable (check if ok if disable undefined)
+				
+				if(disable)
+				{
+					displayAxesButton.disabled = true;
+				}	
+				else 
+				{
+					displayAxesButton.disabled = false;
+				}				
+			}
+			
+		
+			function updateAlignmentBoundries()
+			{				
+				var list = document.getElementById("number-items");					
+				var flexDir = target.style.flexDirection;
+								
+				if(flexWrap.value == "nowrap")
+				{
+					target.style.backgroundImage = "";
+				}			
+				else if(list.value == 3)
+				{
+					target.style.backgroundImage = "";
+				}
+				else if(flexDir == "row" || flexDir == "row-reverse")
+				{
+					target.style.backgroundImage = "url('Images/Horizontal-Alignment-Boundry.svg')";
+				}
+				else 
+				{
+					target.style.backgroundImage = "url('Images/Vertical-Alignment-Boundry.svg')";
+	
+				}
+			}
+						
+			this.randomize = function randomize()
+			{			
+				var flexDirectionA = ["row", "row-reverse", "column", "column-reverse"];					
+				var justifyContentA = ["flex-start", "flex-end", "space-between", "space-evenly" ,"space-around"];
+				var alignItemsA = ["flex-start", "center", "flex-end", "stretch"];		
+					
+				var fdai = Math.floor(Math.random()*4);
+				var jcai = Math.floor(Math.random()*5);
+				var aiai = Math.floor(Math.random()*4);	
+									
+				target.style.flexDirection = flexDirectionValue = flexDirectionA[fdai];
+				target.style.justifyContent  = justifyContentValue = justifyContentA[jcai];
+				target.style.alignItems = alignItemsValue = alignItemsA[aiai];	
+					
+											
+				if(!quizzing) 
+				{ 
+					this.showAxes(null); 
+					flexDirection.value = target.style.flexDirection;
+					justifyContent.value = target.style.justifyContent; 
+					alignItems.value = target.style.alignItems ;					
+				}
+				else
+				{					
+				
+					if(flexDirection.value == flexDirectionValue)
+					{
+						flexDirection.value = flexDirectionA[(fdai + 1) % 4];
+					}
+					if(justifyContent.value == justifyContentValue)
+					{
+						justifyContent.value = justifyContentA[(jcai + 1) % 5];
+					}
+					if(alignItems.value == alignItemsValue)
+					{
+						alignItems.value = alignItemsA[(aiai + 1) % 4];
+					}				
+					
+					setColors();
+				}	
+				
+				
+				updateAlignmentBoundries();			
+			}
+			
+			function setColors()
+			{
+				if(quizzing)
+				{
+					flexDirection.style.backgroundColor = 
+								(target.style.flexDirection == flexDirection.value)?"lime":"yellow";
+								
+					justifyContent.style.backgroundColor =
+						(target.style.justifyContent == justifyContent.value)?"lime":"yellow";
+						
+					alignItems.style.backgroundColor =
+						(target.style.alignItems == alignItems.value)?"lime":"yellow";
+				}
+				else
+				{
+					flexDirection.style.backgroundColor = "white";
+					justifyContent.style.backgroundColor = "white";
+					alignItems.style.backgroundColor = "white";
+				}	
+			}
+			
+					
+			this.doQuiz = function(doQuizButton)
+			{		
+					if(doQuizButton.innerHTML == "Quiz")
+					{		
+						quizzing = true;												
+						this.randomize();																		
+						doQuizButton.innerHTML = "Stop Quiz";						
+						this.showAxes(false, true); // disabled true
+						updateAlignmentBoundries();
+					}
+					else
+					{
+						doQuizButton.innerHTML = "Quiz";
+						
+						target.style.flexDirection = flexDirection.value = flexDirectionValue;
+						target.style.justifyContent = justifyContent.value = justifyContentValue;
+						target.style.alignItems  = alignItems.value = alignItemsValue;
+						
+						this.showAxes(null, false);												
+						quizzing = false;	
+						setColors();
+					
+						updateAlignmentBoundries();
+					}
+			}		
+		});			
+			
+		function updateAlignSelf(x)
+		{				
+			x.parentNode.style.alignSelf = x.value;
+		}	
+		
+		
+		function rollIt(x)
+		{
+			var p = x.parentNode;
+			var sibs = p.querySelectorAll("img");
+			
+			for(var i = 0; i < sibs.length; i++)
+			{
+				sibs[i].style.width = "170px";				
+			}
+			x.style.width = "290px";
+			if(!x.onmouseout)
+			{
+				x.onmouseout = function()
+				{
+					for(var i = 0; i < sibs.length; i++)
+					{
+						sibs[i].style.width = "200px";				
+					}
+				}
+			}
+		}
+	
+	</script>
+	
+	<style type="text/css">
+		div.flex {counter-reset:number} 
+		div.flex > div > span:nth-of-type(1){counter-increment:number}
+		div.flex > div > span:nth-of-type(1):after{content:counter(number)}			
+
+		body{counter-reset:lessonNumber}
+		section.lesson{counter-increment:lessonNumber}			
+		section.lesson{counter-reset:excerciseNumber}
+		
+		section.lesson p.exercise{margin:3em 0 3em 0;display:flex;counter-increment:excerciseNumber}
+		
+		section.lesson p.exercise>span:first-of-type {display:inline-flex;font-size:2em;
+			align-items:flex-start;margin-right:10px;color:red; }			
+		section.lesson p.exercise>span:first-of-type:before{content:counter(lessonNumber) counter(excerciseNumber, lower-latin)}
+		section.lesson p.exercise>span:first-of-type:after{content:url("Images/Art/Rubiks-Cube-30px.png");}
+				
+		section.lesson span.exercise{counter-increment:excerciseNumber;font-size:2em;color:red;
+			display:inline-flex;align-items:center;}
+		section.lesson span.exercise:before{content:counter(lessonNumber) counter(excerciseNumber, lower-latin)}
+		section.lesson span.exercise:after{content:url("Images/Art/Rubiks-Cube-30px.png");margin-top:.5em}
+
+		
+				
+		/*https://stackoverflow.com/questions/23608346/how-to-style-a-div-like-the-button-element*/
+		div.button {
+		    display:inline-block;
+		    color:#444;
+		    border:1px solid #CCC;
+		    background:#DDD;
+		    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+		    cursor:pointer;
+		    vertical-align:middle;
+		    max-width: 100px;
+		    padding: 5px;
+		    text-align: center;	}
+		div.button:active {
+    		color:red;
+    		box-shadow: 0 0 5px -1px rgba(0,0,0,0.6); }		
+	</style>	
+</head>
+
+<body style="width:60vw;font-size:16px;" class="GPeachBlue">
+<img alt="" src="Images/Art/ivy-header.png" style="position:absolute;top:0;left:0;z-index:-1;height:1450px;width:80vw;opacity:.1">
+ <div style="display:flex;flex-direction:column;position:absolute;left:78vw;top:0;width:20.5vw;
+	justify-content:start;overflow:hidden;background-color:yellow">
+	<img alt="" src="Images/Column.png" style="height:1500px;width:25vw;">
+	 <img alt="" src="Images/Column.png"  style="height:1500px;width:25vw;">
+	<img alt="" src="Images/Column.png"  style="height:1500px;width:25vw;">
+	<img alt="" src="Images/Column.png"  style="height:1500px;width:25vw;">
+	<img alt="" src="Images/Column.png"  style="height:1500px;width:25vw;">
+	<img alt="" src="Images/Column.png"  style="height:1500px;width:25vw;">
+	<img alt="" src="Images/Column.png"  style="height:1500px;width:25vw;">
+	<img alt="" src="Images/Column.png"  style="height:1500px;width:25vw;">
+		
+</div>	
+	<header>
+		<h1>Meouzer's Interactive Guide to Flex Box Part 1</h1>
+		<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer</span>
+		<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+		<span class="centerTable">© 2019 Meouzer Consortium</span>	
+	</header>		
+		
+	<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+		<img alt="loading" src="Images/Meouzer.jpg" style="width: 100px; display: inline-block;">
+		<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+		HTML was once exciting before everyone found all the bugs. So Flex is finally something fascinating and new. Something
+		new where things just might go wrong.
+		<br><span style="float:right">Meouzer</span>
+		</div>
+	</blockquote>
+	<p>
+		Meouzer is fascinated by bugs. Especially the IE11 bugs concerning wrap-reverse that are still
+		in place after years. For that reason we suggest you do not use IE11 for the demo in order not
+		to get the wrong ideas. Edge, Firefox, Chrome, and Opera are OK.
+	</p>
+	<div style=" display:flex;align-items:center;width:800px;margin-top:100px;
+		justify-content:space-around;align-items:end;
+		box-sizing:border-box;background-color:black;flex-wrap:wrap;padding:1em">
+		<div  style="display:flex;flex-direction:column;margin-right:3%">
+			 <label style="color:yellow;">flex&#x2011;direction:</label> 
+			 <select id="flex-direction" onchange="X.updateFlexDirection()" style="font-size:1.4em">
+			  <option value="row">row</option>
+			  <option value="row-reverse">row-reverse</option>
+			  <option value="column">column</option>
+			  <option value="column-reverse">column-reverse</option>	  
+			 </select>
+		 </div>
+		<div style="display:flex;flex-direction:column;margin-right:3%">
+			<label style="color:yellow;width:max-width;">justify&#x2011;content:</label>
+			<select id="justify-content" onchange="X.updateJustifyContent();" style="font-size:1.4em">
+			  <option value="flex-start">flex-start</option>
+			  <option value="flex-end">flex-end</option>
+			  <option value="space-between">space-between</option>
+			  <option value="space-evenly">space-evenly</option>
+			  <option value="space-around">space-around</option>
+			 </select>
+		 </div>
+		 <div style="display:flex;flex-direction:column;margin-right:3%">
+			 <label style="color:yellow;">align&#x2011;items:</label> 
+			 <select id="align-items" onchange="X.updateAlignItems()" style="font-size:1.4em">
+			 <option value="flex-start">flex-start</option>
+			 <option value="center">center</option>
+			 <option value="flex-end">flex-end</option>
+			  <option value="stretch">stretch</option>			  	  
+			 </select>
+		 </div>		
+		 
+		 <div style="display:flex;flex-direction:column;margin-right:3%;visibility:hidden">
+			<label style="color:yellow;width:max-width;">align&#x2011;content:</label>
+			<select id="align-content" onchange="X.updateAlignContent();" style="font-size:1.4em">
+			  <option value=""></option>
+			  <option value="flex-start">flex-start</option>
+			  <option value="flex-end">flex-end</option>
+			  <option value="space-between">space-between</option>
+			  <option value="space-evenly">space-evenly</option>
+			  <option value="space-around">space-around</option>
+			 </select>
+		 </div>
+		
+		 <button id="randomize"  onclick="X.randomize()" style="margin-top:1em;margin-left:0em">Randomize</button><br>
+		 <button id="quiz" onclick="X.doQuiz(this)" style="margin-top:1em;">Quiz</button>
+		 <button id="display-axes" onclick="X.showAxes()" style="margin-top:1em;margin-right:8em;margin-left:2em">Hide Axes</button>
+		 
+		  <div  style="display:flex;flex-direction:column;margin-top:1em; margin-right:4em">
+			 <label style="color:yellow;">flex-wrap:</label> 
+			 <select id="flex-wrap" onchange="X.updateWrap()">
+				 <option value="nowrap">nowrap</option>
+			  <option value="wrap">wrap</option>
+			  <option value="wrap-reverse">wrap-reverse</option>				  				  	  
+			 </select>			 	
+		 </div>
+		 <div>
+			<label style="color:yellow;">number-items:</label> 
+			<select id="number-items" onchange="X.upDateNumberItems(this)">
+				<option value=3>3</option>
+			  	<option value=5>5</option>		  				  			  				  	  
+			</select>			 
+		</div>
+	</div>	
+	
+	<div id="overflow-container" style="padding-top:5em;width:1200px;height:680px;overflow:hidden;margin-left:-100px;">
+		<div id="container" style="display:flex;margin-left:100px;width:900px">	
+			<div style="min-width:35px;max-width:35px">
+				<!-- Left -->
+				<img alt="Axis-Left-Main-Down" id ="Axis-Left-Main-Down" src="Images/Axes/Axis-Left-Main-Down.svg" 
+					style="height:450px;margin-top:25px;display:none;">				
+				<img alt="Axis-Left-Cross-Down" id ="Axis-Left-Cross-Down" src="Images/Axes/Axis-Left-Cross-Down.svg" 
+					style="height:450px; margin-top:25px;;display:none;" >				
+				<img alt="Axis-Left-Main-Up" id="Axis-Left-Main-Up" src="Images/Axes/Axis-Left-Main-Up.svg" 
+					style="height:450px;;display:none;"> 	
+				<img alt="Axis-Left-Cross-Up" id ="Axis-Left-Cross-Up" src="Images/Axes/Axis-Left-Cross-Up.svg" 
+					style="height:450px;;display:none;" >			
+
+						
+			</div>
+			<div style="display:flex;flex-direction:column;width:750px;">	
+				<div style="max-height:25px;">
+					<!-- Top -->		
+					<img alt="Axis-Top-Cross-Right" id="Axis-Top-Cross-Right" src="Images/Axes/Axis-Top-Cross-Right.svg" 
+						style="width:750px;height:35px;margin-top:-1em;display:none;">		
+					<img alt="Axis-Top-Main-Right" id="Axis-Top-Main-Right" src="Images/Axes/Axis-Top-Main-Right.svg" 
+						style="width:750px;height:35px;margin-top:-1em;display:none;">				
+					<img alt="Axis-Top-Main-Left" id="Axis-Top-Main-Left" src="Images/Axes/Axis-Top-Main-Left.svg" 
+						style="width:750px;height:35px;margin-top:-1em;display:none;"> 
+						
+					<img alt="Axis-Top-Cross-Left" id="Axis-Top-Cross-Left" src="Images/Axes/Axis-Top-Cross-Left.svg" 
+						style="width:750px;height:35px;margin-top:-1em;display:none;"> 
+	
+						
+				</div>							
+				<div id="target" class="flex" style="flex-wrap:wrap;background-color:rgb(100,100,100);align-items:start;
+					flex-basis:auto;min-width:750px;position:relative;background-size: 100% 100%;">					
+					<div id="test" style="display:block;text-align:center; padding:0 .5em .5em .5em">
+						<span style="position:absolute;top:0px;left:10px"></span><br>					
+						<label>align-self:</label><br>
+						<select onchange="updateAlignSelf(this)">
+							<option value=""></option>												
+					 		 <option value="flex-start">flex-start</option>
+					 		 <option value="center">center</option>
+					 		 <option value="flex-end">flex-end</option>
+					 		 <option value="stretch">stretch</option>
+					 	</select><br>	
+					 	<span style="visibility:hidden"></span>						 												
+					</div>
+					<div id="test2" style="display:block;text-align:center;">
+						<span style="position:absolute;top:0px;left:10px"></span><br>					
+						<label>align-self:</label><br>
+						<select onchange="updateAlignSelf(this)">
+							<option value=""></option>												
+					 		 <option value="flex-start">flex-start</option>
+					 		 <option value="center">center</option>
+					 		 <option value="flex-end">flex-end</option>
+					 		 <option value="stretch">stretch</option>
+					 	</select><br>	
+					 	<span style="visibility:hidden">--------------------------------</span>	
+					 	<br><br><br><br>													
+					</div>
+					<div id="test3" style="display:block;text-align:center;">
+						<span style="position:absolute;top:0px;left:10px"></span><br>					
+						<label>align-self:</label><br>
+						<select onchange="updateAlignSelf(this)">
+							<option value=""></option>												
+					 		 <option value="flex-start">flex-start</option>
+					 		 <option value="center">center</option>
+					 		 <option value="flex-end">flex-end</option>
+					 		 <option value="stretch">stretch</option>
+					 	</select><br>	
+					 	<span style="visibility:hidden">-----------------------------</span>	
+					 	<br><br><br>													
+					</div>						
+
+					<div id="test4" style="display:block;text-align:center;display:none">
+						<span style="position:absolute;top:0px;left:10px"></span><br>					
+						<label>align-self:</label><br>
+						<select onchange="updateAlignSelf(this)">
+							<option value=""></option>												
+					 		 <option value="flex-start">flex-start</option>
+					 		 <option value="center">center</option>
+					 		 <option value="flex-end">flex-end</option>
+					 		 <option value="stretch">stretch</option>
+					 	</select><br>	
+					 	<span style="visibility:hidden">--------------------------------</span>	
+					 	<br><br><br><br>												
+					</div>
+					<div id="test5" style="display:block;text-align:center;display:none">
+						<span style="position:absolute;top:0px;left:10px"></span><br>					
+						<label>align-self:</label><br>
+						<select onchange="updateAlignSelf(this)">
+							<option value=""></option>												
+					 		 <option value="flex-start">flex-start</option>
+					 		 <option value="center">center</option>
+					 		 <option value="flex-end">flex-end</option>
+					 		 <option value="stretch">stretch</option>
+					 	</select><br>	
+					 	<span style="visibility:hidden">-----------------------------</span>	
+					 	<br><br><br>													
+					</div>												
+				</div>
+				<!-- Bottom -->
+				<img alt="" id="Axis-Bottom-Cross-Right" src="Images/Axes/Axis-Bottom-Cross-Right.svg" 
+					style="width:750px;height:35px;display:none;">	
+				<img alt="" id="Axis-Bottom-Main-Right" src="Images/Axes/Axis-Bottom-Main-Right.svg" 
+					style="width:750px;height:35px;display:none;">	
+				<img alt="" id="Axis-Bottom-Main-Left" src="Images/Axes/Axis-Bottom-Main-Left.svg" 
+					style="width:750px;height:35px;display:none;">					
+				<img alt="" id="Axis-Bottom-Cross-Left" src="Images/Axes/Axis-Bottom-Cross-Left.svg" 
+					style="width:750px;height:35px;display:none;">				
+			</div>
+			<!-- Right -->
+			<img alt="" id ="Axis-Right-Cross-Down" src="Images/Axes/Axis-Right-Cross-Down.svg" 
+				style="height:450px;margin-top:25px;margin-left:2px;width:35px;display:none;"> 
+			<img alt="" id ="Axis-Right-Cross-Up" src="Images/Axes/Axis-Right-Cross-Up.svg" 
+				style="height:450px;margin-top:25px;margin-left:2px;width:35px;margin-top:-0px;display:none;"> 
+			<img alt="" id ="Axis-Right-Main-Down" src="Images/Axes/Axis-Right-Main-Down.svg" 
+				style="height:450px;margin-top:20px;margin-left:2px;width:35px;display:none;"> 				
+			<img alt="" id ="Axis-Right-Main-Up" src="Images/Axes/Axis-Right-Main-Up.svg" 
+				style="height:450px;margin-top:0px;margin-left:2px;width:35px;display:none;"> 						
+		</div>
+	</div>	
+<section class="lesson">
+	<h2>Lesson 1: What is Flex About?</h2>
+	<p>
+		Flex is a two dimensional layout design based in CSS that positions <dfn>flex-items</dfn> 
+		within a <dfn>flex-box</dfn>.
+		The flex-items are laid out either in rows or columns with wrapping available to prevent overflow. 
+		Each row or column is a <dfn>flex-strip</dfn>. Every flex-strip is 
+		assigned an 
+		<dfn>alignment-box/confinement-box</dfn> that the items are free to move 
+		and stretch around in both vertically and horizontally. In a special circumstance, the alignment boxes 
+		themselves can be moved about in a small number of preset ways. 		
+	</p>
+	
+	<p class="display">
+		Every flex-box and in fact every alignment-box has a <dfn>main-axis</dfn> and a <dfn>cross-axis</dfn>
+		to specify position.		
+	</p>
+	<p>
+		However, position is not specified by coordinates, which sounds more strange than it actually is.
+		Flex provides a spectrum of numberless positioning presets.
+	</p>
+	<p>
+		With row layouts, the main-axis is horizontal, but with column layouts it is vertical.
+		Movement of flex-items is most restricted along the main axis since flex-items can move only so
+		far until they bump into another flex-item in the same flex-strip. Along the cross-axis there
+		is more freedom of movement since there is nothing in the way inside its alignment-box.
+	</p>
+	<p>
+		Along 
+		both the main-axis and cross-axis there are preset means of positioning that are esthetically pleasing.
+		By adjusting margins of flex-items, you have more fine-grained control. <!-- Using auto margins provides
+		good control in predictable ways. --><!-- Otherwise margins can get you in trouble: If a margin becomes
+		so large that a flex-item bumps into an item of another flex-strip, behaviour at least appears to
+		be undefined, and I seriously doubt the browsers pay much attention to that. -->
+	</p>
+	<p class="display">
+		To position with respect to the main-axis use the css style attribute <var>justify-content</var>.
+		To position with respect to the cross-axis use <var>align-items</var>. <u>They work across all
+		alignment boxes in parallel</u>. So if the flex-items in one alignment-box 
+		are centered with respect to the cross axis, so are the flex-items in any other alignment-box.
+		If the flex-items in one alignment box are spaced out evenly along the main-axis, so are the 
+		flex-items in any other alignment-box. <!-- It's only by setting margins on individual flex-items
+		that makes what's happening in one alignment-box different that what's happening in another. --> 
+	</p>
+	<p>
+		Flex-items are numbered by the order in which they are entered into the flex-box in HTML code.
+		The first flex-box will be closest to the origin of the two axes.  The flex-strips are also
+		numbered. The first flex-strip is the strip containing the first flex-item and will be the
+		flex-strip closest to the origin.				
+	</p>
+	<p class="display">
+		Flex-items always flow along the main axis, i.e., flex-items increase in numbering as you move
+		along the main axis.
+	</p>
+	<p class="display">
+		Flex-strips flow along the cross axis, i.e., flex-strip numbers increase as you move along 
+		in the direction of the cross axis.
+	</p>
+	<p class="display">
+		Setting the flex-box's css style attribute <var>flex-wrap</var> to <var>wrap-reverse</var>
+		will flip the direction of the cross axis to let the flex-strips flow in the direction 
+		opposite
+		to <span lang="en-us"></span>what they otherwise would.		
+	</p>
+	
+	
+	
+	
+</section>	
+
+<section class="lesson">
+	<h2>Lesson 2: The four Primary Layouts</h2>
+	<p class="display"> 
+		To make an element a flex-box,
+		assign its css style property <var>display</var> a value of <var>"flex"</var> or <var>"inline-flex"</var>.
+		Its items or <dfn>flex-items</dfn> are simply its direct children.		
+	</p>
+	<p>
+		If a text-node is a direct child of a flex-box, the text-node is a flex-item.
+	</p>
+	<p>
+		A flex-box may have one of four possible layouts.
+	</p>
+	<ol>
+		<li><dfn>Row</dfn> layout: items are laid out in horizontal rows left to right</li>
+		<li>
+			<dfn>Row Reverse</dfn> layout: items are laid out in horizontal rows right to left
+		</li>
+		<li><dfn>Column</dfn> layout: items are laid out in vertical columns top to bottom</li>
+		<li><dfn>Column Reverse</dfn> Layout: items are laid out in vertical columns bottom to top</li>
+	</ol>
+	<p>
+		See the diagrams below. The yellow box is a flex box with six flex-items. The row and row-reverse layouts 
+		each depict two <dfn>flex-strips</dfn> (rows). 		
+		The column and column-reverse layouts each depict two <dfn>flex-strips</dfn> (columns). 
+	</p>
+	<p class="display">The numeric labeling
+		indicates the order in which the items were added to the flex-box in HTML code.</p>	
+</section>
+<section class="lesson">
+	<h2>Lesson 3: The Main and Cross Axes</h2>
+	<p>
+		Once the axes rules have been read, go over the top row of diagrams very carefully. Based on flex-item
+		numbering, the main-axis is always easy to determine: as mentioned previously, flex-items flow along the main axis. 
+		Then the cross axis will be perpendicular to 
+		the main axis and point right or down. Once the top row is understood, go over the bottom row
+		where the cross axis has been flipped (so now points left or up). Another way to determine the
+		cross axis is to observe how the flex-strips flow: As mentioned previously, flex-strips flow along the 
+		cross-axis.  
+	</p>
+	<div style="display:flex;flex-wrap:wrap;justify-content:space-between;margin:2em 0 2em 0">
+		<img onmouseover="rollIt(this)" alt="" src="Images/Layout/Layout-Row-Wrap.svg" style="width:200px;">	
+		<img onmouseover="rollIt(this)"  alt="" src="Images/Layout/Layout-Row-Reverse-Wrap.svg" style="width:200px;">		
+		<img onmouseover="rollIt(this)"  alt="" src="Images/Layout/Layout-Column-Wrap.svg" style="width:200px;">
+		<img onmouseover="rollIt(this)"  alt="" src="Images/Layout/Layout-Column-Reverse-Wrap.svg" style="width:200px;">
+	</div>
+	<div style="display:flex;flex-wrap:wrap;justify-content:space-between;margin:2em 0 2em 0">
+		<img onmouseover="rollIt(this)" alt="" src="Images/Layout/Layout-Row-Wrap-Reverse.svg" style="width:200px;">	
+		<img onmouseover="rollIt(this)" alt="" src="Images/Layout/Layout-Row-Reverse-Wrap-Reverse.svg" style="width:200px;">		
+		<img onmouseover="rollIt(this)" alt="" src="Images/Layout/Layout-Column-Wrap-Reverse.svg" style="width:200px;">
+		<img onmouseover="rollIt(this)" alt="" src="Images/Layout/Layout-Column-Reverse-Reverse-Wrap.svg" style="width:200px;">
+	</div>
+	
+	<p>
+		 To describe placement within the flexbox we need a pair of axes relative to which 
+	 	 flex items are placed. The following discussion describes how it's done.
+	</p>	
+	<p>
+		It's very convent to take our axes as finite directional lines with a start and an end.
+		Their origin is always at one of the corners of the flexbox.
+		In the diagrams above the axes are supposed to meet precisely at a corner of the flex-box.
+		We simply had to move them so they could be seen.
+	</p>
+	<div class="display">
+		<span class="centerTable">The Main Axis Rule</span>
+		<ol>
+			<li>Row Layout:
+				<ul>
+					<li>The main axis points right.</li>
+				</ul>				
+			</li>
+			<li>
+				Row-reverse Layout:				
+				<ul>
+					<li>The main axis points left.</li>
+				</ul>	
+			</li>
+			<li>
+				Column Layout:
+				<ul><li>The main axis points down.</li></ul>				
+			</li>
+			<li>
+				Column-Reverse Layout:
+				<ul><li>The main axis points up.</li></ul>					
+			</li>			
+		</ol>
+	</div>
+	<div class="display" style="margin-top:1em">
+		<span class="centerTable" >The Cross Axis Rule</span>
+		<ul>
+			<li style="text-decoration:underline">
+				If flex-wrap is set to nowrap or wrap, the cross axis points right or down.
+			</li>
+			<li>
+				If flex-wrap is set to wrap-reverse, the cross axis flips direction.
+				So it points left or up.
+			</li>
+		</ul>
+	</div>
+	<section>
+		<h3>Main-Start, Main-End, Cross-Start, and Cross-End</h3>
+		<p>
+			Suppose a rectangle has sides parallel to the axes. The two sides parallel to the cross-axis
+			are called <dfn>main-start</dfn> and <dfn>main-end</dfn>. main-end is the one that is 
+			furthest along in the direction
+			of the main axis. The two sides parallel to the main-axis are <dfn>cross-start</dfn> and <dfn>cross-end</dfn>. 
+			cross-end is the one that is furthers along in the direction of the cross axis.
+		</p>
+	</section>	
+	
+	<!-- 
+	<section>
+		<h3>Four Special Rectangles</h3>
+		<p>
+			Suppose a rectangle has sides parallel to the axes. The two sides parallel to the cross-axis
+			are called <dfn>main-start</dfn> and <dfn>main-end</dfn>. main-end is the one that is furtherst along in the direction
+			of the main axis. The two sides parallel to the main-axis are <dfn>cross-start</dfn> and <dfn>cross-end</dfn>. 
+			cross-end is the one that is furtherst along in the direction of the cross axis.							
+		</p>
+		<p>
+			There are four rectangles of interest. They each have their very own main-start, main-end, cross-start,
+			and cross-end. 
+		</p>
+		<ol>
+			<li>The flex-box itself</li>
+			<li>
+				An aligment-box. So what's an alignment box?
+				<ul>
+					<li class="display">
+						The diagrams of lessons 4 and 5 relate to positioning within a single alignment-box. We'll
+						get to alingment boxes in <i>Lesson 6: Wrapping</i>. As mentioned in <i>Lesson 1: What is Flex About?</i>,
+						the two means of positioning, <var>justify-content</var>, and <var>align-content</var> work in parallel 
+						across all alignment-boxes. That means we have to look only at a single alignment-box to understand what's 
+						happening in them all. 		
+					</li>
+				</ul>
+			</li>
+			<li>
+				A flex-area
+				<ul>
+					A flex-area is the smallest cross sectional area containing a flex-strip.
+				</ul>
+			</li>
+			<li>A flex-item</li>
+		</ol>
+	</section>
+	<img alt="" src="Images/Start-End.svg">
+	<p>
+		The <dfn>main-size</dfn> is the distance from main-start to main-end. The <dfn>cross-size</dfn> is the distance
+		of cross-start to cross-end. 
+	</p>
+	
+</section> -->
+<section class="lesson">
+	<h2>Lesson 4: The Four Major Properties of a Flex-Box</h2>
+	<p>
+		The flex-box has four css style properties related to the axes: flex-direction, justify-content,
+		and align-items.
+	</p>
+	
+	<table class="web">		
+    	<tbody style="padding:1em">
+			<tr>
+				<th rowspan="2">Axes</th>
+				<td style="background-color:rgb(235,255,235)">flex&#x2011;direction</td>
+					<td>
+						<ol>
+							<li>
+								Determines the direction of the main axis<br>
+								or equivalently the type of layout: row, row-reverse, column, column-reverse.
+							</li>
+							<li>
+								Flex-items flow along the main axis: flex-item numbers increase as you move
+								in the direction of the main axis. 
+							</li>
+						</ol>
+					<br>				
+				</td>
+			</tr>
+			<tr>
+				<td  style="background-color:rgb(235,255,235)">flex-wrap</td>
+				<td>
+					<ol>
+						<li>Determines the direction of the cross axis</li>
+						<li>Flex-strips flow in the direction of the cross-axis: flex-strip numbers increase
+						as you move in the direction of the cross axis.</li>
+					</ol>
+					
+				</td>
+			</tr>
+			<tr>
+				<th rowspan="2">Positioning</th>
+				<td style="background-color:rgb(235,255,235)">justify&#x2011;content</td>
+				<td>Positions flex-items along the main-axis (in their containment box)</td>
+			</tr>
+			<tr>
+				<td  style="background-color:rgb(235,255,235)">align&#x2011;items</td>
+				<td>Positions flex-items along the cross-axis (in their containment box)</td>
+			</tr>
+		</tbody>
+	</table>
+	
+		
+	<section>
+		<h3>Flex-Direction</h3>
+		<div  style="background-color:rgb(235,235,255);padding:.5em 1em 0 1em;border-radius:20px;margin-top:1em" >
+			<p style="margin-bottom:0">
+				<dfn>flex-direction</dfn> specifies the type of layout.
+				It has the four possible values
+			</p>
+			<ol style="display:flex;justify-content:space-between;">
+				<li>row</li><li>row-reverse</li><li>column</li><li>column-reverse</li>
+			</ol>
+		</div>
+		<p>
+			Refer to the diagrams in lesson three.
+		</p>	
+		<table style="display:inline-table;text-align:left;">
+				<tr>
+					<td style="width:200px"><span class="exercise">-</span></td>
+					<td>						
+					</td>					
+				</tr>
+				<tr>
+					<td><u>Explore flex-direction</u></td>
+					<td>
+						Go through all four possibilities for <var>flex-direction</var>			
+						 in the interactive demo.			
+					</td>					
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<br>
+						Once you are clear, repeatedly quiz/randomize and determine what 
+						flex-direction is.
+					</td>
+				</tr>
+			</table>	
+	</section>		
+		
+	<section>
+		<h3>Justify-Content</h3>
+		<div style="background-color:rgb(235,235,255);padding:.5em 1em 0 1em;border-radius:20px;margin-top:2em" >
+			<p  style="margin-bottom:0;">
+				<dfn>justify-content</dfn> positions flex-strips along the main axis. It has five possible values.				
+			</p>
+			<ol style="display:flex;justify-content:space-between;">
+				<li>
+					flex-start
+				</li>
+				<li>flex-end</li>
+				<li>space-between</li>
+				<li>space-evenly</li>
+				<li>space-around</li>
+				
+			</ol>
+		</div>
+		<ul>
+			<li>flex-start: The flex strip is placed at main-start with no spaces between flex-items</li>
+			<li>flex-end: The flex strip is place at main-end with no spaces between flex-items</li>
+			<li>space-between: The flex-strip is spaced out with equal spaces 
+			in-between. </li>	
+			<li>space-evenly: Main start, the flex-items in the flex-strip and main-end are spaced out evenly.</li>		
+			<li>space-around: The flex-strip is spaced out with equal spaces around each item. </li>	
+		</ul>
+			
+		<div style="display:flex;justify-content:space-between;margin-top:2em" >
+			<img alt="flex-start.svg" src="Images/Justify-and-Align/Justify-Flex-Start.svg" style="width:260px;">
+			<img alt="flex-end.svg" src="Images/Justify-and-Align/Justify-Flex-End.svg" style="width:260px;">
+			<img alt="space-between.svg" src="Images/Justify-and-Align/Justify-Space-Between.svg" style="width:260px;">			
+		</div>
+		<div style="display:flex;justify-content:space-between;margin-top:2em" >
+			<img alt="space-around.svg" src="Images/Justify-and-Align/Justify-Space-Evenly.svg" style="margin-right:10px;width:350px;">	
+			<img alt="space-around.svg" src="Images/Justify-and-Align/Justify-Space-Around.svg" style="width:350px;">	
+		</div>
+		
+		<table style="display:inline-table;text-align:left;">
+			<tr>
+				<td style="width:200px"><span class="exercise">-</span></td>
+				<td>						
+				</td>					
+			</tr>
+			<tr>
+				<td><u>Explore justify-content</u></td>
+				<td>
+					Go through all five possibilities for <var>justify-content in the interactive demo.</var>						
+				</td>					
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<br>
+					Once you are clear, repeatedly quiz/randomize and determine what 
+					justify-content is.
+				</td>
+			</tr>
+		</table>
+	</section>
+	<section>
+		<h3>Align-Items</h3>
+		<div style="background-color:rgb(235,235,255);padding:.5em 1em 0 1em;border-radius:20px;margin-top:2em" >
+			<p  style="margin-bottom:0;">
+				<dfn>align-items</dfn> aligns flex-items along the cross-axis. It has four possible values.				
+			</p>
+			<ol style="display:flex;justify-content:space-between;">
+				<li>flex-start</li>
+				<li>center</li>
+				<li>flex-end</li>
+				<li>stretch</li>
+			</ol>
+		</div>
+		<ul>
+			<li>flex-start: Items are aligned with cross-start</li>
+			<li>center: Items are halfway between cross-start and cross-end</li>
+			<li>flex-end: Items are aligned at cross-end</li>
+			<li>stretch: Items are stretched between cross-start and cross-end</li>	
+		</ul>
+		<div style="display:flex;justify-content:space-between;margin-top:2em" >
+			<img alt="Justify-and-Align/start.svg" src="Images/Justify-and-Align/Align-Start.svg" style="width:165px">
+			<img alt="Justify-and-Align/start.svg" src="Images/Justify-and-Align/Align-Center.svg" style="width:165px">
+			<img alt="Justify-and-Align/start.svg" src="Images/Justify-and-Align/Align-End.svg" style="width:165px">		
+			<img alt="Justify-and-Align/stretch.svg" src="Images/Justify-and-Align/Align-Stretch.svg" style="width:165px">
+		</div>
+		
+		<table style="display:inline-table;text-align:left;">
+				<tr>
+					<td style="width:200px"><span class="exercise">-</span></td>
+					<td>						
+					</td>					
+				</tr>
+				<tr>
+					<td><u>Explore align-items</u></td>
+					<td>
+						Go through all four possibilities for <var>align-items in the interactive demo</var>						
+					</td>					
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<br>						
+						Once you are clear, repeatedly randomize and determine what 
+						align-items is.
+					</td>
+				</tr>
+			</table>
+			<p class="display">
+				A flex-item will never stretch past its cross-size and max-cross size. For example
+				if the cross-axis is horizontal, width is 200px and max-width is 300px, the flex-item's
+				stretched length will be 200px. If the width wasn't set, then the flex-item's
+				stretched length will be 300px.
+				
+				<!-- <mark>what about flex-basis</mark> -->
+			</p>				
+	</section>	
+				
+		<!-- <p style="margin-top:2em">
+			<u>Super Quiz</u>:<mark>Check with new AXES</mark> For each of the following alignment-boxes, we don't know the order that the 
+			flex items were written, still we can tell what <var>align-items</var> must be. What must 
+			<var>align-items</var> be?
+			For (2) and (4) please indicate what justify-content must be.
+		</p>
+		
+			<div style="display:inline-block;flex-direction:column;align-items:center;width:180px;">
+				<img alt="Quiz-1.svg" src="Quizes/Quiz-1.svg">
+				<div class="button" style="margin-top:1em;margin-left:2em" 
+					onclick="document.getElementById('answer1').style.visibility='visible'">
+					Click for Solution
+				</div>
+			</div>
+			<div style="display:inline-block;flex-direction:column;align-items:center;width:180px;">
+				<img alt="Quiz-2.svg" src="Quizes/Quiz-2.svg" style="width:180px">
+				<div class="button" style="margin-top:1em;margin-left:2em" onclick="document.getElementById('answer2').style.visibility='visible'">
+					Click for Solution
+				</div>
+			</div>
+			<div style="display:inline-block;flex-direction:column;align-items:center;width:180px;">
+				<img alt="Quiz-3.svg" src="Quizes/Quiz-3.svg" style="width:180px">
+				<div class="button" style="margin-top:1em;margin-left:2em" onclick="document.getElementById('answer3').style.visibility='visible'">
+					Click for Solution
+				</div>
+			</div>
+		
+		<div style="display:inline-block;flex-direction:column;align-items:center;width:180px;">
+			<img alt="Quiz-4.svg" src="Quizes/Quiz-4.svg" style="width:180px">
+			<div class="button" style="margin-top:1em;margin-left:2em" onclick="document.getElementById('answer4').style.visibility='visible'">
+				Click for Solution
+			</div>
+		</div>
+		<p id="answer1"  style="visibility:hidden;margin-top:2em">
+			1. &emsp; Flex-items are laid out in a column, so the cross axis points right.
+				align-items must be center.
+		</p>
+		<p id="answer2"  style="visibility:hidden">
+			2. &emsp; Flex-items are laid out in a column, so the cross axis points right.
+				align-items msut be end. 
+				<br>&nbsp;&emsp;&emsp;justify-content must be space-between.
+		</p>
+		<p id="answer3"  style="visibility:hidden">
+			3. &emsp; Flex-items are laid out in a row, so the cross axis points down.
+				align items must be end.
+		</p>
+		<p id="answer4"  style="visibility:hidden">
+			4. &emsp; Flex-items are laid out in a row, so the cross axis points down.
+				align items must be start. 
+				<br>&nbsp;&emsp;&emsp;justify-content must be space-around.
+
+		</p>-->
+				
+		<!-- 
+		<br>
+				
+		<div onclick="document.getElementById('answer1').style.visibility='visible'"
+			style="background-color:aqua;width:max-content">Click for solution</div>
+		<div  style="margin-left:4.7em;background-color:aqua;width:max-content">Click for solution</div>
+		<button style="margin-left:4.7em">Click for solution</button>
+		<button style="margin-left:4.7em">Click for solution</button>
+		-->
+		
+		
+		
+		
+		
+		<!-- 
+		<p id="answer1" style="visibility:hidden">
+			1. &emsp;The flex-items are laid out in a column, so the cross axis points right.
+			align-items must be center.
+		</p>
+		
+		<ol id="superQuiz" >
+			<li id="answer1" style="display:none">
+				The flex-items are laid out in a column, thus the cross axis points right.
+				Thus align-items is center.
+			</li>
+			<li id="answer2" style="display:none">
+				The flex-items are laid out in a column, thus the cross axis points right.
+				Thus align-items is end.
+			</li>
+			<li id="answer3" style="display:none">
+				The flex-items are laid out in a row, thus the cross axis points up.
+				Thus align items is start.
+			</li>
+			<li id="answer4" style="display:none">
+				The flex-items are laid out in a row, thus the cross axis points up.
+				Thus align items is end.
+			</li>
+		</ol> 
+	-->
+	
+		<!-- <section>
+			<h4 style="margin-bottom:1em">Explore the Origin of the Axes</h4>
+			
+			<p class="exercise" style="margin-top:0">
+				<span>-</span>
+				Refresh the web-page if you've been monkying around with the demo. Notice that 
+				both <var>justify-content</var> and <var>align-items</var> are at start. Now simply go through all
+				four possibilites for flex-direction.
+			</p>
+			<p>
+				Notice how nicely the items are nested at the origin between the two axes.
+				Notice the items (numbered 1, 2, 3) flow in the direction of the main axis. 
+				That's how they were origianlly entered into the flex-box.
+				&#x25A0;										
+			</p>
+			<mark>8 pictures or interactive demo here </mark>
+		</section> -->
+		<!-- <section>
+			<h4>Explore Justify-Content and the Main Axis</h4>
+			<p class="exercise">
+				<span >-</span>
+				Refresh the web page. With <var>flex-dirction = row</var>,
+				select <var>flex-start</var> and <var>flex-end</var> for <var>justify-content</var>. 
+				Notice that the flex-items are first <mark>Go over cross start and end. main start and end</mark>
+				at the start of the main axis and then at the end of the main axis respectively. 
+				Observe how the items increase in numbering as you move along the main axis.
+				Do the same for <var>flex-direction = row-reverse</var>, <var>column</var> and <var>column-reverse</var>. 
+			</p>			
+			<p><mark>new number</mark>
+				Now repeat the above, but instead of <var>flex-start</var> and <var>flex-end</var>, 
+				use <var>space-between</var>, and <var>space-around</var>.
+				Describe what these two properties of <var>justify-content</var> do. Observe how the items still increase
+				in numbering as you move along the main axis. &#x25A0;
+			</p>		
+		</section>-->		<!-- <section>
+			<h4>Explore Align-Items and the Cross Axis</h4>
+			<p class="exercise">
+				<span>-</span>Refresh the webpage!
+				With <var>flex-dirction = row</var>, select the <var>start</var>, <var>center</var>, 
+				<var>end</var> and <var>stretch</var> values for the <var>align-items</var>
+				property. <mark>cross end cross start</mark>
+				Notice how the items start at the main axis and move towards the end of the cross axis
+				before they finally give up and take a stretch.				
+			</p>
+			<p><mark>give new number</mark>
+				Now reapeat the above, but use flex-direction 
+				<var>row-reverse</var>, <var>column</var>, and <var>column-reverse</var>. &#x25A0;
+			</p>
+		</section>	-->		
+	</section>
+<section class="lesson">
+	<h2>Lesson 5: Aligning Flex-Items Individually along the Cross Axis with align-self</h2>
+	<p>
+		Each flex item may set its own <var>align-self</var> property to override the alignment
+		along the cross axis specified by the align-items property. In the demo, <i>as</i>
+		stands for align-self. 
+	</p>
+	<div style="background-color:rgb(235,235,255);padding:.5em 1em 0 1em;border-radius:20px;margin-top:1em">
+		<p style="margin-bottom:0">
+			The values for <dfn>align-self</dfn> follow, and they are the same
+			as the values for <var>align-items</var>.
+		</p>
+		<ol style="display:flex;justify-content:space-between">
+			<li>flex-start</li><li>center</li><li>flex-end</li><li>stretch</li>
+		</ol>
+	</div>	
+	<div style="display:flex;justify-content:space-between">
+		<img alt="align-self.svg" src="Images/Justify-and-Align/align-self.svg" style="width:250px;">
+		<p style="margin-left:2em;width:450px">
+			A flex-box with three items set its <var>align-items</var> property to <var>flex-end</var>
+			However, the third and somewhat pink like box decided to overrule <var>align-items</var>
+			and set itself at the start of the cross-axis by setting its <var>align-self</var>
+			property to <var>flex-start</var>.  
+		</p>
+	</div>		
+</section>
+<section class="lesson">
+	<h2>Lesson 6: Wrapping</h2> 
+	<p class="display" style="margin-bottom:3em">
+		So far we have dealt with only one flex strip, but with wrapping there could be more. 
+		Each flex-strip gets it's own alignment box, which with respect to alignment takes place.
+		align-self, self-align and even justify-content work with respect to the flex-strip's 
+		alignment box. The cross-sizes of the alignment boxes are computed in advance and don't
+		depend upon any css style properties, including justify-content and align-items. Just like
+		the flex-box itself, each alignment box has its own cross-start and cross-end.		
+	</p>
+	
+	<div style="display:flex;max-width:800px;flex-wrap:wrap; align-items:start;justify-content:space-between;">
+		<img alt="Images/Layout/Alignment-Boundries-Start.svg" src="Images/Alignment%20Boundries/Alignment-Boundries-Start.svg" style="width:300px">
+		<img alt="Images/Layout/Alignment-Boundries-Center.svg" src="Images/Alignment%20Boundries/Alignment-Boundries-Center.svg" style="width:300px" >
+		<img alt="Images/Layout/Alignment-Boundries-End.svg" src="Images/Alignment%20Boundries/Alignment-Boundries-End.svg" style="width:300px;margin-top:5%;" >
+		<div style="width:300px;margin-right:10%;margin-top:5%;line-height:1.5em">
+			<p>
+				Enlarging a flex strip by one extra share of the total amount of free space produces
+				its alignment area. 
+			</p>	
+			<ol>
+				<li>
+					If align-items is start give one extra share furthest from cross-start.
+				</li>		
+				<li>
+					If align-items is end give one extra share furthest from cross-end.
+				</li>
+				<li>
+					If align-items is center give an extra half share along each cross edge of
+					the flex-strip.
+				</li>
+			</ol>	 
+		</div>
+	</div>
+	
+	
+	<p class="exercise">
+		<span>-</span>	<span style="width:660px">A flex box is 200px tall with a flex-direction
+		of row or row-reverse. It has three flex-strips of heights 36px, 60px and 80px with
+		center positioning along the cross axis, what are the sizes of the individual free spaces?</span>
+	</p> 
+	<p>
+		<span class="centerTable" style="text-decoration:underline">Solution</span>
+		Subtracting the total three sizes from 200px gives a total free space of 24px. 
+		Draw a picture and you will see two free spaces get 1/2-share and two free spaces
+		get 1-share for a total of 3-shares = 24px. Each share must then be 8px. Whence,
+		the <span lang="en-us"></span>individual free sizes are 4px, 8px, 8px, and 4px.  &#x25A0;
+	</p>
+	
+	<p class="display">
+		Remember that normally the cross-axis points down or to the right. Setting <var>flex-wrap</var> 
+		to <var>wrap-reverse</var> flips the direction of the cross-axis. Flex strips always flow along 
+		the cross axis.
+	</p>
+		
+	<div>
+		<p>
+			In each of the following exercises start by refreshing the web page an 
+			choosing five flex items.
+		</p>
+		
+		<table style="display:inline-table;text-align:left;vertical-align:top;">
+			<tr>
+				<td><span class="exercise">-</span></td>
+				<td  style="width:120px;">
+					Choose 5 items, hide the axes. 				
+				</td>
+				<td>
+					Go through all four possibilities for <var>flex-direction</var>, but each time
+					switch between wrap and wrap-reverse to observe how the cross axis
+					flips direction by examining the item numbering in the flex strips.
+				</td>
+			</tr>			
+		</table>		
+	</div>		
+		
+	<section> 
+		<h3>Narrow before Wrap</h3>				
+		<p>OK! Squishing is more dramatic.</p>
+		<p class="display">
+			With overflow along the main-axis, Flex in an attempt to prevent overflow 
+			will squish, if possible, each flex-item. Flex will ignore widths/heights set 
+			on the flex-items and squish them anyway. However, flex will respect min-width/min-heights.
+		</p>
+		<p>
+			Flex will squish up to but not past the <var>min-width</var> or <var>min-height</var> as the case may be.
+		</p>
+		
+		<table style="display:inline-table;text-align:left;vertical-align:top;">
+			<tr>
+				<td><span class="exercise">-</span></td>
+				<td  style="width:120px;">
+					Set&nbsp;<var>flex&#x2011;wrap</var>&nbsp;<br>to&nbsp;<var>nowrap</var>
+				</td>
+				<td>Toggle between three and five flex-items</td>
+			</tr>
+			<tr>
+				<td></td><td></td>
+				<td>
+					With row or row-reverse, the flex-items get squished horizontally along the main-axis.
+					<br><br>
+					With column or column-reverse, the flex-items get squished vertically along the main-axis.
+				</td>
+			</tr>
+		</table>
+	</section>
+</section>
+<section class="lesson">
+
+	<h2>Lesson 7: Align-Content</h2>	
+	<img alt="" src="Images/Flex-Area-Vertical.svg">
+	<p>
+		A <dfn>flex-area</dfn> is the smallest cross sectional area of the flex-box
+		that contains a flex-strip. If a flex-box sets its <var>align-content</var> property, then the 
+		alignment-boxes are
+		the flex-areas: they aren't as described previously. The items in a flex-strip are free to wiggle around in 
+		the flex-area as determined by <var>justify-content</var>, <var>align-content</var>, <var>self-align</var>.
+		Of course we now that <var>justify-content</var>, <var>align-content</var> produces parallel wiggling
+		across all flex-areas/alignment-boxes.
+	</p>	
+	<p>
+		Since the cross-size of the alignment-box is smaller than it was before, there is less wiggling
+		room along the cross-axis of any flex-area. In fact the longest flex-item within any given
+		flex-area can't move along the cross-axis at all. It is already at cross-start so setting
+		align-items to start does nothing. It is already centered in the flex-area so setting align-items
+		to center does nothing. It is already at cross-end so setting align-items to end does nothing.
+		It is already stretched across the flex-area so setting align-items to stretch does nothing.
+	</p>
+	
+	<p>
+		OK! Why are the flex-items in each flex-area above positioned differently? Aren't they supposed to
+		be in positioned in parallel? Well the second and third WERE just like the first, but their purple and green 
+		flex-items set their self-align properties individually. Can you tell to what? (to center and to
+		end respectively).
+	</p>
+	
+	
+	<p>
+		The programming team, meouzer and the cows, decided not to include <var>align-content</var> in the demo because
+		someone will set a value for it and then wonder why the rest of the demo doesn't work
+		as expected.
+	</p>
+	
+	<div style="background-color:rgb(235,235,255);padding:.5em 1em 0 1em;border-radius:20px;margin-top:2em" >
+			<p  style="margin-bottom:0;">
+				<dfn>align-content</dfn> aligns flex-strips along the cross-axis. It has five possible values.				
+			</p>
+			<ol style="display:flex;justify-content:space-between;">
+				<li>flex-start</li>
+				<li>flex-end</li>
+				<li>space-between</li>
+				<li>space-around</li>
+				<li>space-evenly</li>				
+			</ol>
+		</div>	
+		<p>
+			These are the same values that <var>justify-content has</var>. How <var>align-content</var>
+			works on flex-areas along the cross-axis is the same way that <var>justify-content</var>
+			acts on flex-items along the main-axis.
+		</p>
+		<img alt="" src="Images/Art/cow.png" style="width:400px" 
+			onclick="document.getElementById('align-content').parentNode.style.visibility = 'visible'">
+		
+		<p class="exercise">
+			<span>-</span><span style="width:660px">Chose 5 items and set <var>flex-wrap</var> to <var>wrap</var> or <var>wrap-reverse</var>. 
+			Set <var>align-content</var> to any of its values.
+			Then go through all the possibilities for <var>align-items</var>. You will see very limited movement because the
+			flex-areas are so restricted. Also, pick a flex-item and go through the values for <var>self-align</var>.</span> 
+		</p>		
+	</section>
+</section>
+	
+<!-- 
+<section>
+	<h2>Question and Answers</h2>
+	<p>
+		Jim Smith from Denver Colorado writes.		
+	</p>
+	<blockquote style="line-height:1.5em">
+		Meouzer. My cat is awfully sneaky. He's always hiding where I can't tell what he's doing. 
+		He slinks around corners trying to be all secretive like, but sometimes I see him and he
+		simply ignores me. He may try to
+		sneak up on me and then pretend nothing is going on. I don't want to sound paranoid, but I think
+		he's planning something untoward. What should I do? 
+	</blockquote>
+	<p>
+		Dear Mr. Smith<br>
+		<span style="margin-left:2em"> Give him tuna casserole!</span> 
+	</p>	
+</section> -->
+
+	
+</body>
+</html>
