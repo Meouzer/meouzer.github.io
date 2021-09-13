@@ -1,0 +1,419 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>JavaScript: Deep Copying</title>
+<link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+<link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css"/>
+<script src="../../00-Commons/JSHTML.js"></script>
+<script src="../../00-Scripts/typing.js"></script>
+<script src="../../00-Scripts/Stringify.js"></script>
+<script src="../../00-Scripts/ValueCopy.js"></script> 
+<script src="../01a-Copying-Functions-Part-1/evaluators.js"></script>
+<script src="../../00-Scripts/deepCopy.js"></script>
+<script src="Test-deepCopy.js"></script> 
+<script src="Test-deepSystemCopy.js"></script> 
+
+<script>	
+	window.addEventListener("load", function()
+	{
+		applyJSHTML();			
+	});			
+	
+	const x = new Map([['key1', 'value1'], ['key2', {a:1,b:2}]]);	
+	const y = deepCopy(x);
+					
+</script>
+
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px; font-family:sans-serif">
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<header>
+	<h1>Deep Copying in JavaScript<br>
+		<span style="font-size:.8em">The deepCopy() Function and Intro to deepCopySystem</span>
+	</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:1em;color:maroon">Meouzer</span>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">The Curiously Deep Copy Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>	
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+	 An oyster met an oyster and they were oysters two. Two oysters met two oysters and they were oysters too.
+      Four oysters met Chef Boyardee, who thinking they appeared healthy and hearty, invited them to a party. 
+      The hot tub was just right, warm and not too salty. Too late they realized that Chef Boyardee was very very 
+      naughty.<br>	
+		<span style="float:right">Meouzer</span></div>
+</blockquote>
+<p>
+	This excerpt from Meouzer's critically acclaimed treatise, <i>The Oyster Dimension</i>, 
+	is available to the public under poetic license. 
+</p>
+<p>
+	Full code is at <a target="_blank" href="../../00-Scripts/deepCopy.js">deepCopy.js</a>, which depends on
+	<a target="_blank" href="../../00-Scripts/ValueCopy.js">ValueCopy.js</a>, which depends on
+		<a target="_blank" href="../../00-Scripts/typing.js">typing.js</a>. 
+</p>
+ 
+<section>
+	<h2>Introduction</h2>
+	<p>
+		The <var>deepDataCopy()</var> function could deeply copy only data. However, <var>deepCopy()</var> can do more
+		because it can handle functions and setters/getters in the copy stream. However, one requirement is that a single 
+		evaluator must be capable of correctly copying all the functions and setter/getters. It seems that a single evaluator
+		will work in many situations, as is that case when deep copying some programmer defined classes. 
+	</p>
+	<p class="display">
+		Using the  <var>deepCopy()</var> function directly can get to complicated to handle, and so its use
+		is somewhat deprecated. However,  <var>deepCopy()</var> forms the basis of <var>deepCopySystem</var>,
+		which makes things much simpler. The next article will show how to deep copy a class instance
+		using <var>deepCopySystem</var>. Also see code listing #5 below.
+	</p>
+</section>
+
+<section>
+	<h2></h2>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				The deepCopy() Function
+		</header><div class="numberShield colorLightBurlywood"></div>
+		
+		function deepCopy(source, evaluator)		
+		{	
+		// for handling circular and duplicate references
+		const wm = new WeakMap(); 
+		
+		// stack of source/descendent-sources in preorder
+		const stack = [];			
+		
+		// the target to be returned
+		const target = ValueCopy(source, evaluator); 	
+		
+		if(target == source) return source; // source is value copy primitive	
+		
+		wm.set(source, target);		// record the source and target	
+		
+		// push source onto stack
+		stack.push({source:source, target:target,  
+		keys:Object.getOwnPropertyNames(source), index:0});	
+		
+		if(isSet(source) || isMap(source))
+		{
+			// copy internal properties of source to target externally	
+			target.clear();						
+			stack.push({source:getInternalState(source), 
+			target:target,  keys:["internalState"], index:0});
+		}
+	
+						
+		while(stack.length &gt; 0) // while still processing sources
+		{						
+			const T = stack[stack.length - 1]; // peek top of stack
+										
+			if(T.index &lt; T.keys.length ) // still processing child source nodes
+			{		
+				// T.index is index of current child source to process.
+				
+				// get key of current child source being processed
+				const key = T.keys[T.index]; 
+				
+				if(!isOffLimitProperty(T.source, key))
+				{				
+					const source = T.source[key]; // current child source to process	
+									
+					if(!wm.has(source)) // no circular or duplicate reference
+					{
+						// copy key property from T.source to T.target 
+						valueCopyProperty(T.source, T.target, key, evaluator); 	   	
+					 		
+					 	const pd = Object.getOwnPropertyDescriptor(T.source, key);
+	                                      
+						if (!(pd.get || pd.set) &amp;&amp; (T.target[key] != T.source[key]) )  
+						{   	
+							// record source and target						
+							wm.set(T.source[key], T.target[key]); 							
+							
+							// push child source onto stack
+							stack.push({source: T.source[key], target:T.target[key], 
+			                keys:Object.getOwnPropertyNames(T.source[key]), 
+			                index:0}); 
+			                
+			                if(isSet(source) || isMap(source))
+							{	
+								// copy internal properties of source to target externally	
+								T.target[key].clear();						
+								stack.push({source:getInternalState(source), 
+								target:T.target[key],  keys:["internalState"], index:0});
+							}
+			            }
+					}
+					else
+					{	
+						// close circular or duplicate reference
+											
+						const pd = Object.getOwnPropertyDescriptor(T.source, key);
+						
+						if(pd.get || pd.set)
+						{							
+							// copy the getter/setter. 
+							valueCopyProperty(T.source, T.target, key, evaluator); 
+						}
+						else
+						{
+							const value = wm.get(T.source[key]);
+							const pd = Object.getOwnPropertyDescriptor(T.source, key);
+							pd.value = value;
+							Object.defineProperty(T.target, key, pd);						
+						}
+					}	
+				}															
+				
+				T.index++; // process next child source.				
+			}
+			else 
+			{
+				// all child sources of a source node have been 
+				// processed so pop source off the stack
+				const top = stack.pop();
+				
+				// Move needed external properties to internal properties
+				// in case top.target is a Set or Map
+				processTargetPostOrder(top.target);																				
+			}
+		}		
+						
+		return target;	
+	}
+		
+	</div>	
+</section>
+<section>
+	<h2>Examples</h2>
+	<p>
+		Our examples will be kept as simple as possible.
+	</p>
+	<section>
+		<h3>Copying Data</h3>
+		<p>
+			Like <var>deepCopyData()</var>, <var>deepCopy()</var> can copy pure data with circular and duplicate references.
+		</p>
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+					Copy Data with Circular References
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			function CopyPureDataWithCircularReference()
+			{
+				var x = new Map([['key1', 'value1'], ['key2', {a:1,b:2}],
+		        [new Boolean(true), new Number(7)]]);
+		        
+		        var y = new Set(["cat", "dog", ["a", new String("b")]]);
+		        
+		        x.a = y;
+				y.b = x;
+				x.f = 1;
+				y.g = 2;	
+				
+				var z = {M:x, N:y};				 			  			 		 	
+				var cz = deepCopy(z);
+				console.log ("ref 1 passed " + (z.M.a != cz.N.a));
+				console.log ("ref 2 passed " + (z.N.b != cz.N.b));			 			 	
+				console.log("CopyPureDataWithCircularReference passed: " 
+				+ (stringify(z) == stringify(cz)));
+			}		
+			
+		</div>		
+	</section>
+	<section>
+		<h3>Copying a Get that Uses Pure Data Only</h3>
+		
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+					Copy Get Returning Pure Data
+			</header><div class="numberShield colorLightBurlywood"></div>
+
+			function TestGet()
+			{
+				const z = {}; // cz will be the deep copy of z
+				
+				const x = new Map([['key1', 'value1'], ['key2', {a:1,b:2}],
+		        [new Boolean(true), new Number(7)]]);
+		        
+		        x.y = new Set(["cat", "dog", ["a", new String("b")]]);
+		
+				Object.defineProperty(z, "x",
+				{					
+					get:function(){return x;},
+		
+				});
+				
+				// make sure cz.x returns a deep copy of z.x.
+				// If you want cz.x to be z.x use an empty context object {}.
+				const evaluator = eval(Evaluator)({"const x":deepCopy(x)});						
+				
+				var cz = deepCopy(z, evaluator);
+				
+				console.log("TestGet ref 1 passed: " + (z.x != cz.x) );
+				console.log("TestGet ref 2 passed: " + (z.x.y != cz.x.y) );	
+				console.log("TestGet passed: " + (stringify(cz) == stringify(z)) );				
+			}
+
+		</div>
+	</section>
+	<section>
+		<h3>Copying a Get that doesn't use Pure Data Only</h3>
+		
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+					Two Chained Gets
+			</header><div class="numberShield colorLightBurlywood"></div>
+
+			function TestTwoGets()
+			{
+				const z = {}; // cz will be the deep copy of z
+				const x = {a:{b:{c:1}}};
+				const y = {c:{a:{b:1}}};
+				
+				// x has a getter and so is no longer pure data
+				Object.defineProperty(x, "y", 
+				{
+					get:function(){return y;},
+				});				
+				
+				// getter that does not use pure data only		
+				Object.defineProperty(z, "x",
+				{
+					get:function(){return x;},
+		
+				});
+					
+				// first make a deep copy cx of x. An evaluator must be
+				// used since x has a getter property y.
+				const evaluator1 =  eval(cefString)({y:deepCopy(y)});
+				const cx =  deepCopy(x, evaluator1);
+					
+				// next make a deep copy of z
+				const evaluator = eval(cefString)({x:cx});				
+				var cz = deepCopy(z, evaluator);
+				
+				console.log("TestTwoGets ref 1 passed: " + (z.x != cz.x));
+				console.log("TestTwoGets ref 2 passed: " + (z.x.y != cz.x.y));		
+				console.log("TestTwoGets passed: " + (stringify(cz) == stringify(z)));				
+			}
+
+		</div>
+		
+		<p>
+			You can now see that things can quickly get out of hand.  Let's take the example above and make things
+			even more complicated by creating a property <var>z</var> of <var>y</var> that returns <var>z</var>, thus creating 
+			a circular three chained sequence of gets. However, there is a simple way to deep copy <var>z</var> using 
+			the deep copy system method.			
+		</p>
+	</section>
+	<section>
+		<h3>Deep Copy System for Copying Circular Gets</h3>
+			<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+				<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+					Copying Circular Gets with deepCopySystem	
+				</header><div class="numberShield colorLightBurlywood"></div>
+						
+				function TestCircularGets()
+				{
+					const z = {}; // cz will be the deep copy of z
+					const x = {a:{b:{c:1}}};
+					const y = {c:{a:{b:1}}};
+							
+					Object.defineProperty(z, "x",
+					{
+						get:function(){return x;},
+			
+					});
+					
+					Object.defineProperty(x, "y",
+					{
+						get:function(){return y;},
+					});
+					
+					Object.defineProperty(y, "z",
+					{
+						get:function(){return z;},
+					});
+			
+					
+					const dcs = eval(deepCopySystem)({"const z":z, "const x":x, 
+					"const y":y});		
+					const cz = dcs.z;				
+					
+					console.log("TestCircularGets ref 1 passed: " + (z != cz));
+					console.log("TestCircularGets ref 2 passed: " + (z.x != cz.x));
+					console.log("TestCircularGets ref 3 passed: " + (z.x.y != cz.x.y));		
+					console.log("TestCircularGets ref 4 passed: " + (z.x.y.z != cz.x.y.z));
+					console.log("TestCircularGets passed: " + (stringify(cz) == stringify(z)));				
+				}
+
+			TestCircularGets();	
+			
+			<header class="codeSection">
+				Expansion of line 11 (more or less)
+			</header>
+			\numbersRestart
+			
+			const dcs = (function ()
+			{	
+				const evaluator = function()
+				{
+					return eval('('+ arguments[0] +')');
+				}				
+				
+				this.dcs =	deepCopy(this.contextObject, evaluator);	
+					
+				const z = this.dcs.z;
+				const x = this.dcs.x;
+				const y = this.dcs.y;
+				return this.dcs;
+			}).call({contextObject:{z:z, x:x, y:y}})
+			
+			</div>
+			<p>
+				Behind the  scenes <var>deepCopySystem</var> uses <var>deepCopy()</var>. It looks like when
+				things get complicated using <var>deepCopySystem</var> is simple, while using <var>deepCopy()</var>
+				directly could become too complex to handle.
+			</p>
+			<p>
+				The way the deep copy system works is magical. Above what happens is that 
+				<var>deepCopy()</var> is called on the object <var>{z:z, x:x, y:y}</var> using an evaluator to obtain
+				a deep copy <var>{z:cz, x:cx, y:cy}</var>, where the constants <var>const z = cz</var>, <var>const x = cx </var>, and
+				<var>const y = cx</var> are put into the evaluator's context. The copied gets therefore instead of 
+				returning the original <var>x</var>, <var>y</var>, and <var>z</var> return <var>cx</var>, <var>cy</var>, 
+				and <var>cz</var>. So <var>cz</var>, <var>cx</var>, <var>cy</var> are deep copies of <var>z</var>, <var>x</var>, 
+				<var>y</var>, while <var>cz.x = cx</var>, <var>cx.y = cy</var>, and <var>cy.z = cz</var>. 
+			</p>			
+			<p>
+				To see how <var>deepCopySystem</var> works, we expanded line 11. OK! this isn't the exact expansion
+				but it gives you what you need to know in a little bit simpler form than the actual expansion.
+				Once you gander and understand the expansion, you are ready to take a look at <var>deepCopySystem</var>
+				in <a target="_blank" href="../../00-Scripts/deepCopy.js">deepCopy.js</a>
+			</p>			
+	</section>
+</section>
+<section>
+	<h2>From the Meouzer Collection</h2>
+	<p class="display centerTable">
+		Deep copying was one of Meouzer's projects<br>
+		as in deep copying so many objects<br>
+		now here's the need to know scoop<br>
+		he wrote an infinite loop<br>
+		and said there goes my infinite prospects<br>
+	</p>
+
+</section>
+
+<br><br><br><br><br><br><br><br><br><br><br>	
+</body>
+
+</html>
+
+

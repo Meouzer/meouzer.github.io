@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>JavaScript: Deep Copying User Classes</title>
+<link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+<link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css"/>
+<script src="../../00-Commons/JSHTML.js"></script>
+<script src="../../00-Scripts/typing.js"></script>
+<script src="../../00-Scripts/Stringify.js"></script>
+<script src="../../00-Scripts/ValueCopy.js"></script> 
+<script src="../../00-Scripts/deepCopy.js"></script>
+<script src="../../00-Scripts/parseDataString.js"></script>
+<script src="Test-Class-Copy.js"></script> 
+
+<script>
+	window.addEventListener("load", function()
+	{
+		applyJSHTML();			
+	});	
+						
+</script>
+
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px; font-family:sans-serif">
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<header>
+	<h1>JavaScript: Deep Copying User Classes<br>		
+	</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:1em;color:maroon">Meouzer</span>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">The Curiously Classy Copy Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">Making JavaScript Great Again</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>	
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+		Simon, our infiltration specialist, was able to install a hidden camera in the JavaScript committee's conference room. Here he is watching
+		the committe who obviously is up to something scary.		
+		
+		<video width="320" height="320" controls>
+		  <source src="Cat Watching Horror Movie.mp4" type="video/mp4">
+		Your browser does not support the video tag.
+		</video>
+
+	<br>	
+		<span style="float:right">Meouzer</span></div>
+</blockquote>
+
+<p>
+	Full code is at <a target="_blank" href="../../00-Scripts/deepCopy.js">deepCopy.js</a>, which depends on
+	<a target="_blank" href="../../00-Scripts/ValueCopy.js">ValueCopy.js</a>, which depends on
+		<a target="_blank" href="../../00-Scripts/typing.js">typing.js</a>. 
+	The test file is <a target="_blank" href="Test-Class-Copy.js">Test-Class-Copy.js</a>,
+	which uses <var>deepCopySystem</var> to deep copy a user class instance. 
+	Search for <var>this.deepCopy</var> in the test file to
+	see how it goes. Open your browser's console window to see that all current tests have
+	been passed. 	If you are using IE11, then you must 
+		comment out all code attempting to change constants because such is a fatal error at compile time.
+
+	To see how <var>this.deepCopy()</var> works see <var>this.deepCopyExpanded()</var>
+	in the test file, or read below.  	
+</p>
+ 
+<section>
+	<h2>Introduction</h2>
+	<p>
+		The term <i>user</i> is used as an abbreviation for <i>programmer</i>, not a catnip fanatic, 
+		though most of the members of the consortium are in fact catnip lovers to the extreme.	
+	</p>
+	<p>
+		We may speak colloquially and say that <i>a user class can be deep copied</i>. What is meant
+		is that class instances of the user class can be deep copied with a <var>deepCopy()</var> method.
+	</p>
+	<p>		
+		Given a particular user defined class there's a good chance you can deep copy	
+		the class by using <var>deepSystemCopy</var> in a <var>deepCopy()</var> method.
+	</p>
+	<p style="margin-left:2em">
+		The main requirement that makes a user class deep copiable is that no class methods 
+		are defined in a nested function of the constructor. Another rule is that if there 
+		are any references to class instances of another user class, then that other class 
+		must have its own <var>deepCopy()</var> method to perform deep copies (currently
+		such references are not supported). 
+	</p>	
+</section>
+
+<section>
+	<h2>The How to Do It Section</h2>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				The deepCopy() Method of the foo Class 
+		</header><div class="numberShield colorLightBurlywood"></div>
+		
+		function foo(x,y)
+		{
+			// variables. functions that aren't methods are variables.
+			var a = ...;
+			const b = ...;
+			let c = ...;			 
+			
+			// Write methods here. 
+			// Methods that are getters/setters allowed.
+						
+			(function nestedFunction(x,y)
+			{
+				// no class methods defined inside nestedFunction
+				// changes to variables of the class allowed
+			})(5,7); 
+						
+			this.deepCopy = function()
+			{
+				return eval(deepCopyClass)({this$:this, a:a, "const b":b, 
+				"let c":c, x:x, y:y}).this$;	
+								
+				// This is good! Don't make the mistake of using a local variable,
+				// because it would end up in context of the functions of the 
+				// deep copy.					
+			}			 
+		}
+		
+		// That's all there is to it.	
+		
+		<header class="codeSection">
+			A rough expansion of this.deepCopy() so you can 
+			see how it works. <br>	
+			However, this expansion introduces unnecessary context.<br> 		
+		</header>
+		\numbersRestart
+		
+		this.deepCopy = function()
+		{
+			var contextObject = {this$:this, a:a, "const b":b, "let c":c};
+			var cleanContextObject =  {this$:this, a:a, b:b, c:c};
+			
+			function foo ()				
+			{					
+				this.evaluator = function(){return eval('('+ arguments[0] +')');};					
+				this.contextObject = deepCopy(cleanContextObject, this.evaluator, true);
+				var a = this.contextObject.a;
+				var b = this.contextObject.b;
+				var c = this.contextObject.c;
+				return this.contextObject;	
+			}	
+				
+			var dcs = foo.call({contextObject:contextObject});
+			return dcs.this$;
+			
+			// contextObject, cleanContextObject, foo, and dcs,
+			// all end up in the context of copied methods. Bad! 	
+			// Yes you can! You can fix that if you want.		
+		}
+		
+		<p style="margin-left: 3em">
+			Look at function foo(). Line 6 implies that the deep copy depends upon the evaluator
+			While lines 7-10 say that the evaluator depends upon the deep copy. You might think this is
+			cause for some concern. However, some thinking and a careful reading of the first article on
+			function copying will bring up an important fact about evaluators that makes it clear 
+			why everything is A-OK.
+		</p>
+				
+	</div>
+	
+</section>
+
+<br><br><br><br><br>	
+</body>
+
+</html>
+
+

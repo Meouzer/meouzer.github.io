@@ -1,0 +1,788 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>CSS Selectors</title>	
+<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body class="GPeachBlue" style="width:800px; font-size:16px"> 
+
+<header>
+	<h1>CSS Selectors Level 3</h1>
+	<span class="centerTable" style="font-size:1.3em;margin-top:.5em;color: maroon">Meouzer</span>
+	<span class="centerTable" style="font-size:1.2em;color:maroon;">meouzer@gmail.com</span>
+</header>		
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">
+		W3 not run by cats, so W'3s C'sS's materials needs go0d's edit's. 	 
+		<br><span style=" float:right">Meouzer</span>
+	</div>
+</blockquote>
+
+<p>
+	A diagram and table below provide a quick overview of CSS selectors.
+</p>
+
+<img alt="not available" src="Selectors.svg" style="width:500px;margin-top:2em;margin-bottom:2em" class="centerTable">
+
+<table class="web" style="margin-left:auto;margin-right:auto">
+	<thead style="padding:1em">
+		<tr><th colspan="4">CSS Selectors</th></tr>
+		<tr><td>Category</td><td>Selector</td><td>Description</td><td>Restrictions</td></tr>
+	</thead>
+	<tbody style="padding:1em; text-align:left">
+		<tr><th style="background-color:rgb(230,230,255)">Simple Selectors</th><th>lots</th><td>See 
+		<a href="#Simple-Selectors"> Simple Selectors</a>
+		</td><td style="background:rgb(255,245,255)">Must be officially Recognized by W3</td></tr>
+		<tr>
+			<th style="background-color:rgb(230,230,255)">Product Selectors</th>
+			<th>xyz</th><td> Elements that are elements of x, y, and z simultaneously</td>
+			<td style="background:rgb(255,245,255)">x, y, z are simple selectors</td>
+		</tr>
+		
+		<tr>
+			<th style="background-color:rgb(230,230,255)" rowspan="4">Combined Selectors</th>
+			<th>X Y</th><td>Y elements that descend from some X element</td>
+			<td rowspan="4" style="background:rgb(255,245,255)">X and Y are product selectors</td>
+		</tr>
+		<tr><th>X &gt; Y </th><td>Y elements that are a child of some X element</td></tr>
+		<tr><th>X ~ Y </th><td>Y elements that are a subsequent sibling some X element</td></tr>
+		<tr><th>X + Y </th><td>Y elements that are the very next sibling of some X element</td></tr>
+		<tr><th style="background-color:rgb(230,230,255)">Group Selectors<br> (= all HTML Selectors)
+		</th><th>A, B, C </th><td>Elements that are members of at least one of A, B, and C</td>
+			<td style="background:rgb(255,245,255)">A, B, and C are combined selectors
+			</td></tr>
+		<tr>
+			<th style="background-color:rgb(230,230,255)">Pseudo Selectors</th>
+			<th>Xp</th>
+			<td>An abstract part of X depending on p</td>
+			<td style="background:rgb(255,245,255)">
+				X is a combined Selector and p a <a href="#Pseudo-Elements">pseudo element</a>
+			</td>
+		</tr>
+		<tr>
+			<th style="background-color:rgb(230,230,255)">CSS Selectors</th>
+			<th>E, F, G</th><td>Elements that are members of at least one of E, F, and G</td>
+			<td style="background:rgb(255,245,255)">E, F, G are combined selectors or pseudo selectors</td>
+		</tr>
+	</tbody>
+</table>
+
+<section>
+	<h2>Introduction</h2>
+	 <p>                      
+           This article is based solely on original W3 source material at
+           <a href="http://www.w3.org/TR/css3-selectors/" target="_blank">http://www.w3.org/TR/css3-selectors/</a>.
+	</p>
+
+	
+	<p class="display">
+		A HTML <dfn>selector</dfn> is a formal expression, algebraic in nature, that represents the set/class 
+		of HTML elements that meet the criteria specified by the expression.
+	  </p>	  
+	  <p>	
+		If <var>G</var> is an HTML selector and <var>g</var> is an HTML element, then by 
+		definition all the following mean the same.		
+	</p>
+	<ol>
+		<li>
+			<var>g</var> is an element/member of <var>G</var>.
+		</li>
+		<li><var>g</var> meets the criteria of <var>G</var>.</li>
+				
+		<li><var>g</var> matches <var>G</var>.</li>
+		<li><var>G</var> selects <var>g</var>.</li>
+	</ol>
+	  
+	 <p>
+	 	The one the author likes the best is the first because it leads to the least 
+		awkward terminology
+	 	for describing complex selectors.	 
+	 </p> 
+	  
+	  
+	  <p>As we shall see the criteria for the selector <var>div.myclass</var> is that an element must be a <var>div</var>
+	  	with class <var>myclass</var>. So its <dfn>class</dfn>, the set of elements that it represents, is the set of 
+	  	all divs with class <var>myclass</var>. Note that description of the criteria and the description its class are
+	  	pretty much the same: so either may be used to describe the selector. 
+	  </p>
+	  
+	  
+	  <p>
+	  	Now we give an overview of the different types of selector. &sub; represents the inclusion symbol.
+	  </p>
+	  <p class="display" style="display:table;text-align:center;margin-left:auto; margin-right:auto; font-size: .9em">
+            Simple Selectors &sub; Product Selectors &sub; Combined Selectors &sub; HTML Group Selectors = 
+            All HTML Selectors &sub; CSS group selectors = CSS Selectors
+	</p>
+	<p>
+		So all simple selectors are product selectors. All product selectors are combined selectors. All combined selectors
+		are group selectors. The HTML group selectors form the set of all HTML selectors. All HTML group selectors
+		are CSS group selectors. 
+	</p>
+	
+	<section>
+		<h2>Construction of HTML Selectors</h2>
+		<ol class="display mt1" style="padding-left:2em;margin-top:2em">
+            <li>We start with the <dfn>simple selectors</dfn>. 
+            	<ul>
+            		<li>They are explicitly/officially specified in the section with the same name.</li>
+            	</ul>            	
+            </li>
+            <li>            
+            	<dfn>Product selectors</dfn> are obtained by the concatenation  of simple selectors without space 
+				in-between.
+            	<ul>
+            		<li>
+            			If <var>x</var>, <var>y</var>, and <var>z</var> are simple selectors,
+            			then <var>xyz</var> is a product selector.
+            		</li>
+            		<li>
+            			The members of <var>xyz</var> is the set of HTML elements that are simultaneously members
+            			of <var>x</var>, <var>y</var> and <var>z</var>. Thus <var>xyz</var> is the intersection
+            			of <var>x</var>, <var>y</var> and <var>z</var>.
+            		</li>
+            	</ul>
+             </li>
+            <li>
+            	<dfn>Combined selectors</dfn> are the results of binary operations, called <dfn>combinators</dfn>
+            	applied to the product selectors.  The combinators are          	
+            	<ol style="list-style:lower-alpha;margin-left:3em">
+            	    <li>The white space character</li>
+            		<li><var>&gt;</var></li>
+            		<li> <var>+</var></li>
+            		<li><var>~</var></li>
+            	</ol>
+            	<ul>
+            		<li>So if <var>X</var> and <var>Y</var> are product selectors
+            			then <var>X Y</var>, <var>X+Y</var>, and <var>X~Y</var> are <var>combined selectors</var>.
+            			<ul>
+            				<li>
+            					 <var>X Y</var> is the set of <var>Y</var> elements that are a descendant
+            					 of some <var>X</var> element.
+            				</li>
+            				<li>
+            					<var>X&gt;Y</var> is the class of <var>Y</var> elements that are a child of
+            					some <var>X</var> element
+            				</li>            				
+            				<li>
+            					<var>X~Y</var> is the set of <var>Y</var> elements that are a subsequent
+            					sibling of some <var>X</var> element.
+            				</li>
+            				<li>
+            					<var>X+Y</var> is the set of <var>Y</var> elements that are the next
+            					immediate sibling of some <var>X</var> element.
+            				</li>							
+            			</ul>
+            		</li>
+            	</ul>
+            </li>
+            <li>
+            	Then the unions/groups of combined selectors, indicated by comma, form the set of all
+            	<var>HTML group selectors</var>.
+            	<ol>
+            		<li>
+            			If <var>A</var>, <var>B</var>, and <var>C</var> are combined selectors, then their
+            			grouping/union <var>A, B, C</var> is an HTML group selector. It represents the
+            			set of all elements that meet at least one of the criteria of the three.   
+            			More simply <var>A, B, C</var> is the set of HTML elements that are elements
+            			of at least one of <var>A</var>, <var>B</var>, and <var>C</var>.
+            		</li>
+            	</ol>
+            </li>
+            </ol>
+	</section>
+	          
+      	
+	<p>For future reference keep in mind that </p>
+        <ul style="list-style: square">
+            <li>
+                Every simple selector is a product selector. A product of one.
+            </li>
+            <li>Every product selector is a combined selector. A combination of one.</li>
+            <li>Every combined selector is a group selector. A group of one.</li>
+            <li>Since HTML selectors don't include pseudo selectors, HTML Selectors don't form the full set of all CSS selectors </li>
+	</ul>
+<!--
+	<p>	
+		If <var>G</var> is an HTML selector and <var>h</var> is an HTML element, then by 
+		definition all the following mean the same.		
+	</p>
+	<ol>
+		<li><var>h</var> meets the criteria of <var>G</var>.</li>
+		<li><var>h</var> is an element of <var>G</var>.</li>		
+		<li><var>h</var> matches <var>x</var>.</li>
+		<li><var>h</var> selects <var>x</var>.</li>
+	</ol>
+	 
+	<p>
+		Also keep in mind that it is very convient to conflate an HTML selector <var>G</var> with its class, the set of all html elements
+		that meet its criteria. Now we can express three previous
+		definitions more simply.
+	</p>
+	<ol>
+		<li><var>G H</var> is the set of all <var>H</var> elements that are 
+		descendants of some <var>G</var> element.</li>
+		<li><var>G&gt;H</var> is the set of all <var>H</var> elements that are a child of some <var>G</var> element.</li>
+		<li><var>G~H</var> is the set of all <var>H</var> elements that are siblings of some <var>G</var> element.</li>
+		<li><var>G+H</var> is the set of all <var>H</var> elements that are the next immediate sibling of some <var>G</var> element.</li>
+	</ol>	-->
+</section>        
+<section id="Simple-Selectors">
+	<h2>Simple Selectors</h2>	
+	<p>
+		The next table lists all <dfn>simple selectors</dfn> in the third column and categorizes them in the first column. 
+		The second column either gives the name of the selector, or in the case of a parameterized selector, the subcategory.
+		The name or subcategory includes the word <i>selector</i>, which we had to leave out for brevity. So for example:
+	</p>
+	<ul class="ml2">		
+		<li>the name of the <var>*</var> selector is the <var>universal selector</var>;</li>
+		<li>
+			The only child selector is the <var>:only-child</var> selector.
+		</li>
+		<li>
+			The <var>substring selector</var> is a little bit of a misnomer, but it's ok to use anyway. It
+			has two parameters and you don't actually get a selector until you specify its parameters.
+			So <var>[foo*="bar"]</var> is an actual substring selector: the two parameters have been explicitly
+			specified with <var>foo</var> as the attribute and <var>bar</var> as the 
+			substring. If <var>bar</var>
+			has double quotes they will need to be escaped before placing in the outer quotes. 
+		</li>
+	</ul>	
+	<table class="web">
+		<thead>
+			<tr><th colspan="4">Simple Selectors<br></th></tr>
+			<tr><td>Category</td><td>Name or<br>Subcategory</td><td>Selector</td><td>Criteria for an HTML element.</td></tr>
+		</thead>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="2">Initial Selectors</th><td>Universal</td><td>*</td><td>None (so selects all html elements)</td></tr>
+			<tr><td>Type</td><td>E</td><td>has type E (E = p, div, span, etc.)</td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th>ID</th><td>ID</td><td>#myid</td><td>has an id equal to <var>myid</var></td></tr>
+			<tr><th>Class</th><td>Class</td><td>.myclass</td><td>has class <var>myclass</var> </td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="7">Attribute<br>Selectors</th><td>Presence</td><td>[foo]</td><td>has attribute <var>foo</var></td></tr>
+			<tr><td>Value<sup>1</sup></td><td>[foo=bar]</td><td>has attribute <var>foo</var> with value <var>bar</var></td></tr>
+			<tr><td>Starting</td><td>[foo^="bar"]</td><td>has attribute <var>foo</var> whose value starts with <var>bar</var>.</tr>
+			<tr><td>Ending</td><td>[foo^="bar"]</td><td>has attribute <var>foo</var> whose value ends with <var>bar</var>.</tr>
+			<tr><td>Word<sup>2</sup></td><td>[foo~="bar"]</td><td>has attribute <var>foo</var> whose value contains word <var>bar</var></td></tr>
+			<tr><td>Substring</td><td>[foo*="bar"]</td><td>has attribute <var>foo</var> with substring <var>bar</var> in value</td></tr>
+			<tr><td>First Hyphenated<br>Token<sup>3</sup></td><td>[foo|="bar"]</td>
+			<td>has attribute <var>foo</var> and first 
+				hyphenated token <var>bar</var></td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="12">Structural<br>Pseudo<br>Classes</th><td>Root<sup>4</sup></td><td>:root</td><td>is the sole root element &lt;html&gt;</td></tr>
+			<tr><td>Nth-Child<sup>5</sup></td><td>:nth-child(k)</td><td>is a kth child (the kth child in its parent)</td></tr>
+			<tr><td>Nth to Last Child<sup>5</sup></td><td>:nth-last-child(k)</td><td>is a kth to last child</td></tr>
+			<tr><td>Nth of Type<sup>5</sup></td><td>:nth-of-type(k)</td><td>is a kth child of its type (in its parent)</td></tr>
+			<tr><td>Nth last of Type<sup>5</sup></td><td>:nth-last-of-type(k)</td><td>is a kth to last child of its type</td></tr>
+			<tr><td>First Child</td><td>:first-child</td><td>is a first child</td></tr>			
+			<tr><td>Last Child</td><td>:last-child</td><td>is a last child</td></tr>
+			<tr><td>First of Type</td><td>:first-of-type</td><td>is a first child of its type</td></tr>
+			<tr><td>Last of Type</td><td>:last-of-type</td><td>is the last child of its type</td></tr>
+			<tr><td>Only Child</td><td>:only-child</td><td>is an only child</td></tr>
+			<tr><td>Only of Type</td><td>:only-of-type</td><td>is an only child of its type</td></tr>
+			<tr><td>Empty</td><td>:empty</td><td>has no children including text nodes</td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="2">Link<br>Pseudo<br>Classes</th><td>Link</td><td>:link</td><td>is an unvisited links</td></tr>			
+			<tr><td>Visited</td><td>:visited</td><td>is a visited link</td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="3">User Action<br>Pseudo<br>Classes</th><td>Active<sup>6</sup></td><td>:active</td><td>
+				is currently active</td></tr>			
+			<tr><td>Hover<sup>7</sup></td><td>:hover</td><td>is currently in the hovered state.</td></tr>
+			<tr><td>Focus<sup>8</sup></td><td>:focus</td><td>currently has the focus</td></tr>	
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th>Negation<br>Pseudo Class</th><td>Negation</td><td>:nots(s)</td><td>does not match the simple selector s</td></tr>
+			<tr><th>Target<br>Pseudo Class</th><td>Target</td><td>:target</td><td>is the target of a link</td></tr>
+			<tr><th>Lang<br>Pseudo Class</th><td>Language</td><td>:lang(fr)</td><td>has language "fr" </td></tr>
+		</tbody>
+		<tbody style="padding:.5em">
+			<tr><th rowspan="3">UI State<br>Pseudo<br>Classes</th><td>Enabled</td><td>:enabled</td><td>is currently enabled</td></tr>	
+			<tr><td>Disabled</td><td>:disabled</td><td>is currently in the disabled state</td></tr>
+			<tr><td>Checked</td><td>:checked</td><td>is currently checked</td></tr>	
+		</tbody>	
+	</table>	
+	<span style="text-decoration:underline">Foot Notes</span>:
+	<ol>
+		<li>
+			For the Value sub-category we did not quote <var>bar</var> like W3 does because not all values are strings. 
+			Some attributes take Boolean values. If the value is a string, it needs to be quoted.
+		</li>
+		<li>
+			A word is a maximal sequence of characters not containing any white space. 
+		</li>
+		<li>
+			A hyphenated token is a maximal sequence of characters not containing a hyphen. Take the first one. The attribute <var>foo</var> as 
+			a string may or may not contain hyphens. If it doesn't then the whole 
+			spring is the first hyphenated token.
+		</li>
+		<li>
+			The root of the document is the html element, i.e., the sole element whose starting tag is &lt;html&gt;.
+		</li>
+		<li>
+			Indices <var>k</var> are always positive  because they are one based (index zero not allowed). 
+			<ol>
+				<li><var>:nth-child(1)</var> matches every first child.</li>
+				<li><var>:nth-child(2)</var> matches every second child, etc.,. </li>
+				<li><var>:nth-last-child(1)</var> matches every first to last child, or more simply every last child.</li>
+				<li><var>:nth-last-child(2)</var> matches every second to last child, etc. </li>
+			</ol>
+			<p>
+				Also <var>k</var> can be a formula <var>an + b</var> where <var>a</var> and <var>b</var> are specified integers and
+				where the exact letter <var>n</var> is used as a variable non-negative integer. To find out what's matched just determine the 
+				positive values of 
+				<var>an + b</var> to use as the index <var>k</var>.  
+			</p>
+			<p>The second and third columns below give examples and should be read 
+			independently. </p>	
+			<table class="web"> 
+				<thead>
+					<tr><th colspan="3">Examples of Formulas in Selectors<br><span style="font-size:.9em">(use n = 0, 1, 2, ... to obtain indices)</span></th></tr>
+				</thead>
+				<tbody style="padding-top:.3em;padding-bottom:.3em" >
+					<tr><th>Index Formula</th><td>2n + 1</td><td>-2n + 6</td></tr>
+					<tr><th>n</th><td>0, 1, 2, 3, ...</td><td>0, 1, 2, 3, ...</td></tr>
+					<tr><th>Positive Indices</th><td>1, 3, 5, 7, ...</td><td>6, 4, 2, <span style="text-decoration:line-through">0, -2, ...</span> (strike out zero and negative indices)</td></tr>
+					<tr>
+						<th>Selector</th>
+						<td>
+							<var>:nth-child(2n + 1)</var><p class="mth mb0">matches all first, third, fifth, 
+							etc. children</p>
+						</td>	
+						<td>
+							<var>:nth-child(-2n + 6)</var><p class="mth mb0">matches all sixth, fourth and second children</p>
+						</td>
+					</tr>
+					<tr>
+						<th>Selector</th>
+						<td>
+							<var>:nth-last-child(2n+1)</var><p class="mth mb0">matches all last, third to last, fifth to last, 
+							etc. children</p></td>
+						<td>
+							<var>:nth-last-child(-2n+6)</var><p class="mth mb0">matches all sixth to last, fourth to last, and second to last children</p>
+						</td>
+					</tr>
+					<tr>
+						<th>Selector</th>
+						<td>
+							<var>:nth-of-type(2n + 1)</var><p class="mth mb0">matches all first, third, fifth, 
+							etc. children of their type</p></td>
+						<td>
+							<var>:nth-of-type(-2n + 6)</var><p class="mth mb0">matches all sixth, fourth, and second children of their type</p>
+						</td>
+					</tr>
+					<tr>
+						<th>Selector</th>
+						<td>
+							<var>:nth-last-of-type(2n + 1)</var><p class="mth mb0">matches all last, third to last, fifth to last, 
+							etc. children of their type</p></td>
+						<td>
+							<var>:nth-last-of-type(-2n + 6)</var><p class="mth mb0">matches all sixth to last, fourth to last, and second to last children of their type</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>				
+		</li>
+		
+		<li>
+			Any element becomes active if you click on it. If for example you click on a div you are also clicking on the body, so both become active
+			simultaneously.
+		</li>
+		<li>
+			Likewise if you hover the mouse pointer on a div you are also hovering over any of its parents including the body, so all simultaneously
+			enter the hovered state.
+		</li>
+		<li>
+			When a UI element (user interaction element) is primed for user interaction, it enters the focused state. Examples of UI elements 
+			are content editable elements, buttons, and input elements. Using the tab to select a UI element forces it into the 
+			focused state. 
+			Also pressing down on the UI element with the mouse will cause the element to enter both the focused and active states.  
+		</li>
+	</ol>	
+</section><!-- Simple-Selectors -->	    
+    
+    
+<section>
+	<h2>Product Selectors</h2>
+	<p>
+		To review, if <var>x</var>, <var>y</var>, and <var>z</var> are selectors 
+		the concatenation <var>xyz</var>
+		is a selector. Since this looks like formal algebraic multiplication, <var>xyz</var> is called a 
+		<dfn>product selector</dfn>. It has three factors <var>x</var>,  <var>y</var>, and <var>z</var>.
+		It could also be called the <dfn>intersection</dfn> selector because it selects elements that 
+		are simultaneously in all three factors.
+	</p>
+	
+	<p class="ml2">		
+		<var>Product selector</var> is definitely briefer that W3's awkward terminology <var>sequence of simple selectors</var>, 
+		which doesn't even suggest that the result is a selector or even an intersection.
+	</p>
+		  
+	<div style="margin-top:1em">			
+		<div style="margin-left:3em; border:medium maroon ridge;padding:.5em 2em .5em 2em">	
+			<span style="text-decoration:underline" class="centerTable">Example</span>			
+			<p>
+				Consider the product selector whose factors are <var>:first-child</var>, <var>:hover</var>, 
+				<var>#mydiv</var>, and <var>.myclass</var>.
+				We can obtain the product selector by concatenating these four factors in twenty-four ways, but we show only three.	
+			</p>
+			<ol>
+				<li><var>:first-child.myclass:hover#myid</var></li>
+				<li><var>:first-child:hover#myid.myclass</var></li>
+				<li><var>#myid.myclass:first-child:hover</var></li>
+			</ol>
+			<p>
+				All three concatenations represent the same product or intersection. 
+				This product matches all elements that are a <var>first child</var>, 
+				are of the class <var>myclass</var>, are being <var>hovered</var> on, 
+				and have id <var>#myid</var>.		
+			</p>
+			<p>We can prepend a type selector like <var>div</var> as the first factor, and again an intersection is represented.</p>
+			<ol>
+				<li><var>div:first-child.myclass:hover#myid</var></li>
+				<li><var>div:first-child:hover#myid.myclass</var></li>
+				<li><var>div#myid.myclass:first-child:hover</var></li>
+			</ol>
+			<p>
+				All three product selectors are identical because each represents the HTML collection of 
+				all <var>divs</var> that are a <var>first child</var>, are of the class
+				<var>myclass</var>, are being <var>hovered on</var>, and have id <var>#myid</var>.		
+			</p>
+		</div>
+	</div>
+	<p class="display">
+		One of the rules of product selectors is that if the universal selector or a type selector is a factor, it must be listed as the
+		first factor. Except for this caveat, order of factors isn't important.
+	</p>
+</section><!-- Product Selectors -->
+ <section>
+	<h3>Combined Selectors</h3>
+		<p>The following table is review. A description of the set of element 
+		represented is given. You might try
+		and give the criteria. For example the descendant selector criteria is that an element must be an F element
+		that is a descendant of some E element. </p>
+		
+		<table class="web">
+		<thead>
+			<tr><th colspan="4">Combined Selectors<br><span style="font-size:.9em">(E is a combined selector, F is a product selector)</span></th></tr>
+			<tr><td>Combinator Name</td><td>Combinator</td><td style="text-align:center">Combined<br>Selector</td><td>Matching HTML Collection</td></tr>
+		</thead>
+		<tbody style="padding:.5em">
+		<tr><th>Descendant</th><td style="text-align:center">(white space)</td><td style="text-align:center">E F</td><td>All F elements that are 
+			descendants of E elements</td></tr>
+		<tr><th>Child</th><td style="text-align:center">&gt;</td><td style="text-align:center">E &gt; F</td><td>All F elements that are children of E elements</td></tr>
+		<tr><th>Adjacent Sibling</th><td style="text-align:center">+</td><td style="text-align:center">E + F</td><td>All F elements that are the very next sibling of an E element</td></tr>
+		<tr><th>General Sibling</th><td style="text-align:center">~</td><td style="text-align:center">E ~ F</td><td>All F elements that are a following sibling of an E element</td></tr>
+		</tbody>
+	</table>		
+		<p>
+			<dfn>Combined selectors</dfn> are obtained from product selectors by applying combinators. Write out a sequence
+			of product selectors and write combinators in-between. The combinators are space as 
+			descendant
+			combinator <var>&gt;</var> as child combinator, <var>+</var> as adjacent sibling combinator,
+			and <var>~</var> as general sibling combinator.
+			
+			OK! Here's a list of product selectors.
+		</p>
+		<div style="border:medium maroon ridge; padding:.5em 2em .5em 2em"> 
+			<ol>
+				<li class="mth mbh"><var>div:first-child</var>
+					<ul>
+						<li>Selects all <var>divs</var> that are a <var>first child</var>.</li>
+					</ul>
+				</li>
+				<li class="mth mbh">
+					<var>span[foo="bar"]:only-child </var>
+					<ul>
+						<li>
+							Selects all <var>spans</var> with attribute <var>foo</var> and string value <var>"bar"</var>.
+							Example <var>&lt;span foo="bar" &gt;&lt;/span&gt;</var>
+						</li>
+					</ul>
+				</li>
+				<li class="mth">
+					<var>var.myclass</var>
+					<ul>
+						<li>Selects all elements of type <var>var</var> having class <var>myclass</var> </li>
+					</ul>
+				</li>
+			</ol>
+			
+			<p>
+				Write these out in order and place the combinators space and <var>&gt;</var> 
+				in-between
+				the first two and last two respectively. You get the combined selector.
+			</p>
+			
+			<var class="centerTable">div:first-child&ensp; span[foo="bar"]:only-child &ensp; &gt; &ensp; var.myclass</var>
+			
+			<p>
+				To interpret this, you always work backwards. 
+			</p>
+			<p style="margin-left:2em">
+				This combined selector selects any element that is a <var>var</var> with class <var>myclass</var> 
+				that is a <var>child</var> of an only child <var>span</var> that has a <var>foo</var> 
+				attribute 
+				whose value is <var>"bar"</var> that is in turn a <var>descendent</var> of a <var>div</var> 
+				that is the first child in its parent. 
+			</p>
+		</div>
+		<p>
+			To understand spacing, the descendent combinator is a space, but you can have white space around it.
+			Likewise the other combinators can have more white space around them.
+		</p>
+		
+		<p>
+			The reader should keep in mind that <i>Adjacent Sibling</i> and <i>General Sibling</i> are oxymoronic. 
+			Proper language dictates that a general sibling could be any sibling previous or subsequent, while an adjacent sibling
+			could also  be previous or subsequent. Lets emphasize that only subsequent siblings are allowed by these two combinators. 
+			These two terms
+			are officially standardized and so can't be changed to proper terms such as <i>next sibling</i> or <i>following sibling</i>.
+		</p>
+		
+		<p>It's a hole is CSS that you can't access previous siblings. </p>
+</section>		
+<section>
+	<h2>HTML Group Selectors</h2>
+	<p>
+		A HTML group selector is formally, a comma separated list of combined selectors. It represents the union or grouping
+		of the individual combined selectors. That's it and there isn't anything more to say. However, meouzer as a 
+		Siamese 
+		is rather talkative. If <var>x</var>, <var>y</var>, and <var>z</var> are combined selectors (which includes product 
+		selectors and simple selectors).
+		then <var>x, y, z</var> is a group selector. It represents the union of the three combined selectors. It's criteria
+		is that an element must lie in at least one of the three. 
+	</p>
+			
+	<p style="border:thin maroon ridge;margin-left:2em;margin:2em" >
+		<var class="centerTable">div, span, var</var> 
+		<span class="centerTable">is the selector that corresponds to the HTML collection of all 
+		<var>divs</var>, <var>spans</var>, and <var>vars</var>.</span>
+	</p>
+	<p>
+		Lets look at the group selector for proper combined selectors.
+	</p>
+	<div style="border:medium maroon ridge;padding:.5em 2em .5em 2em">
+		The union of the following combined selectors
+			
+		<ol>
+			<li><var>.myclass[foo] ~ span</var> </li>
+			<li>
+				<var>p:empty + :nth-child(2)</var>
+			</li>
+			<li>
+				<var>:first-child &gt; div#myid</var>
+			</li>			
+		</ol>
+		<br>
+		can be grouped in any order, such as
+		
+			<var class="centerTable">.myclass[foo] ~ span,&ensp; p:empty + :nth-child(2),&ensp; :first-child &gt; div#myid</var>
+		<br>	
+		It selects all elements that meet at least one of the following criteria.
+		<ol>
+			<li>
+				is a <var>span</var> that is a general sibling of some element of class <var>.myclass</var> 
+				that in turn has a <var>foo</var> attribute.
+			</li>
+			<li>
+				is a <var>second child</var> that is the adjacent sibling of some empty paragraph.
+			</li>
+			<li>
+				is a <var>div</var> whose id is <var>myid</var> and which is a child of a first-child. 
+			</li>
+		</ol>	
+	</div>
+</section>		
+		
+<section>
+	<h2>Pseudo Elements and Pseudo Selectors</h2>
+	<p>
+		Logical portions of the web page that can't be accessed by the DOM are called <dfn>abstract elements</dfn>.		
+	</p>
+	<p>
+		Officially a <dfn>pseudo element</dfn> is a formal notation whose name stands for a type of
+		abstract element. For example, <var>::first-line</var> is a pseudo element that stands for first lines. By appending this particular pseudo 
+                element to the end of a combined HTML selector <var>E</var>, we obtain a pattern <var>E::fist-line</var>, called a <dfn> pseudo selector</dfn>, 
+                that matches all first lines of elements of <var>E</var>. 
+	</p>
+        <p class="display" style="display:table;margin-left: auto; margin-right: auto">
+            A <dfn>pseudo selector</dfn> is the concatenation of an HTML combined selector with a pseudo element. 
+        </p>
+	<table class="web" id="Pseudo-Elements">
+		<thead style="padding:.5em">
+			<tr><th colspan="3">Pseudo Elements and Pseudo Selectors<br><span style="font-size:.9em">(E is a combined HTML selector)</span>
+			</th></tr>
+			<tr><td>Pseudo Element</td><td>Pseudo Selector</td><td>Selection Criteria for Abstract Elements</td></tr>
+		</thead>
+		<tbody style="padding:.5em">
+		<tr><td>::first-line</td><td>E::first-line</td><td>is the first line of some E element</td></tr>
+		<tr><td>::first-letter</td><td>E::first-letter</td><td>is the first letter of some E element</td></tr>
+		<tr><td>::before</td><td>E::before</td><td>is generated content at the start of an E element's innerHTML</td></tr>
+		<tr><td>::after</td><td>E::after</td><td>is generated content at the end some E element's innerHTML</td></tr>		
+		</tbody>
+	</table>
+	<p>
+ 		Single colons can also be used, which is best because some modern browsers don't recognize the double semicolon. 
+ 		<!-- The before and after pseudo
+ 		elements will be discussed in the styling appendix. -->
+	</p>	
+	<p>
+		Let's take the combined selector <var>div:last-child &gt; span</var> and append the pseudo element 
+		<var>:first-line</var> to get.
+		<var class="centerTable">div:last-child &gt; p:first-line</var> 
+	</p>
+	
+	<p>
+		This is the pseudo selector that selects all <var>first lines</var> of <var>
+		paragraphs</var> that are a 
+		<var>child</var> of a <var>div</var> that is a <var>last child</var>.	
+	</p>
+	
+	<p>Let's take a look at :before. The style div:before{content:"Insert at beginning of Every Div "}
+		will insert the string "Insert at beginning of Every Div " at the start of every div's
+		innerHTML.
+	</p>
+</section>		
+<section>
+	<h2>CSS Group Selectors and CSS Selectors</h2>
+	<p>
+		The grouping of any number of HTML combined selectors and pseudo selectors is called a <dfn>CSS group selector</dfn>.
+		It represents the union of the individual selectors: all the elements that meet the criteria of at least one
+		of the individual selectors. The CSS group selectors form the set of all CSS selectors as displayed in the
+		following diagram.
+	</p>
+	
+	<img alt="not available" src="Selectors.svg" style="width:500px;margin-top:2em;margin-bottom:2em" class="centerTable">
+	
+	<p>
+		It just remains to give examples of proper CSS selectors. <dfn>Homogeneous</dfn> means alike in some sense.
+		Combined selectors are like other combined selectors, and pseudo selectors are like other pseudo selectors,
+		but combined selectors and pseudo selectors are not like each other. 
+	</p>
+	
+	<div class="ml2">
+	<p>
+		All the following are CSS selectors.
+	</p>
+		<ol>
+			<li>
+				<var>div, span, var</var> 
+				<ul>
+					<li>is a homogenous union of HTML selectors</li>
+				</ul>
+			</li>
+			<li>
+				<var>div::first-line, span::first-letter, var::before</var>
+				<ul>
+					<li>is a homogenous union of pseudo element selectors.</li>
+				</ul> 
+			</li>
+			<li>	
+				<var>div, span::first-letter </var>
+				<ul>
+					<li>is a non-homogenous union of HTML selectors and pseudo selectors.</li>
+				</ul> 
+			</li>
+		</ol>
+		<p>
+			Of course in the place of the <var>div</var>, <var>span</var>, and <var>var</var> we could have used combined 
+			HTML selectors of any complexity. 
+		</p>
+	</div>	
+</section>
+<section>
+	<h2>Appendices</h2>
+	<section>
+	<h3>Common Misunderstandings</h3>
+		<p>
+			Most likely because W3 is so haphazard, people get pseudo classes, pseudo elements,
+			and pseudo selectors confused with each other. Even W3 and MDN get confused.
+		</p>	
+		<p>
+			We have already seen the pseudo classes such as <var>:fisrt-child</var> in the <i>Simple Selectors</i>
+			section.
+		</p>
+		<blockquote>
+			<a target="_blank" href="https://www.w3.org/TR/selectors-3/#pseudo-classes">W3 Pseudo Classes</a>. 
+			The pseudo-class concept is introduced to permit selection based on information that lies outside 
+			of the document tree or that cannot be expressed using the other simple selectors. 
+		</blockquote>
+		<p>
+			This quote is blatantly false. According to it the pseudo class and simple selector 
+			<var>:first-child</var> is based on information outside the document tree. Wrong!
+			No information outside the document tree
+			describes its selection/criteria. It's only by examining the document tree that you can tell
+			whether a element is a first child or not.
+		</p>
+		<p>Now let's see how MDN goes off the deep end.</p>
+		
+		<blockquote>
+			A CSS 
+			<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes" >pseudo-class</a> 
+			is a keyword added to a selector that specifies a special state of the selected element(s).
+			For example, :hover can be used to change a button's color when the user's pointer hovers over it.
+			<br>
+			<span style="margin-left:25em;">Mozilla Developer Network</span>
+		</blockquote>
+		<p>
+			Again recall that <var>:first-chld</var> is a pseudo class. That an element is a first child really can't be considered
+			to be a state of  the element and certainly not any more than the attribute selectors. That I am a first child
+			has nothing to do with my state. The fact that I have brown hair does have something to do with my state.
+		</p>
+		<p>
+			The quote messes up again by suggesting that <var>:first-child</var> is not a selector: it's just a keyword
+			added to an actual selector. Wrong!
+		</p>
+		<p>
+			The only thing you can say about the pseudo classes is that they are the simple selectors left over after you consider the
+			universal selector, the type selectors, and the attribute selectors. You can't give a simple independent
+			description of this: at least no one has.		
+		</p>
+		<p>
+			Another thing is to realize is that <var>pseudo selectors</var> arise from <var>pseudo elements</var>
+			and so are closely related but not the same. Furthermore, pseudo classes are something else.
+			All pseudo classes are listed in the <i>Simple Selectors</i> table.
+		</p>	
+		<!-- <p>
+			Author's that aren't careful will claim that <var>pseudo classes</var> such as
+			<var>:first-child</var> are either <var>pseudo elements</var> or <var>pseudo selectors</var>. 
+			The weight of evidence is clear! There are only four <var>pseudo elements</var> and we 
+			went over all four of them.
+		</p> -->		
+	</section>
+</section>
+	<br><br><br><br>
+	
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

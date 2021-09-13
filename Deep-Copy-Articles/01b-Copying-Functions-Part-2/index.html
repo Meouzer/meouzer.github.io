@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>JavaScript: Copying Functions with Evaluators Part 2</title>
+<link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+<link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css"/>
+<script src="../../00-Commons/JSHTML.js"></script>
+<script src="../01a-Copying-Functions-Part-1/evaluators.js"></script>
+<script src="Test.js"></script>
+
+<script>
+	
+	window.addEventListener("load", function()
+	{
+		applyJSHTML();	
+	});			
+</script>
+
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px; font-family:sans-serif">
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<header>
+	<h1 style="margin-bottom:1em">JavaScript: Copying Functions with Evaluators Part 2</h1>
+	<h1 style="margin-bottom:1em">Draft 1: By draft 20 we will get it right!</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em;margin-top:.5em;color:maroon">Making Eval Great Again!</span>
+	<span class="centerTable" style="font-size: 1.1em; color: maroon;">meouzer@gmail.com</span>	
+</header>	
+	
+<blockquote style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+		This article shows a better way to copy functions! So you read the previous article? Oops!<br>
+		<span style="float:right">Meouzer</span></div>
+</blockquote>
+<p>
+	The previous article is a good introduction to context evaluation factories and evaluators. It was all
+	so simple, but now it gets more complicated. Good luck! We at the consortium hope you can now figure out the code below.
+</p>
+<p>
+	Full code is at <a target="_blank" href="../01a-Copying-Functions-Part-1/evaluators.js">evaluators.js</a>, which has no dependencies.
+</p>
+<section>
+	<h2>Introduction</h2>
+	<p>
+		We show the most powerful way to copy functions. Not only <i>vars</i> but <i>constants</i> and <i>lets</i> can be placed into
+		the evaluator's context, which are seen by all the copied functions. This comes close to the way that functions 
+		and getter/setters are copied when we get to copying class instances.
+	</p>
+</section>
+
+
+<section>
+	<h2>Infrastrucure for Copying Functions</h2>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				The context evaluation factory getEvaluator()
+			</header><div class="numberShield colorLightBlue"></div>	
+
+			function writeVars(contextObject)
+			{	
+				var vars = "";
+				
+				if(contextObject != null &amp;&amp; typeof contextObject == "object")
+				{
+					const regVar = /^(var |let |const )?([a-zA-z_$][a-zA-z_$0-9]*)$/;		
+											
+					for(let i = 0, keys = Object.keys(contextObject), 
+						length = keys.length; i &lt; length; i++)
+					{
+						var a = regVar.exec(keys[i]);
+						vars +=	(a[1]?a[1]:"var ") + a[2] + " = arguments[0]['" + keys[i] + "'];"; 
+					}
+				}
+										
+				return vars;
+			}			
+				
+			function getEvaluator()
+			{	
+				return eval("(function()\
+				{"				
+					+ 
+						writeVars(arguments[0])			
+					+
+								
+					"return function(){return eval('('+arguments[0]+')');}\
+				});")(arguments[0]);
+			}
+		
+			const Evaluator = '(' + getEvaluator + ')';
+
+		</div>	
+</section>
+
+<section>
+	<h2>Example</h2>
+	
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				A Local Context Evaluation Factory and Evaluator 
+			</header><div class="numberShield colorLightBlue"></div>	
+			
+			function Test()
+			{
+				// This Z would be in the evalautor's context but it is overriden
+				// in a nested scope.
+				var Z = 100;  
+		
+			    (function(){
+			        // Here the scope is local, not global.
+			
+			        var Z = 0; // used since Z is local
+			        
+			        // local but not used since b is overriden by the context object. 
+			       	var b = 9; 
+				
+					// In evaluator context, b is a const and c is a var.
+					// eval(Evaluator) is the local context evaluation factory.
+					const evaluator = eval(Evaluator)({"const b":2, c:3});       
+			
+					// sum is the copy a function, and lives in the evaluator's context.
+			        const sum = evaluator(function(a){return a + b + c + Z});
+			
+					// const b = 2, var c = 3 and Z = 0 are in the evaluator's context.
+			        console.log(sum(1));  // 1 + 2 + 3 + 0 = 6
+			        
+			        // setB is the copy a function, and lives in the evaluator's context.
+			        const setB = evaluator(function(value){b = value}); 
+			        
+			        try
+			        {
+			        	// Attempt to change const b in evaluator's context to 100.
+			        	setB(100); 
+			        }
+			        catch(e)
+			        {
+			        	console.log(e.message); // invalid assignment to const 'b'
+			        }	        
+			
+			    })();
+			}			
+	</div>		
+	
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br><br><br><br><br><br><br>
+
+<!-- 
+<section>
+	<h2>Copying Functions with Evaluator</h2>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood">
+			<div class="codeListing"></div>
+			The Evaluator Function
+		</header><div class="numberShield colorLightBurlywood"></div>
+		
+		function getEvaluator()
+		{
+		return eval("(function(" + Object.keys(arguments[0]) + "\c)\
+		{\
+			for(let i = 0, keys = Object.keys(this.contextObject),\ 
+				length = keys.length; i &lt; length; i++)\
+			{\
+				eval(keys[i] + ' = this.contextObject.' + keys[i] + ';');\
+			}\
+			this.e = function(func)\
+			{\
+				return eval('('+func+')');\
+			};\
+			this.e.contextObject= this.contextObject;\
+			this.e.setValue = function(name, value){eval(name + ' = value');};\
+			this.e.setValues = function(co)\
+			{\
+				for(let i = 0, keys = Object.keys(co), length = keys.length;\ 
+					i &lt; length; i++)\
+				{\
+					eval(keys[i] + ' = co.' + keys[i] + ';');\
+				}\
+			};\
+			this.e.updateAll = function()\
+			{\
+				for(let i = 0, keys = Object.keys(this.contextObject),\ 
+					length = keys.length; i &lt; length; i++)\
+				{\
+					eval(keys[i] + ' = this.contextObject.' + keys[i] + ';');\
+				}\
+			};\
+			return this.e;\
+		});").call({contextObject:arguments[0]});
+	}   
+	
+	const Evaluator = "(function(){return " + getEvaluator + ";})();";
+
+	</div>	
+
+</section>
+-->
+
+<br><br><br><br><br><br><br><br><br><br><br>	
+</body>
+
+</html>
+
+

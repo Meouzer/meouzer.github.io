@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">JavaScript: Serialization/Deserialization of Classes</title>
+	<link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../../00-Commons/JSHTML.js"></script>
+	<script src="../../00-Scripts/typing.js"></script>
+	<script src="../../00-Scripts/Stringify.js"></script>
+	<script src="../../00-Scripts/parseDataString.js"></script>
+	<script src="Test-Ser-Des.js"></script>
+	<script>
+		window.addEventListener("load", function()
+		{
+			applyJSHTML();										
+		});							
+	</script>
+
+	<style>	
+		div.codeBox.simple{background-color:rgb(255,245, 255);border-radius:20px; padding:1em;border:none}
+	</style>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1>JavaScript: Serialization/Deserialization of Classes</h1>
+<header id="header" style="margin-top:2em">	
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">
+	Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+</header>	
+
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+		Finding a serialization algorithm for JavaScript is tough. Finding one while riding a Bull is tougher. 
+	Finding one while riding a Bull jumping out of an airplane is tougher than tough. Finding one while riding
+	a Bull jumping out of an airplane while eating a Butter Finger in all its crispity crunchity peanut buttery 
+	glory is tougher than tougher than tough. Taking the Butter Finger away from the Bull is just plain stupid. 
+	<br>	
+		<span style="float:right">Meouzer</span></div>
+</blockquote>
+
+	
+<section>
+	<h2>Introduction</h2>
+	<p>
+		Open the console window to see that all tests of <i>Test-Ser-Des.js</i> have been passed. If you are using IE11, then you must 
+		comment out all code attempting to change constants because such are fatal errors at compile time. Or just hook up the
+		<i>Test-Ser-Des-IE11.js</i> file.		
+	</p>
+	
+</section>
+
+<section>
+	<h2>The How to Do It Section</h2>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				The Serialization and Deserialization Functions of the foo Class
+		</header><div class="numberShield colorLightBurlywood"></div>
+		
+		function foo(x,y)
+		{
+			// variables. functions that aren't methods are variables.
+			var a = ...;
+			const b = ...;
+			let c = ...;
+			
+			(function nestedFunction(x,y,z)
+			{
+				// No class methods defined inside nestedFunction.
+				// Changes to variables of the class allowed.
+				// Well it's actually OK if the method is 
+				// context equivalent to a method written
+				// outside. E.g., a method here is ok as
+				// long as it doesn't depend on the local x,y,z. 
+			})(5,7); 
+						
+			this.serialize = function()
+			{
+				var cleanContextObject = {this$:this, a:a, b:b, c:c, x:x, y:y};
+				return serializeClassData(cleanContextObject);
+
+			} 			
+		}
+		
+		// write deserialization function immediately after constructor
+		// so both have the same outer context.		
+		
+		foo.deserialize(str)
+		{
+			return (function ()				
+			{					
+				this.evaluator = function(){return eval('('+ arguments[0] +')');};
+				this.contextObject = parseDataString(str, this.evaluator, 
+				Object.create(foo.prototype), "foo");
+				var a = this.contextObject.a;
+				const b = this.contextObject.b;
+				let c = this.contextObject.c;
+				var x = this.contextObject.x;
+				var y = this.contextObject.y;
+				return this.contextObject.this$
+			}).call({});	
+		}			
+				
+	</div>	
+</section>
+
+		
+<br><br><br><br><br>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

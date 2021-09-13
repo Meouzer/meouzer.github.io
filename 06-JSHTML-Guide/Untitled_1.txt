@@ -1,0 +1,13 @@
+﻿1. applyJSHTML()
+   <div class = "codeBox"></div> 
+
+2. define body indent; brace indent, case indent, implicit indent.
+
+3. code  numbers
+	data-codeNumbers
+	\numbersOff
+	\numbersOn
+	\numbersRestart
+	
+4.	
+

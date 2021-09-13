@@ -1,0 +1,659 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title id="title">Guide to JSHTML: Displaying JavaScript in HTML</title>
+	<link href="../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+	<link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" />
+	<script src="../00-Commons/JSHTML.js"   type="text/javascript" id="script"></script>
+	<script src="../00-Commons/PrettyHTML.js"></script>	 
+	<script src="../00-Archive/01a-Data-Typing-1-Archive/typing.js"></script>
+	
+	<script type="text/javascript">
+		window.addEventListener("load", function() 
+		{
+			applyJSHTML();							
+		});			
+	</script>
+
+	<style type="text/css" id="style">	
+		div.codeBox.simple{background-color:rgb(255,245, 255);border-radius:20px; padding:1em;border:none}
+		pre{font-family:"Times New Roman", Times, serif; border:thin black solid;padding:1em 1em 0 1em;margin:auto;display:table }
+	</style>
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;font-family:sans-serif" >
+
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<h1>
+	<span style="font-size:.9em">Guide to JSHTML: Displaying JavaScript in HTML</span><br>		
+</h1>
+<header id="header" style="margin-top:2em">	
+	<span class="centerTable" style="font-size: 1.3em; margin-top:.5em; color: maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">Making JavaScript Great in HTML!</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block; margin-right:2em">
+	<div style="display: inline-block; width: 500px; vertical-align: top; line-height: 1.5em; text-align:left">
+		Programmers ask me all the time. Meouzer! How do I display great JavaScript code in HTML that I can be proud of?
+		I say it's just just 50,000 lines of JSHTML that form the basis of every great JavaScript display!  
+		<cite style="margin-left: 28em">Meouzer</cite></div>
+</blockquote>
+
+<section>
+	<h2>Introduction</h2>
+	<p>
+		To allow JSHTML to convert JavaScript in HTML to formatted JavaScript 
+		first include <var><span lang="en-us"></span>JSHTML.js</var> and <var>JSHTML.css</var> in the header.		 
+	</p>
+	
+	<pre>
+&lt;link href="../00-Commons/JSHTML.css" rel="stylesheet" type="text/css" /&gt;
+&lt;script src="../00-Commons/JSHTML.js"   type="text/javascript" id="script"&gt;&lt;/script&gt;
+	</pre>
+	
+	<p>
+		Then call <var>applyJSHTML()</var> after the window or body has loaded, e.g., 
+	</p>
+	<div class="codeBox centerTable" style="padding-right:1em">
+		//In some script in the header
+		window.addEventListener("load", function() 
+		{
+			applyJSHTML();							
+		});		
+			
+	</div>
+	<p>
+		Then all divs of class <var>codeBox</var> will have their unformatted JavaScript neatly formatted, with 
+		appropriate indentations, code numbers, and colorization. 
+		A <dfn>code box</dfn> is a div with class <var>codeBox</var>.
+	</p>
+	<p>
+		The previous box shows formatted JavaScript in a code box. Originally, the JavaScript in the code
+		box  could look like the following, but JSHTML don't care. It don't give a schmuck! It will
+		format anyway.
+	</p>
+	<pre>
+		window.addEventListener("load",        function() 
+		                          {
+			                                          applyJSHTML();							
+	  });		
+	</pre>
+	
+	<p class="display">
+		As you can see JSHTML respects line breaks in the unformatted code, turning them into HTML 
+		breaks &lt;br&gt; in the formatted code.
+	</p>	
+</section>
+
+<section>
+	<h2>The Four Types of Indentations</h2>
+		
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<div class="numberShield colorLightBurlywood"></div>
+		<div class="codeListing"></div>
+		<header class="codeHeader colorLightBurlywood">
+			Indentations 		
+		</header>
+
+		function foo (x)
+		{
+			x = func(a,b,        // telescoping implicit indents
+			c,d,e,             // 1 implicit indent
+			f,g,h,         // add another implicit indent
+			i,j,k);    // add another implicit indent
+			&nbsp;                      // telescoping stops when statement is complete   
+			 
+			switch(x)
+			{
+				case "cat":
+					x++;
+					<p style="display:block;left:10em;margin:0"><i>Switch Specialist</i></p>
+					<img alt="loading" src="../00-Commons/Meouzer.jpg" style="width:100px;display:block;margin-left:10em" class="slider">
+					switch(y)
+					{
+						case 1:
+						z++;
+						/* comment
+						comment 
+						*/
+						y++;
+						default: /* comment
+						comment*/
+							"An oyster
+							met an oyster
+							";
+							y++;
+					}
+					break;
+			}
+		}
+	
+		
+		<p style="margin-left:3em">
+			This paragraph mixed in with the JavaScript code introduces the
+			following table, also mixed in with the JavaScript code, explaining the four indentations.
+		</p>	
+				
+		<table class="web" style="margin-left:3em;margin-right:1em">
+			<thead>
+				<tr><th colspan="4">The Four Indentations</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Indentation</td><th>Description</th><th>Default</th><th>Example<br>Lines</th></tr>
+				<tr><th>body indent</th><td>The indentation from the left<br>edge to the main body of code</td>
+				<td style="white-space:nowrap">4 x &amp;nbsp; </td><td>1</td>
+				<tr><th>brace indent</th><td>The indentation from a left brace<br>to subsequent code</td>
+				<td>4 x &amp;nbsp; </td><td>2, 7, 10</td>
+				<tr><th>case indent</th><td>The indentation from a case X:<br>to subsequent code</td>
+				<td>5 x &amp;nbsp; </td><td>8-9, 11-12,<br>14-15</td>
+				<tr><th>implicit indent</th><td>The indentation for <br>uncompleted statements.</td>
+				<td>4 x &amp;nbsp; </td><td>3-5</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		/*
+			To set your default preferences go to the following code 
+			in JSHTML.js and change the values maybe. Then you shouldn't
+			need to pass applyJSHTML() any parameter.
+		*/
+		
+		
+		\numbersRestart
+		const DEFAULT_BODY_INDENT = 4;
+		const DEFAULT_BRACE_INDENT = 4;
+		const DEFAULT_IMPLICIT_INDENT = 4;
+		const DEFAULT_CASE_INDENT = 5;	
+		const DO_TELESCOPE_IMPLICIT_INDENT = true;	
+		
+		/*
+			For a particular web page you can override the defaults by passing 
+			applyJSHTML(p) a parameter that looks like the following. All 
+			attributes of p are optional.
+		*/
+		
+		\numbersOff		
+		p = {bodyIndent:5, braceIndent:6, implicitIndent:3, 
+		caseIndent:5, doTelescope:false}; 
+		
+		/*
+			A particular code box can override the two higher level defaults by using the
+			attributes		
+		<ol style="margin-left:3em;margin-bottom:0;margin-top:0" >
+			<li style="margin-top:0">
+				data-bodyIndent
+			</li>
+			<li>
+				data-braceIndent
+			</li>
+			<li>
+				data-ImplicitIndent
+			</li>
+			<li>
+				data-caseIndent			
+			</li>
+			<li style="margin-bottom:0">data-doTelescope</li>
+		</ol>		
+		*/		
+	</div>
+	
+	
+</section>
+<section>
+	<h2>Code Numbers</h2>
+	<p>
+		A code box with attribute <var>data-codeNumbers</var> and value <var>true</var> will have code numbers displayed.
+		Code numbers are displayed only for lines that have code. Displaying numbers for all lines isn't useful and would make the
+		code box look too busy. 
+	</p>
+	
+	<pre>
+&lt;div class="codeBox" data-codeNumbers="true"&gt;
+	</pre>
+	
+	<section>
+		<h3>The Number Shield and Code Listing</h3>
+		<p>
+			To put a shield over the numbers, after the start tag of the code box write an empty div
+			with class <var>numberShield</var> as demonstrated. To give the code box a code listing,
+			which is a number in the top right corner enumerating the code boxes, write an empty
+			div with class <var>codeListing</var> as demonstrated. Both are optional and order of
+			writing doesn't matter.
+		</p>
+		<pre>
+&lt;div class="codeBox colorLightPink rounded" data-codeNumbers="true"&gt;
+	&lt;div class="numberShield colorLightBurlywood"&gt;&lt;/div&gt;
+	&lt;div class="codeListing"&gt;&lt;/div&gt;
+
+		</pre>
+	</section>
+	
+	<section>
+		<h3>Number Directives</h3>
+		<p>
+			You can put a number directive on its own line (with nothing else) to turn code numbering off, turn
+			code number back on, or restart code numbering at 1. 
+		</p>
+		
+		<p>
+			Double clicking on a code numbered code box will cause the code numbers to 
+			disappear.
+			Double clicking again will bring the code numbers back.
+		</p>
+		
+		<table class="web slider" style="margin:auto">
+		<thead>
+			<tr><th colspan="2">Number Directives</th></tr>
+		</thead>
+		<tbody>
+			<tr><th>Directive</th><th>Description</th></tr>
+			<tr><td style="color:blue">\numbersOff</td><td>stop subsequent code numbering</td></tr>
+			<tr><td style="color:blue">\numbersOn</td><td>turn subsequent code numbering back on</td></tr>
+			<tr><td style="color:blue">\numbersRestart</td><td>restart code numbering at number 1</td></tr>
+		</tbody>
+	</table>
+	</section>
+</section>
+<section>
+	<h2>Fine Tuning Indentation</h2>
+	<p>
+		Use indentation directives to fine tune or change indentations. Only on rare 
+		occasions should this be
+		useful. An indentation directive must not be written
+		on its own line. Indentation directives belong at the start of a line of code or at the end of a line
+		of code.
+	</p>
+	<p>
+		The indentation directives take the form <var>\^xy</var> or <var>\$xy</var>, where <var>x</var> and
+		<var>y</var> are two decimal digits with <var>x</var> usually being zero.  At the start or end of a line
+		of code <var>\^xy</var> will move subsequent indentations to the right by <var>xy</var> spaces. 
+		 At the start or end of a line
+		of code <var>\$xy</var> will move subsequent indentations to the left by <var>xy</var> spaces.
+	</p>
+	
+	<p>For example the following unformatted JavaScript code</p>
+	
+	<pre>
+		&lt;div class="codeListing"&gt;&lt;/div&gt;
+		x = func(a,b,
+		\^09c,d,e,
+		f,g,h,
+		i,j,k);\$09	
+	</pre>
+	
+	will produce the following formatted JavaScript code.
+	
+	<div class="codeBox centerTable">
+		<div class="codeListing"></div>
+		
+		x = func(a,b,
+		\^09c,d,e,
+		f,g,h,
+		i,j,k);\$09			
+			
+	</div>
+	
+	Compare this with lines 2-5 of code listing 1 to observe the difference.
+	
+	</section>
+		<h3>Turn Telescoping of Implicit Indents on or off</h3>	
+	<section>
+	<p>
+		Observe from code listing 2 that the implicit indent telescopes. For each line of code
+		that does not end the statement, the indentation increases by the 
+		implicit indent each time.
+		You might prefer a non telescoping implicit indent shown as follows.
+	</p>
+	
+	<pre>
+x = func(a, b,
+         c, d, e,
+         f, g, h,
+         i, j, k);
+	</pre>
+	<p class="display">
+		In <i>JSHTML.js</i>, search for <var>var DO_TELESCOPE_IMPLICIT_INDENT</var> and change it's value to <var>false</var>
+		to make non telescoping implicit indents the default. 
+	</p>	
+	<p>		
+		Also, for a particular code box you can override the default by setting the <var>data-doTelescope</var> attribute to 
+		<var>"true"</var> or <var>"false"</var>. You can also override the previous two by using the two directives 
+		written on their own lines: <var>\telescopeOff</var>; <var>\telescopeOn</var>.		
+	</p>
+		
+</section>
+
+<section>
+	<h2>Comments</h2>
+	<p>
+		You can see from code listing 1 that JSHTML knows how to place block comments so that
+		everything looks nice and neat. Block comments condense white space.
+	</p>
+	<p>
+		JSHTML also knows how to place EOL comments. EOL comments respect white spaces, both
+		before and after "//", and does not condense them. 
+	</p>
+	<p>
+		Look at the EOL comments in code listing 1. You can align all five comments by using white space
+		before the comment. To align comment 5, which is on its own line, write one hard space &amp;nbsp;
+		at the beginning of the line and then as many soft white spaces as are needed for alignment.
+		Alignment is always done by trial and error when fonts that aren't monospace are used.
+	</p>	
+</section>
+
+<section>
+	<h2>The Code Header</h2>
+	<p>
+		In code listing 1, a code header is shown displaying the text "Indentations." 
+		The code header comes before any JavaScript code. Here is how it is achieved.
+	</p>
+	<pre>
+&lt;div class="codeBox colorLightPink rounded" data-codeNumbers="true"&gt;
+	&lt;div class="numberShield colorLightBurlywood"&gt;&lt;/div&gt;
+	&lt;div class="codeListing"&gt;&lt;/div&gt;	
+	&lt;header class="codeHeader colorLightBurlywood"&gt;&lt;/div&gt;
+		Indentations 		
+	&lt;/header&gt;	
+	</pre>
+	
+	<p>
+		Inside the code header is pure HTML, so the &lt;br&gt; tag is used for 
+		<span lang="en-us"></span>line breaks.
+	</p>
+	<p>
+		The number shield, code listing, and code header are all optional an can be written in
+		any order. The code listing may be placed in the code header.
+	</p>
+</section>
+
+<section>
+	<h2>The Code Section</h2>
+	<p>
+		A code section is a code header for subsequent code, used after some previous code is displayed.
+	</p>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+	<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+		The userType() Function		
+	</header><div class="numberShield colorLightBlue"></div>	
+		
+		function userType(x) 
+	    {    
+	        if (x === null) return "null";
+	        if (typeof (x) != 'object' &amp;&amp; typeof (x) != 'function') return typeof (x);
+	        try { x.constructor; } catch(e) { return "CrossOriginObject";} 
+	        
+	        etc;
+	        ...;       
+	    } 
+	    
+	    <header class="codeSection colorLightBurlywood">Code Section with Code Numbers Restarting at 1</header>
+       	\numbersRestart
+       	
+       	function foo(){}
+		    function bar(){}
+		    <hr>
+		    function foobar(){};
+		    	  		
+	</div>
+	<p>Here's the pertinent code.</p>
+	<pre>
+function userType(x) 
+{    
+	if (x === null) return "null";
+	if (typeof (x) != 'object' &amp;&amp; typeof (x) != 'function') return typeof (x);
+	try { x.constructor; } catch(e) { return "CrossOriginObject";} 
+	        
+	etc;
+	...;       
+} 
+	    
+&lt;header class="codeSection colorLightBurlywood"&gt;
+	Code Section with Code Numbers Restarting at 1
+&lt;/header&gt;
+       	\numbersRestart
+       	
+	function foo(){}
+	function bar(){}
+	&lt;hr&gt;
+	function foobar(){};
+
+	</pre>
+	
+	<p>
+		You can also section the code box by using the &lt;hr&gt; tag.
+	</p>
+</section>
+
+<section>
+	<h2>Mixing in HTML with the JavaScript Code</h2>
+	<p>
+		If <i>xyz</i> is any HTML element other than <i>div</i>, then the element
+		displays pure HTML. That is
+		&lt;xyz&gt;...&lt;/xyz&gt; is pure HTML even if it contains
+		div elements.
+	</p>
+	<p>
+		So divs, not in any non-div element, define the structure of the formatted JavaScript,
+		while other elements output pure HTML.
+	</p>
+</section>
+<section>
+	<h2>Double Quoted Code</h2>
+	<p>
+		You might want to quote code for eval to operate on.
+	</p>
+	
+	<div class="codeBox" data-codeNumbers="true">
+	<div class="numberShield colorLightBurlywood"></div>
+	const ceFactory = function() 
+		    {		
+		        return eval("\c(function(" + Object.keys(arguments[0]) + "\c)\
+		          {\
+		              return function(){return eval('('+arguments[0]+')');}\
+		          }).apply(null,Object.keyValues(arguments[0]));");
+    		}
+	</div>
+	<p>
+		To achieve this effect write <var>\c</var> after beginning quotes as in <var>"\c(function("</var> and <var>"\c)\</var>.
+	</p>
+</section>
+<section>
+	<h2>Default Styling Preferences</h2>
+	<p>
+		Styling of course is done with <i>JSHTML.css</i>. You should be able to tell where it's too dangerous
+		to modify. However, to set the font of the JavaScript code, and also the font of the HTML mixed in with the
+		JavaScript, to your default preferences see the last two lines of <i>JSHTML.css</i>.
+	</p>
+</section>
+
+<section>
+	<h2><i>Code Tables</i> Using Nested Divs</h2>
+	
+	<div class="codeBox codeNumbers colorLightBlue" style="letter-spacing:1px" data-codeNumbers="true">
+	<header class="codeHeader colorLightPink">
+		<span class="codeListing"></span>			
+		Simple Facts about Eval
+	</header>
+	<div style="display:table">		
+		<div style="display:table-row">
+			<div style="display:table-cell;border-left:thin maroon solid; width:50%">
+				<header class="codeSection colorLightViolet" style="border-right:thin maroon solid">				
+					Out of strict mode may declare variable inside eval	<br>&nbsp;
+				</header><div class="numberShield colorLightOrange" style="z-index:0"></div>	
+								
+					(function()
+					{
+						function sum(a,b){return a + b;};
+						eval('var sumCopy = ' + sum); 
+						//line 3 bombs if strict mode used
+						
+						alert(sumCopy(1,2)); // alerts 3
+					})();
+					
+			</div>
+			<div style=" display:table-cell;border-left:thin maroon solid; width:49%">
+				<header class="codeSection colorLightViolet ">
+						In strict mode declare top level variable outside of eval
+				</header><div class="numberShield colorLightOrange" style="z-index:0"></div>
+								
+				(function(
+					{
+						'use strict';
+						function sum(a,b){return a + b;}
+						var sumCopy; //declare outside eval
+						eval('sumCopy = ' + sum);
+						alert(sumCopy(1,2)); //alerts 3 							
+					})();
+						
+			</div>	
+		</div>	
+		<div style="display:table-row">
+			<div style="display:table-cell;border-left:thin maroon solid; width:50%">
+				<header class="codeSection colorLightViolet fitted" style="border-left:thin maroon solid">				
+					eval as a string defining function requires <br>
+				<span style="font-weight:bold; color:blue">(</span> and <span style="font-weight:bold; color:blue">)</span> as prefix and suffix.				
+				</header><div class="numberShield colorLightOrange" style="z-index:0"></div>				
+				
+						(function(
+				{
+					"use strict";
+					var x  = eval('<span style="font-weight:bold; color:blue">(</span>function(){return a + b;}<span style="font-weight:bold; color:blue">)</span>');
+					alert(x(1,2)); //alerts 3 							
+				})();
+					
+			</div>
+			<div style=" display:table-cell;border-left:thin maroon solid;width:49%">
+				<header class="codeSection colorLightViolet fitted" style="border-left:thin maroon solid;">
+						may declare variable inside eval if it's nested inside
+						a function string
+				</header><div class="numberShield colorLightOrange" style="z-index:0"></div>
+				
+					(function(
+				{
+					"use strict";
+					var x  = eval(function(){var a = 7; alert(a);});
+					x(); //alerts 7 							
+				})();
+			</div>	
+		</div>	
+	</div>
+</div>
+<p>
+	It's too complicated to display the code that produces this. So just look inside this file. It's named
+	<i>index.html</i> and lies in the <i>06-JSHTML-Guide</i> directory.
+</p>
+
+<p>
+	Here's a variant of the code box above.
+</p>
+
+<div class="codeBox codeNumbers colorLightBlue" style="letter-spacing:1px" data-codeNumbers="true">
+		<header class="codeHeader colorLightPink">
+			<span class="codeListing"></span>			
+			Simple Facts about Eval
+		</header>	
+		<div style="display:table">		
+			<div style="display:table-row">
+				<div style="display:table-cell;border-left:thin maroon solid; width:50%">
+					<header class="codeSection colorLightViolet" style="border-right:thin maroon solid">				
+						Out of strict mode may declare variable inside eval<br>&nbsp;					
+					</header><div class="numberShield colorLightOrange" style="z-index:0"></div>					
+						(function()
+						{
+							function sum(a,b){return a + b;};
+							eval('var sumCopy = ' + sum); 
+							//line 3 bombs if strict mode used
+							
+							alert(sumCopy(1,2)); // alerts 3
+						})();
+						
+				</div>
+				<div style=" display:table-cell;border-left:thin maroon solid; width:50%">
+					<header class="codeSection colorLightViolet">
+							In strict mode declare top level variable outside of eval
+					</header><div class="numberShield colorLightOrange" style="z-index:0"></div>
+						(function(
+						{
+							'use strict';
+							function sum(a,b){return a + b;}
+							var sumCopy; //declare outside eval
+							eval('sumCopy = ' + sum);
+							alert(sumCopy(1,2)); //alerts 3 							
+						})();
+						
+				</div>	
+			</div>	
+			<div style="display:table-row">
+				<div style="display:table-cell;border-left:thin maroon solid; width:50%">
+					<header class="codeSection colorLightViolet">				
+						eval as a string defining function requires <br>
+					<span style="font-weight:bold; color:blue">(</span> and <span style="font-weight:bold; color:blue">)</span> as prefix and suffix.				
+					</header><div class="numberShield colorLightOrange" style="z-index:0"></div>
+						(function(
+					{
+						"use strict";
+						var x  = eval('<span style="font-weight:bold; color:blue">(</span>function(){return a + b;}<span style="font-weight:bold; color:blue">)</span>');
+						alert(x(1,2)); //alerts 3 							
+					})();
+
+						
+				</div>
+				<div style=" display:table-cell;border-left:thin maroon solid;width:50%">
+					<header class="codeSection colorLightViolet">
+							may declare variable inside eval if it's nested inside
+							a function string
+					</header><div class="numberShield colorLightOrange" style="z-index:0"></div>
+					(function(
+					{
+						"use strict";
+						var x  = eval('<span style="font-weight:bold; color:blue">(</span>function(){var a = 7;alert(a);}<span style="font-weight:bold; color:blue">)</span>');
+						x(); //alerts 7 							
+					})();
+				</div>	
+			</div>	
+		</div>
+	</div>
+
+</section>
+
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

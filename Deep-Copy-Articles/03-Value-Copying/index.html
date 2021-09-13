@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>JavaScript Copying the Data Types and other Objects with valueCopy()</title>
+<link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+<link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css"/>
+<script src="../../00-Commons/JSHTML.js"></script>
+<script src="../../00-Scripts/typing.js"></script>
+<script src="../../00-Scripts/Stringify.js"></script> 
+<script src="../../00-Scripts/ValueCopy.js"></script>
+<script src="Tests/Test-Error.js"></script> 
+<script src="Tests/Test-Error-Constructors.js"></script>
+ 
+<script>
+	"use strict"
+	window.addEventListener("load", function()
+	{	
+		applyJSHTML();			
+	});			
+		
+</script>
+
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;">
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<header>
+	<h1 style="font-size:1.5em">JavaScript: Copying the Data Types and other Objects with valueCopy()</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer</span>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">The Values Based Copy Cat</span>
+	<span class="centerTable" style="font-size: 1.2em;margin-top:.5em;color:maroon">Making JavaScript Great Again!</span>
+	<span class="centerTable" style="font-size: 1.1em; color: maroon;">meouzer@gmail.com</span>	
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+	In JavaScript, value copying is the fundamental basis of all copying. Both shallow and deep copying 
+	rely heavily on value copying. So if you want to copy, it's imperative that you understand value copying.
+	<span style="float:right">Meouzer</span></div>
+</blockquote>
+<section>
+	<h2>Introduction</h2>
+	<p>
+		Full code is at <a target="_blank" href="../../00-Scripts/ValueCopy.js">ValueCopy.js</a>, which depends on
+		<a target="_blank" href="../../00-Scripts/typing.js">typing.js</a>. We will not cover everything
+		in ValueCopy.js.
+	</p>
+	<p>
+		The goal is to produce a <var>ValueCopy()</var> function that will serve as the basis for shallow 
+		and deep copying. The <dfn>value copy</dfn> of a source object is a target
+		object whose internal state is the same but without any properties of its own: That's the way
+		the concept was originally conceived, however JavaScript may force the value copy to have 
+		properties, but that's not a problem since after a copying source to target the properties
+		are what they should be.
+	</p>	
+	<p>
+		A value copy primitive is an element <var>x</var> for which <var>ValueCopy(x)</var> is supposed to be
+		<var>x</var>. The value-copy-primitives are explicitly listed below.
+	</p>
+	<div style="border:thin black ridge; padding-right:1em"> <span class="centerTable" style="text-decoration:underline">The value-copy-primitives</span>
+		<ol>
+			<li>The primitives</li>
+			<li>The host objects</li>
+			<li>JavaScript's built in functions, and JavaScript's built in constructors.</li>
+			<li>
+				Class instances of <var>Symbol</var>, <var>WeakSet</var>, <var>WeakMap</var>.
+				<ul>
+					<li>
+						It is impossible to read the internal state of <var>Symbol</var>, <var>WeakSet</var> and 
+						<var>WeakMap</var> class instances. It would be reasonable to throw 
+						exceptions on encountering <var>Symbols</var>,
+						<var>WeakSets</var> and <var>WeakMaps</var>, but there's too much of a chance that copying
+						them as is in deep copy operations may be just what you want.
+					</li>
+				</ul>
+			</li>
+			<li>Prototypes of Built in classes.</li>
+		</ol>
+	</div>
+	<p>
+		It's also impossible to read the internal states of programmer
+		defined class instances, but instead of being a value-copy-primitives, we will throw exceptions on
+		encountering such because they are just too problematic.
+	</p>
+	<p>
+		The most arcane JavaScript elements treated in this article are null objects, which you can read about
+		in <a target="_blank" href="../../02-object-inheritance/index.html">Object Inheritance</a>. The most arcane class
+		is the fake <var>Arguments</var> class, which you can read about in 
+		<a target="_blank" href="../../01a-Data-Typing-1/index.html">JavaScript Data Typing isn't as Simple as you Think</a>.
+	</p>
+	<p class="display">
+		Of particular note, if <var>x</var> is an <var>ArrayBuffer</var>, a <var>DataView</var>, a <var>Set</var> or a <var>Map</var>, then 
+		a copy of <var>x</var> is simply <var>x.valueCopy()</var>. The same holds for all other built in classes
+		except for <var>Array</var> and all the typed arrays. (Implicitly understood WeakMap and WeakSet excluded also).
+	</p>
+	<p>
+		If <var>x</var> is an array <var>x.valueCopy(x) is the empty Array </var><var>[]</var>.
+		That's because indices are public properties of <var>x</var> and so the empty array has the same internal state
+		as <var>x</var> but without any properties of its own. The next step in the copying process after <var>valueCopy()</var>
+		will be to fill in the entries of the empty Array. 
+	</p>
+	
+	<p>
+		To show how <var>ValueCopy</var> can be used to shallow copy every type of built in class instance, and pretty much
+		every object except for programmer defined class instances and value-copy-primitives, look at the following code.	
+	</p>
+	
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+			The shallowCopy() Function 		
+		</header><div class="numberShield colorLightBurlywood"></div>
+		
+		function shallowCopy(x)
+		{			
+			const y = ValueCopy(x);
+			if( y == x) return x;
+			const keys = Object.getOwnPropertyNames(x);
+			for(var i = 0; i &lt; keys.length; i++)
+			{
+				const key = keys[i];
+				const pd = Object.getOwnPropertyDescriptor(x, key);
+				Object.defineProperty(y, key, pd);
+			}
+			return y;			
+		}
+		
+		// Line 2: y has the same internal state as x.
+		// Line 3: If x is a value-copy-primitive return x.
+		// The rest of the code transfers the properties of x to y, 
+		// making sure property descriptors	are copied.
+		// Note: x and y share their properties, as the properties 
+		// themselves are not copied.
+	</div>
+	<p class="display">
+		Of particular note, if <var>x</var> is an <var>ArrayBuffer</var>, a <var>DataView</var>, a <var>Set</var> a <var>Map</var>, 
+		an <var>Array</var>, a typed array or any other built in class then
+		a copy of <var>x</var> is simply <var>shallowCopy(x)</var>. 
+	</p>	
+</section>
+<section>
+	<h2>The Prototyped valueCopy() Methods</h2>	
+	<p>
+		To eliminate the need for a huge switch statement in <var>ValueCopy()</var> 
+		to handle all the numerous built in classes,
+		it's necessary to prototype <var>ValueCopy()</var>, in uncapitalized form,  for the same numerous built in classes. Then 
+		<var>ValueCopy()</var> will employ those prototyped versions of <var>valueCopy()</var> and tie up some loose ends.
+		To avoid naming conflict bugs in both node.js and the browsers, 
+		the name of the prototyped versions must be uncapitalized.
+	</p>
+	<p>
+		For example, to define <var>valueCopy</var> for <var>Booleans</var> we need to define <var>Boolean.prototype.valueCopy</var>. 
+		This obviously
+		defines the <var>valueCopy</var> property of <var>Boolean.Prototype</var> itself. What should the value be? Well in a copy stream 
+		it doesn't hurt to copy built in class prototypes as is. So <var>Boolean.prototype.valueCopy()</var> is <var>Boolean.prototype</var>.
+		Besides why would you want to valueCopy/shallow-copy/deep-copy <var>Boolean.prototype</var> even if you could? 
+	</p>
+	
+	<p class="display">
+		If <var>x</var> is not a class instance of some class, and not a value-copy-primitive, then the value copy of
+		<var>x</var> is <var>y = Object.create(Object.getPrototypeOf(x))</var>. Basically the internal state of <var>x</var>
+		and <var>y</var> consist solely of their internal prototypes and those internal prototypes are equal.	
+	</p>
+	
+	<section>
+		<h3>Basic Classes</h3>		
+		<table class="web" style="text-align:left">
+			<thead>
+				<tr><td>Basic Class</td><td>Class Instance x</td><td>Internal State</td><td>x.valueCopy()</td><td>Number Properties</td></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>Boolean</th><td>x&nbsp;=&nbsp;new&nbsp;Boolean(true)</td><td>true</td>
+					<td>new&nbsp;Boolean(x.valueOf())</td><td>0</td>
+				</tr>
+				<tr>
+					<th>Number</th><td>x&nbsp;=&nbsp;new&nbsp;Number(7)</td><td>7</td>
+					<td>new&nbsp;Number(x.valueOf())</td><td>0</td>
+				</tr>
+				<tr>
+					<th>String</th><td>x&nbsp;=&nbsp;new&nbsp;String("cat")</td><td>"cat"</td>
+					<td>new&nbsp;String(x.valueOf)</td><td>0</td>
+				</tr>		
+				<tr><th>Date</th><td>x = new Date()</td><td>1617286697028</td><td>new Date(x.valueOf())</td><td>0</td></tr>		
+			</tbody>
+			<tbody>
+				<tr>
+					<th>RegExp</th><td>x&nbsp;=&nbsp;new&nbsp;RegExp(/abc/)</td><td>/abc/</td>
+					<td>new&nbsp;RegExp(x.valueOf())</td><td>1</td>
+				</tr>
+				<tr>
+					<th>Set</th><td>x&nbsp;=&nbsp;new&nbsp;Set(["cat",&nbsp;"dog"])</td><td>elements "cat", "dog"</td>
+					<td>new&nbsp;Set(x.valueOf())</td><td>0</td>
+				</tr>
+				<tr>
+					<th>Map</th><td style="white-space:nowrap">x&nbsp;=&nbsp;new&nbsp;Map([["a","b"],["c","d"]])</td>
+					<td>"a" mapped to "b" and "c" mapped to "d"</td>
+					<td>new&nbsp;Map(x.valueOf())</td><td>0</td>
+				</tr>
+			</tbody>		
+		</table>
+		<p>
+			If <var>x = new RegExp(/abc/)</var> then <var>y = new&nbsp;RegExp(x.valueOf())</var> has a single
+			property <var>lastIndex</var> with a value possibly different than that for <var>x</var>. 
+			However, once the properties of <var>x</var> are transferred to <var>y</var>, the <var>lastIndex</var>
+			properties of the two will be the same.
+		</p>
+		<p>
+			If <var>source = new Boolean(true)</var> then <var>target = new Boolean(source.valueOf())</var>
+			is a value copy of source. It has the same internal state <var>true</var> as the source and has no
+			properties of its own. A similar discussion holds for  all remaining classes of the table.
+		</p>
+		
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood">
+				<div class="codeListing"></div>
+				Boolean valueCopy as Template for the Basic classes			
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			Object.defineProperty(Boolean.prototype, 'valueCopy',
+			{			
+				value:function()         
+				{			
+					// primitives boxed	
+					if(isBoolean(this)) return new Boolean(this.valueOf()); 
+					if(this === Boolean.prototype) return this;
+					return Object.create(Object.getPrototypeOf(this));				
+				}
+			});
+			
+			// <u>Line 3</u>: if this is a class instance of Boolean 
+			// (i.e., a Boolean) then the value copy is returned as per the table.  			
+			// <u>Line 4</u>: if this is an instance of Boolean but not a class instance 
+			// of Boolean the return has already been noted as the value copy.
+			
+		</div>
+				
+	</section>	
+	<section>
+		<h3>Error Classes</h3>						
+		<p>
+			If <var>x</var> is an instance of one of the error classes then <var>x.valueCopy()</var> will be
+			an actual copy of <var>x</var>. This breaks the theme that the value copy should be empty, but makes
+			the value copy more useful. 
+		</p>	
+				
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood">
+				<div class="codeListing"></div>
+				Error Classes valueCopy 		
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			function makeErrorClassValueCopiable(klass)
+			{
+				Object.defineProperty(klass.prototype, "valueCopy",
+				{
+					value:function()
+					{
+						if(isErrorVariant(this))
+						{				
+							const target = new klass();						
+							if(hasOwnProperty(this, "fileName")) 
+							target.fileName= this.fileName;
+							if(hasOwnProperty(this, "message")) 
+							target.message = this.message;						
+							if(hasOwnProperty(this, "number")) 
+							target.number = this.number;
+							if(hasOwnProperty(this, "lineNumber")) 
+							target.lineNumber= this.lineNumber;
+							if(hasOwnProperty(this, "columnNumber")) 
+							target.columnNumber = this.columnNumber;
+							if(hasOwnProperty(this, "stack")) 
+							target.stack= this.stack;
+							if(hasOwnProperty(this, "description")) 
+							target.description= this.description;						
+							return target;
+						}
+						if(this === klass.prototype) return this;
+						return Object.create(Object.getPrototypeOf(this));	
+					}
+				});				
+			}
+			
+			makeErrorClassValueCopiable(Error);	
+			makeErrorClassValueCopiable(InternalError);		
+			makeErrorClassValueCopiable(EvalError);				
+			makeErrorClassValueCopiable(ReferenceError);		
+			makeErrorClassValueCopiable(RangeError);
+			makeErrorClassValueCopiable(SyntaxError);
+			makeErrorClassValueCopiable(TypeError);
+			makeErrorClassValueCopiable(URIError);			
+			
+			// Line 4: Check to see if this is a class instance of some error class.
+			// Line 5: Create another class instance of the error class
+			// Line 6-19: Fill in all the possible properties, which vary by browser.
+			// Line 20: return the value copy
+			// Line 21: That's what we do with prototypes
+			// Line 22. Thats what we do with instances of the 
+			// class that are not class instances of the class.
+		</div>
+	
+	</section>
+	<section>
+		<h3>Typed Array Classes</h3>
+		<p>
+			All typed array class instances are fixed length arrays whose entries are accessible by index notation.
+			If <var>x</var> is an instance of a typed array class then <var>x.valueCopy()</var> is an instance of the
+			same class, and with the same fixed length as <var>x</var>. However, the entries of the value copy are
+			all initialized to zero.  
+		</p>
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood">
+				<div class="codeListing"></div>
+				Int8Array value copy is Template for the other Typed Arrays 		
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			Object.defineProperty(Int8Array.prototype, 'valueCopy',
+			{			
+				value:function()
+				{		
+					if(isInt8Array(this)) return new Int8Array(this.length);
+					if(this === Int8Array.prototype) return this;
+					return Object.create(Object.getPrototypeOf(this));
+				}
+			});
+			
+		</div>
+		
+			
+
+	</section>
+	<section>
+		<h3>The Indeterminate Classes</h3>
+		<p>
+			The two indeterminate classes are <var>WeakSet</var> and <var>WeakMap</var>. There is no way to determine
+			what the members of a <var>WeakSet</var> instance are. Thus it is impossible to duplicate a 
+			<var>WeakSet</var> instance. Since it's impossible to copy a <var>WeakSet</var> instance, a <var>WeakSet</var> 
+			instance is taken as a value-copy-primitive.
+			A similar discussion holds for <var>WeakMap</var>.			
+		</p>
+				
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood">
+				<div class="codeListing"></div>
+				WeakMap value copy is also a Template for WeakSet 		
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			Object.defineProperty(WeakMap.prototype, 'valueCopy',
+			{			
+				value:function()         
+				{				
+					if(isWeakMap(this)) return this;
+					if(this === WeakMap.prototype) return this;
+					return Object.create(Object.getPrototypeOf(this));
+				}
+			});	
+			
+			// Line 3: Class instances of WeakMap are returned as is.
+			// Line 4: Thats what we do with instances of the 
+			// class that are not class instances of the class. 
+		
+		</div>
+
+
+	</section>
+	<section>
+		<h3>The Array Class</h3>
+		<p>
+			If <var>x</var> is an array then <var>y = x.valueCopy()</var> is an empty array <var>[ ]</var>.
+			We don't want entries for the value copy because the next step in the copying process
+			is to transfer the properties of <var>x</var> to <var>y</var>, which then fills in the 
+			empty array.
+		</p>
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood">
+				<div class="codeListing"></div>
+				Array value copy  		
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			Object.defineProperty(Array.prototype, 'valueCopy',
+			{			
+				value:function()
+				{	
+					if(isArray(this)) return [];
+					if(this === Array.prototype) return this;
+					return Object.create(Object.getPrototypeOf(this));
+				}
+			});
+			
+			// Line 3: return the value copy of a class instance of Array
+			// Line 5:  Thats what we do with instances of the 
+			// class that are not class instances of the class. 	
+
+		</div>
+		
+	</section>
+	<section>
+		<h3>The ArrayBuffer Class</h3>
+		<ol>
+			<li>
+				Let <var>b1</var> be an <var>ArrayBuffer</var>.
+			</li>
+			<li>
+				<var>v1 = new Int8Array(b1)</var> is a view of <var>b1</var>, which means
+				<var>v1.buffer = b1</var>.
+			</li>
+			<li>
+				<var>v2 = new Int8Array(v1)</var> is a copy of <var>v1</var>. <var>v2</var> has an equivalent
+				but different buffer than <var>v1</var>. 
+			</li>
+			<li>
+				Since <var>b1 = v1.buffer</var> is equivalent to 
+				<var>v2.buffer</var>. <var>v2.buffer</var> is a value copy of <var>b1</var>:
+				It has the same internal state and doesn't introduce any new properties. 				 				
+			</li>
+			<li>
+				However, <var>v2.buffer</var> expands to <var>new Int8Array(v1).buffer</var>,
+				which in turn expands to <var>new Int8Array(new Int8Array(b1)).buffer</var>.
+			</li>
+		</ol>	
+		
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood">
+				<div class="codeListing"></div>
+				ArrayBuffer value copy  		
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			Object.defineProperty(ArrayBuffer.prototype, 'valueCopy',  
+			{			
+				value:function()
+				{			
+					if(isArrayBuffer(this)) return 
+					new Int8Array(new Int8Array(this)).buffer;	
+					if(this === ArrayBuffer.prototype) return this;
+					return Object.create(Object.getPrototypeOf(this));				
+				}
+			});
+			
+			// Line 3-4: Return the value copy of a class instance of ArrayBuffer
+			// Line 6: Thats what we do with instances of the 
+			// class that are not class instances of the class. 	
+			
+		</div>
+		
+	
+	</section>	
+	<section>
+		<h3>The DataView Class</h3>
+		<p>
+			Let <var>dv1</var> be a <var>DataView</var>. <var>dv1.buffer</var> and <var>dv1.buffer.valueCopy()</var>
+			are equivalent <var>ArrayBuffers</var>. Let <var>dv2 = DataView(dv1.buffer.valueCopy())</var>.
+			Then <var>dv2.buffer = dv1.buffer.valueCopy()</var> is equivalent to <var>dv1.buffer</var>. Thus
+			<var>dv2</var> is a value copy of <var>dv1</var>. They both have the same internal state,
+			and <var>dv2</var> doesn't introduce any new properties. 
+		</p>
+		
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood">
+				<div class="codeListing"></div>
+				DataView value copy  		
+			</header><div class="numberShield colorLightBurlywood"></div>
+			
+			Object.defineProperty(DataView.prototype, 'valueCopy',  
+			{			
+				value:function()
+				{	
+					if(isDataView(this)) return new DataView(this.buffer.valueCopy());
+					if(this === DataView.prototype) return this;
+					return Object.create(Object.getPrototypeOf(this));					
+				}
+			});	
+			
+			// Line 3: Value copying a DataView amounts to value copy its buffer.
+			// Line 4: That's what you do with prototypes.
+			// Line 5: Thats what we do with instances of the 
+			// class that are not class instances of the class. 	
+			
+		</div>
+
+		
+		
+	</section>	
+	<section>
+		<h3>The Function Class</h3>
+		<p>
+			In general, value-copying/copying/deep-copying with functions involved is hopeless. That's because
+			in general you don't know in advance details about a function's outer context. It is therefore imposssible
+			to write an evaluator to copy the function into an appropriate context. Also multiple functions may
+			enter the copy stream and it is highly unlikely a single evaluator will work for them all. 
+		</p>
+		<p style="margin-left:2em">
+			The prototyed version of <var>valueCopy</var> is <var>Function.prototype.valueCopy(evaluator)</var>.
+			When you write <var>func.valueCopy(evaluator)</var> just any evaluator won't do. You have to examine
+			the details of the outer context of <var>func</var> and actually write a custom evaluator before you plug 
+			it into <var>func.valueCopy()</var>.			
+		</p>		
+		<p>
+			However, it is actually possible
+			that for a particluar programmer defined class, the class constructor can provide a single custom evaluator
+			that works for all the instance methods and private functions and so deep copying a class instance
+			will be possible if the class doesn't get too wild.
+		</p>
+	</section>		
+</section>
+
+<section>
+	<h2>Summary</h2>
+	<p class="display">
+		The <var>valueCopy()</var> function will copy class instances of the built in classes, no problem. That is
+		except for the <var>Array</var> and typed array classes. The <var>shallowCopy()</var> function will copy class instances 
+		of all built in classes. <var>shallowCopy()</var> will also copy the property descriptors.
+	</p>
+	<p>
+		Of lesser interest, <var>valueCopy()</var> will copy all objects whose internal state consists solely of its 
+		<var>__proto__</var> attribute. If <var>x</var> is such an object then <var>Object.create(Object.getPrototypeOf(x))</var>
+		is a value copy of <var>x</var>. Examples that cover the full gambit of such objects follow.
+		<var>Klass</var> is either a built in class or a programmer defined class.
+	</p>
+	<ol>
+		<li>
+			<var>x = Object.create(Klass.prototype)</var>
+			<ul>
+				<li>
+					Here <var>Klass</var> must be a built in class. If <var>Klass</var> is a programmer defined class, <var>x</var>
+					can't be distinguished from a class instance of <var>Klass</var>, and <var>valueCopy(x)</var> throws
+					an exception.
+				</li>
+			</ul>
+		</li>
+		<li>
+			<var>x = Object.create(new Klass(...))</var>
+		</li>
+		<li>
+			<var>x = Object.create(Object.create(Klass.prototype))</var>
+		</li>
+		<li>
+			<var>x</var> is an instance of <var>Klass</var> but not a class instance of <var>Klass</var>,
+			where <var>Klass</var> is the most derived class for which <var>x</var> is an instance.
+		</li>
+		<li>
+			<var>x</var> is not an instance of any class and not a value copy primitive.
+		</li>
+	</ol>
+</section>
+
+
+<br><br><br><br><br><br><br><br><br><br><br>	
+</body>
+
+</html>
+
+

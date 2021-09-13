@@ -1,0 +1,453 @@
+﻿ <!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Deep Copies with Circular References</title>
+<link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+<link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css"/>
+<script src="../../00-Commons/JSHTML.js"></script>
+<script src="../../00-Scripts/typing.js"></script>
+<script src="../../00-Scripts/Stringify.js"></script>
+<script src="Deep-Copy-Literals.js"></script>
+<script src="a-preorder-transversal.js"></script>
+<script src="../../00-Scripts/valueCopy.js"></script>
+<script src="Test.js"></script> 
+
+<script>
+	window.addEventListener("load", function(){applyJSHTML()});	
+</script>
+
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px;">
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<header>
+	<h1>Deep Copies with Circular References</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer</span>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">The Curiously Deep Copy Cat</span>
+	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>	
+</header>	
+	
+<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+		In deep copyying, handling circlular refences is the easy part.
+		<span style="float:right">Meouzer</span></div>
+</blockquote>
+<p>
+	Meouzer is biting his tail, which somehow just seems relevant.
+</p>
+<p>
+	Full code at <a target="_blank" href="Deep-Copy-Literals.js">Deep-Copy-Literals.js</a>, which has no dependencies.
+</p>
+<p>
+	In an object tree, if two nodes are equal they are <dfn>circular references</dfn> if one is an ancestor of the other,
+	but otherwise they are <dfn>duplicate references</dfn>. Circular references tend to cause  infinite recursion in
+	naive algorithms, while duplicate references do not.
+</p>
+<section>
+	<h2>Introduction</h2>
+	<p>
+		Our goal is to show how to break circular references, so we take it easy and stick to copying literals.		
+		
+	</p>
+	<p>The following is probably the simplest way to process a tree of nodes in preorder, with upper most node topNode.</p>
+		
+	<div class="codeBox" style="border-radius:20px;padding:1em;background-color:rgb(255,245,255)">  
+           function processInPreOrder(topNode)
+           {    
+                 var stack = [topNode];
+                                  
+                 while(stack.length &gt; 0)
+                 {
+                       var node = stack.pop(); 
+                       // process node here
+
+					   // push children onto stack for further processing	
+                       for(var length = node.children.length, k = length - 1; k ≥ 0; k--)
+                       {
+                             stack.push(node.children[k]);
+                       }
+                 }
+           }     
+	</div>	
+	<p>
+		However, it adequate for only the most basic tasks. One problem is that once a node is on the stack, 
+		it's ancestors have already been popped off. You can in fact transverse in preorder while keeping 
+		ancestors on the stack and doing so makes dealing with circular references a one liner, with some 
+		supporting code of course. Also the stack consists of nodes when it's possible that it should 
+		contain additional information for processing needs. So a member of the stack should roughly 
+		resemble something like <var>{node:x, otherInfo:info, ...}</var>.
+	</p>
+	<p>
+		In deep copying, stack members may be like <var>{node:x, children:x.children, index:3}</var> 
+		where index points to the child node currently being processed.
+		When index passes its <var>max = x.children.length - 1</var>, all children of the node <var>x</var> 
+		have been processed, and <var>x</var> can then be popped off the stack. So a child while processing 
+		will always have its parent on the stack.
+	</p>	
+</section>
+
+
+<section>
+	<h2>Power Preorder Transversals</h2>
+	
+	<img class="centerTable" alt="unavailable" src="Images/Tree.png" style="margin-bottom:2em">	
+	
+	<p>
+		This tree can be "represented" in literal notation as
+		<var class="centerTable">var tree = {a:{b:{e:{},f:{}},c:{g:{}, h:{}},d:{i:{}, k:{}}}}.</var> 	
+		Let's process the "nodes" of this tree in 
+		a preorder transversal.
+	</p>
+	
+	<div class="codeBox" style="font-size:.9em;background-color:rgb(255,245, 255)">
+			<header class="codeHeader colorBurlywood">
+				<div class="codeListing"></div>
+				The Basic and Powerful Preorder Transversal
+			</header><div class="numberShield"></div>	
+	
+		var tree = 
+		{
+			a:
+			{
+				b:{e:{},f:{}},
+				c:{g:{}, h:{}, i:{}},
+				d:{j:{}, k:{}}
+			}
+		}		
+		
+		function aPreorderTransversal(tree)
+		{
+			var stack = [];
+			stack.push({node:tree, childKeys:Object.getOwnPropertyNames(tree), index:0});
+			
+			while(stack.length &gt; 0)
+			{
+				var T = stack[stack.length - 1];          // top of stack
+				var node = T.node;                          // node at top of stack 
+				var childKeys = T.childKeys;            // its child keys to access children
+				
+				if(T.index &lt; childKeys.length ) 	
+				{				
+					// process child of node at current index here		
+				
+					console.log(childKeys[T.index]);              // log key of child  
+					var child = node[childKeys[T.index]];  		    // child of node
+						
+					// push child node onto the stack
+					stack.push({node:child, 
+						childKeys:Object.getOwnPropertyNames(child), index:0});
+		
+					T.index++;	// process next child of node	
+				}
+				else
+				{					
+					stack.pop();
+				}
+			}
+		}
+
+		aPreorderTransversal(tree);
+		
+		// The nodes are logged in preorder a, b, e, f, c, g, h, i, d, j, k.
+		
+	</div>
+	<p class="display">
+		The above is the preorder transversal framework that can accomplish major things: stringification of objects,
+		deep copying, and in part helps with breaking circular references in deep copying. Of course members of
+		the stack may become more complicated with other information for the need.		
+	</p>		
+	<p>
+		We will next show how to deep copy literal objects with circular references with help from a 
+		cheater stack.
+	</p>		
+</section>
+
+<section>
+	<h2>Deep Copying Literals with Circular References</h2>
+	<p>
+		The object to be copied is called a <dfn>source</dfn> and its deep copy is called the <dfn>target</dfn>.
+		Each node <var>source.X</var>, where <var>X</var> is a dotted chain of attributes, is also called a <dfn>source</dfn> and 
+		its <dfn>target</dfn> is <var>target.X</var>,
+		the corresponding node in the target tree.
+		When the deep copy algorithm is complete, each target will be a deep copy of its source. 
+	</p>
+	<p>
+		The code below produces the tree on the left. We want to do a deep copy. Notice that 
+		<var>x</var> and <var>y</var> 
+		refer to each other through their attributes <var>a</var> and <var>b</var>. In the left
+		tree, the two circular references are shown. We want to make sure the deep
+		copy contains the same circular references, and that once a circular reference is obtained
+		copying should stop for the node in question.
+	</p>
+
+	<img alt="unavailable" src="Images/DeepCopy.svg">
+
+	<p>
+		The following table depicts a stack algorithm in preorder transversal. <!-- The objects
+		that get pushed onto the stack take the form 
+		<var>{source:(copy source), target:(copy target), keys:(child keys of source), index:0}</var> -->
+	</p>
+	<table class="web" style="margin-right:auto;margin-left:auto">
+		<thead>
+		<tr><th colspan="4">Stack</th></tr>
+			<tr><td>depth</td><td>Source</td><td>Target</td><td>Keys in Preorder</td></tr>
+		</thead>
+		<tbody>
+			<tr><td>1</td><td>z</td><td>cz = { }</td><td></td></tr>
+			<tr><td>2</td><td>z.M = x</td><td>cz.M = { }</td><td>M</td></tr>
+			<tr><td>3</td><td>z.M.a = y</td><td>cz.M.a = { }</td><td>a</td></tr>
+			<tr>
+				<td style="background-color:lime">4</td>
+				<td style="background-color:lime">z.M.a.b = z.M</td>
+				<td style="background-color:lime">cz.M.a.b = cz.M</td>
+				<td>b</td></tr>
+			<tr><td>4</td><td>z.M.a.g = 2</td><td>cz.M.a.g = 2</td><td>g</td></tr>	
+			<tr><td>3</td><td>z.M.f = 1</td><td>cz.M.f = 1</td><td>f</td></tr>
+			<tr><td colspan="4" style="text-align:center">Intermission. Popcorn is ready!</td></tr>
+			<tr><td>2</td><td>z.N = y</td><td>cz.N = { }</td><td>N</td></tr>
+			<tr><td>3</td><td>z.N.b = x</td><td>cz.N.b = { }</td><td>b</td></tr>
+			<tr>
+				<td style="background-color:lime">4</td>
+				<td style="background-color:lime">z.N.b.a = z.N</td>
+				<td style="background-color:lime">cz.N.b.a = cz.N </td>
+				<td>a</td></tr>
+			<tr><td>4</td><td>z.N.b.f = 1</td><td>cz.N.b.f = 1</td><td>f</td></tr>	
+			<tr><td>3</td><td>z.N.g = 2</td><td>cz.N.g = 2</td><td>g</td></tr>	
+		</tbody>
+	</table>
+	<p>
+		OK! The target is the deep copy of the source, but not originally. The target gets filled
+		in as the algorithm progresses.
+	</p>
+	<ul>
+		<li>
+			First the source <var>z</var> and its empty target <var>cz</var> are pushed onto the stack.
+		</li>
+		<li>
+			We see that <var>z.M = x</var>, so we write <var>cz.M = { }</var>, and push them onto the stack.
+		</li>
+		<li>
+			We see that <var>z.M.a = y</var>, so we write <var>cz.M.a = { }</var> and push them onto the stack
+		</li>
+		<li style="background-color:lime;padding:1em"><var>z.M.a.b = x</var> but <var>x</var> is already on the stack at depth 2. 
+		This means we have
+		    a circular reference: it is <var>z.M.a.b = z.M</var>. We won't push anything onto
+		    the stack but we do need to duplicate the circular reference in the copy
+		    by writing <var>cz.M.a.b = cz.M</var>.
+		</li>
+		<li>
+			<var>z.M.a.f</var> is next in the preorder transversal and is equal to 2, so we write
+			<var>cz.M.a.f = 2</var>.
+		</li>
+		<li>
+			<var>z.M.f</var> is next in the preorder transversal and is equal to 1, so we write
+			<var>cz.M.f = 1</var>.
+		</li>
+		<li>
+			The second half after intermission continues as in the first half.
+		</li>
+	</ul>
+	<p>
+		Original thoughts were that there's no way we are going to search through the stack in preorder transversal code to
+		find circular references, so we are going to let the stack itself do the work. (1) The stack will keep a fast record,
+		say a WeakSet of all sources on the stack and so infinite recursion is avoided since a source will not be pushed onto the stack
+		if it already is on the stack. 		
+	</p>
+	<p>
+		(2) To check and close circular references the stack will maintain a <var>WeakMap</var>. Every time a source, and target
+		are pushed onto the stack, the source will be weakly mapped to the target. 
+		Once we reach a particular source <var>source.X</var> that is already on the stack,
+		we look up its target <var>T</var> in the <var>WeakMap</var>. The value
+		of <var>target.X</var> in the target tree is set to <var>T</var> to close the circular reference and maintain consistency.
+	</p>
+	<p>The <var>WeakSet</var> is redundant since the <var>WeakMap</var> is also a fast record of sources (in addition to their targets)</p>
+	<p>
+		For example, when we see <var>z.M.a.b = x</var> is already a source on the stack, we lookup
+					its target which is <var>cx</var>. We then know to set <var>cz.M.a.b</var> to that target <var>cx</var> to duplicate
+					the circular reference.
+
+	</p>
+	
+	
+	<div class="codeBox" style="font-size:.9em;background-color:rgb(255,245, 255)">
+			<header class="codeHeader colorBurlywood">
+				<div class="codeListing"></div>
+				Cheater Stack Customized for Deep Copying <br>Literals with Possible Circular References
+			</header>
+			
+		function CheaterStack()
+		{
+			
+			var wm = new WeakMap(); // record of sources and their targets 			
+			var l = 0;                       // length of stack 
+			
+			this.push = function(x)                   
+			{				                
+					this[l++] = x;                         // push onto stack
+					wm.set(x.source, x.target);      // record source and its target					
+						
+			} 
+			
+			this.pop = function()
+			{
+				var x = this[--l];                       // pop the stack 
+				
+				// record of source and target no longer needed   
+				//wm.delete(x.source);              
+				
+				// The above line is commented out since we want to handle
+				// duplicate references. If you know for sure there are
+				// going to be no duplicate references, you can gain some
+				// efficiency by uncommenting the above line. 
+				
+				return x;
+			}
+			
+			this.peek = function()
+			{
+				return this[l - 1];
+			}
+			
+			this.inSource = function(source)           
+			{
+				// return true if source is on the stack  
+				return wm.has(source);
+			}
+			
+			this.getTarget = function(source)         // get target of source     
+			{
+				return wm.get(source);
+			}			
+			
+			Object.defineProperty(this, 'length',
+			{
+				get:function(){return l;}
+			});
+		}
+	</div>
+	
+	<p>
+		You should now be able to make headway on the grand finale: The deep copy algorithm of literals
+		that can deal with circular references.
+	</p>
+	
+	<div id="deepCopyLiteral" class="codeBox" style="font-size:.9em;background-color:rgb(255,245, 255)" >
+			<header class="codeHeader colorBurlywood">
+				<div class="codeListing"></div>
+				Deep Copying Literals with Possible Circular References
+			</header>	
+	
+		function deepCopyLiteral(source)
+		{
+			var stack = new CheaterStack();			
+			var target = {}; 						
+			stack.push({source:source, target:target,  
+				keys:Object.getOwnPropertyNames(source), index:0});						
+					
+			while(stack.length &gt; 0)
+			{						
+				var T = stack.peek();
+											
+				if(T.index &lt; T.keys.length ) // process next key of source at current index
+				{		
+					var key = T.keys[T.index]; // key at current index
+					let source = T.source[key]; // source to copy	
+					
+					// dont process if source already on stack
+					if(!stack.inSource(source))  
+					{
+						if(isPrimitive(source))
+						{
+							T.target[key] = source;	// fill in target
+						}
+						else
+						{
+							T.target[key] = {};  // empty copy target of source												
+							stack.push({source:source, target:T.target[key] , 
+								keys:Object.getOwnPropertyNames(T.source[key]), index:0});
+						}
+						
+						// alert(stringify(target)); // Watch target filled in preorder. 
+					}
+					else // source already on stack, so copy circular reference
+					{		
+						// add circular reference to deep copy.					
+						T.target[key] = stack.getTarget(source); 
+					}											
+					
+					T.index++;				
+				}
+				else 
+				{
+					stack.pop();															
+				}
+			}		
+						
+			return target;	
+		}	
+		
+		function isPrimitive(x)
+	    {
+	        return (x == null || typeof(x) != 'object') &amp;&amp; typeof(x) != 'function';
+	    }
+		
+	</div>
+
+	
+	
+	<div class="codeBox" style="font-size:.9em;background-color:rgb(255,245, 255)">
+			<header class="codeHeader colorBurlywood">
+				<div class="codeListing"></div>
+				Test deepCopyLiteral with Circular References<br>
+				(uses <a target="_blank" href="../../00-Archive/01a-Data-Typing-1-Archive/typing.js">type2.js</a> and
+				<a target="_blank" href="../../00-Scripts/Stringify.js" >Stringification.js</a>)
+			</header>	
+	
+			function TestDeepCopyLiteral()
+			{	
+				var x = {}, y = {}
+				x.a = y;
+				y.b = x;
+				x.f = 1;
+				y.g = 2;			
+																	
+				var z = {M:x, N:y};				 			  			 		 	
+				var cz = deepCopyLiteral(z);
+				 			 	
+				console.log(stringify(z) == stringify(cz));
+				
+				// stringification will indicate circular references with the @ symbol.
+				console.log(stringify(cz));	
+			}	
+			
+	</div>	
+</section>
+<p>
+	The reader can create more extensive examples.
+</p>
+<section>
+	<h2>Appendices</h2>
+	<section>
+		<h3>A Better Way to Deep Copying Literals </h3>
+		<p>
+			In addition to circular references, which cause infinite recursion unless you specifically code for that
+			possibility, there may be duplicate references that themselves should really be taken care of. To do
+			that in the CheaterStack pop code delete the line <var>wm.delete(x.source);</var>. You can even do better.
+			In <var>deepCopyLiteral</var> code, start with <var>[]</var> as the stack, i.e., no cheater stack, then
+			<var>deepCopyLiteral</var> will itself use a weak map to take care of circular references and duplicate
+			references. 
+		</p>
+		<p>
+			However, cheater stacks are still important and you got to see a simple example of one.
+		</p>
+	</section>
+</section>
+<br><br><br><br><br><br><br><br><br><br><br>	
+</body>
+
+</html>
+
+

@@ -1,0 +1,815 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>JavaScript: Copying Functions with Evaluators Part 1</title>
+<link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
+<link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css"/>
+<script src="../../00-Commons/JSHTML.js"></script>
+<script src="../../00-Scripts/typing.js"></script>
+<script src="../../00-Scripts/Stringify.js"></script>
+<script src="evaluators.js"></script> <!-- does not depend on previous scripts -->
+<script src="Test.js"></script>
+
+<script>	
+	window.addEventListener("load", function()
+	{
+		applyJSHTML();	
+	});			
+</script> 
+</head>
+
+<body class="GPeachBlue" style="font-size:16px;width:800px; font-family:sans-serif">
+<span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
+<header>
+	<h1 style="margin-bottom:1em">JavaScript: Copying Functions with Evaluators Part 1</h1>
+	<h1 style="margin-bottom:1em;font-size:.9em" >By draft 20 we will get it right! That will be 100 cat years.</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer the Snarky Cat Programming Cat</span>
+	<span class="centerTable" style="font-size: 1.2em;margin-top:.5em;color:maroon">Making Eval Great Again!</span>
+	<span class="centerTable" style="font-size: 1.1em; color: maroon;">meouzer@gmail.com</span>	
+</header>	
+	
+<blockquote style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
+	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
+		I rollick in bubble wrap because bubble wrap is always in context, and context is everything. <br>
+		<span style="float:right">Meouzer</span></div>
+</blockquote>
+<p>
+	Meouzer is currently busy working in context! 
+</p>
+<p>
+	Oh! By the way, <var>eval</var> will be used a lot, so let's
+	end the meowsense about <var>eval</var> being evil and make it great again. Saying <var>eval</var> is evil
+	is like saying hammers are evil because Dr. Evil could use one to boink yourself in the noggin. So you use <var>eval</var>
+	on a string that doesn't belong to you and you end up with covid. Yea! Well don't do that. 
+</p>
+<p>
+		Full code is at <a target="_blank" href="evaluators.js">evaluators.js</a>, which has no dependencies.
+</p>
+<section>
+	<h2>Introduction</h2>	
+	<p>
+		You can skip the introduction for now because it is a high level summary of function copying
+		that you probably won't understand at first. Read it when you want a review, after understanding
+		the basics in the rest of the article.	
+	</p>
+	<!-- <p class="display" style="text-decoration:line-through">
+		This article introduces the <i>context evaluation factory string</i>, which when evaluated with <var>eval</var> produces
+		an in place <i>context evaluation factory</i>, which when called on a context object produces an <i>evaluator</i>,
+		with context dictated by the context object, which
+		when called on a function copies the function into the evaluator's context. All the functions created
+		by an evaluator form an <i>evaluation module</i>: They all see and can use the evaluator's context.
+		In particular the outer context of each function copy is the same as the context of the evaluator. 
+	</p>-->
+	<dl>
+		<dt>Evaluator</dt>
+		<dd>	
+			An <dfn>evaluator</dfn> is a function, that takes a function and uses <var>eval</var> on it to 
+			define and return a copy of that function. <br><br>The context of the evaluator is the outer context
+			of every function copy returned by the evaluator. This is why we say <dfn>functions are copied into 
+			the evaluators context</dfn>, or that
+			<dfn>function copies live in the evaluator's context</dfn>.
+			
+		</dd>
+		<dt>Parent Evaluator</dt>
+		<dd>
+			A <dfn>parent evaluator</dfn> is a function that defines and returns an evaluator, while
+			having the the necessary scope to provide the evaluator with the outer context 
+			that it needs to copy functions. 
+		</dd>
+		<dt>Context Evaluation Factory</dt>
+		<dd>
+			A <dfn>context evaluation factory</dfn> is a function that takes an input parameter
+			called the <dfn>context object</dfn>. It then writes out out a parent evaluator 
+			using <var>eval</var> so that the parent evaluator has a scope that is specified by the context object. 
+						
+		</dd>
+		<dt>Copying Functions starting with a CEF</dt>
+		<dd>						
+			What happens is that a call to the CEF calls the parent evaluator to get an evaluator,
+			which is returned from the CEF. The evaluator, is then used to copy functions into its context.
+		</dd>
+	</dl>
+	<p class="display">
+		So that the CEF and evaluator do not introduce unwanted outer context for the copies of
+		functions that the evaluator produces, the CEF and evaluator should have empty scope.
+		Also to avoid unwanted context, the evaluator and parent evaluator should be defined 
+		on return statements so that they are nameless.
+	</p>
+	
+	<p class="display" style="background-color:yellow">
+		As you see, evaluation/copying of functions is all about scope and context. Thus we have a <i>Scope and Context</i> section
+		to correct common misunderstandings of these terms. Those who incorrectly believe that Scope is all that is visible, or
+		don't understand the difference between scope and context won't be able to understand the article.
+	</p>
+	
+	<section>
+		<h3>Show Me the High Level Code and Explain it Later</h3>
+			
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				Global and Local Context Evaluation Factories
+			</header><div class="numberShield colorLightBlue"></div>	
+
+			// The global context evaluation factory
+
+			const ceFactory = function() 
+		    {		
+		        return eval("(function(" + Object.keys(arguments[0]) + "\c)\
+		          {\
+		              return function(){return eval('('+arguments[0]+')');}\
+		          }).apply(null,Object.keyValues(arguments[0]));");
+    		}
+    		
+    		// Line 2-4 does a lot. It writes out the text of a parent evaluator, 
+    		// eval then defines the parent evaluator, whereupon the PE is
+    		// immediately called to return the evaluator on line 3.
+
+			// To create local context evaluation factories 
+			// use eval on the following string locally.
+			
+			const cefString = '('+ceFactory +')'; 
+			<hr>
+			
+			// Utility function
+			
+			Object.defineProperty(Object, 'keyValues',
+			{
+			       value:function(X)
+			       {
+			           return Object.keys(X).map(function(x){return X[x];});
+			       }
+			 });
+
+		</div>
+		
+		
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				Example 1: Use ceFactory, the Global Context Evaluation Factory 
+			</header><div class="numberShield colorLightBlue"></div>	
+			
+			var Z = 100; // global variable written in the global scope
+			
+			(function(){
+				// In some scope A, not the global scope
+			
+				// This local Z, and X are completely ignored by evaluator 
+				// copies because the factory ceFactory is global.
+				var Z = 0;  
+				var X = 1;
+							
+				const evaluator = ceFactory({b:2, c:3}); 
+				// {b:2, c:3} is the context object 
+							
+				const sum = evaluator(function(a){return a + b + c + Z}); 
+				
+				alert(sum(1)); // 1 + 2 + 3 + 100 = 106
+				
+			})();
+			
+		</div>
+		
+		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
+				Example 2: Use a Local Context Evaluation Factory 
+			</header><div class="numberShield colorLightBlue"></div>	
+			
+			var Z = 100; // global variable
+				
+			(function(){
+				// In some scope A, not the global scope
+			
+				// This local Z, and X are not ignored by evaluator 
+				// copies because the factory is written at this scope.
+				var Z = 0;  
+				var X = 1;
+			
+				const localFactory = eval(cefString);
+				
+				const evaluator = localFactory({b:2, c:3}); 
+							
+				const sum = evaluator(function(a){return a + b + c + Z}); 
+				
+				alert(sum(1)); // 1 + 2 + 3 + 0 = 6
+				
+			})();
+					
+		</div>
+		<p>
+			The rest of the article will show how <var>ceFactory</var> and <var>cefString</var> arose.
+		</p>
+		
+	</section>		
+</section>
+<section>
+		<h2>Scope and Context</h2>
+	<p>
+		We take our definitions of <i>scope</i> and <i>context</i> from careful readings of
+		<a target="_blank" href="https://en.wikipedia.org/wiki/Scope_(computer_science)">Wikipedia: Scope</a>
+		and 
+		<a target="_blank" href="https://blogs.msdn.microsoft.com/jscript/2007/07/26/scope-chain-of-jscript-functions/">
+			Scope Chain and Activation Objects
+		</a>,
+		taking their nuances into account. Multiple authors put a lot of thought into the concepts of scope and context.
+		We do not allow multiple meanings for either term and insist on precision: to do otherwise is simply wishy-washy. 
+	</p>
+	<p>
+		The reader is warned that the view that scope is all that is visible, is very wrong. It's wrong because it
+		makes scope ambiguous and does not leave a separate and precise meaning for context. We insist
+		on non ambiguous precise language that covers all the important concepts that actually occur in copying
+		functions with evaluators. 
+	</p>
+	<dl>
+		<dt>Global Scope</dt>
+		<dd><dfn>Global scope</dfn> consists of the variables (functions are variables) that are declared outside of every function.</dd>
+		<dt>Function Scope</dt>
+		<dd>
+			A <dfn>function's scope</dfn> consists of the variables (including the parameters) declared by the function: It's
+			understood the variables declared by a function are declared outside of any nested function.	
+		</dd>
+		<dt>Scope</dt>
+		<dd>Global Scope or Function Scope</dd>
+		<!-- <dt>Parent Scope</dt>
+		<dd>
+			The scope of a function's parent function. If a function has no parent function, its parent scope is the 
+			global scope. The global scope has no parent scope.
+		</dd>-->
+		<dt>Scope Chain</dt>
+		<dd>
+			The <dfn>scope chain</dfn> of a function is a sequence of scopes. The first element is the function's scope. The
+			second element is the scope of the function's parent. This process of entering scopes of parent functions 
+			into the sequence continues until the global scope has been entered into the sequence. 
+		</dd>
+		<dd></dd>
+		<dt>Function Context</dt>
+		<dd>
+			A function's <dfn>context</dfn> is the set of all variables in the function's scope chain. 
+			However, there is one caveat. A variable  in a higher scope whose name duplicates the name of 
+			a variable in a lower scope is <dfn>hidden</dfn>, and is not part of the function's context.<br><br>					
+			We say that a function inherits the context of its parent, but can put new scope (the fuction's scope)
+			into context, which might possibly override the parent context.
+		</dd>
+		<dt>Function Outer Context</dt>
+		<dd>
+			A function's <dfn>outer context</dfn> is the context of the function sans its scope.
+			Equivalently it is the context of the function's parent function sans hidden variables in the parent.
+		</dd>
+		<dt>Location Context</dt>
+		<dd>
+			A particuar point/location in code has a context. It is simply the context of the innermost function containing it.
+			It is also the set of all variables visible at that point in code.
+		</dd>		
+	</dl>
+	<section>
+		<h4>Test Your Understanding</h4>
+		<p>The following questions are not rhetorical as they pop up naturlly in copying functions.</p>
+		<ol>
+			<li>
+				Are the global scope and the global context the same?
+				<ul><li>Yes!</li></ul>
+			</li>
+			<li>
+				Can two different scopes overlap?
+				<ul>
+					<li>
+						No! Never!						
+					</li>
+				</ul>
+			</li>
+			<li>
+				Can two different contexts overlap?
+				<ul>
+					<li>
+						Yes they can. Sans hidden variables, the global scope is in every context.
+						Generally, sans hidden variables, a function that is ancestor to two functions has scope that
+						belongs to the context of both functions.
+					</li>					
+				</ul>
+			</li>
+			<!-- <li>
+				What is the relationship between the outer context of a function and its location?
+				<ul>
+					<li>The outer-context of a function is always the context of its location
+					or point in code.</li>
+				</ul>
+			</li>-->
+			<li>
+				What is most closely related to visibility of variables? Scope or Context?
+				<ul>
+					<li>Context! 
+						<ul>
+							<li>Let's hammer this one home.</li>
+							<li>There are more variables visible to a function than its scope.</li>
+							<li>
+								Scope is function scope or global scope. Scope is not everything
+								that is visible from a particular location: In fact the following
+								quote gives good reason for explicitly disallowing such a meaning.
+								<ul>
+									<li>
+										<blockquote>
+											The term "scope" is also used to refer to the set of all entities that are visible 
+											or names that are valid within a portion of the program or at a given point in a program, 
+											<b><u>and which is more correctly referred to as context</u></b> or environment. <br>												
+											<a style="margin-left:25em" target="_blank" href="https://en.wikipedia.org/wiki/Scope_(computer_science)">
+												Wikipedia</a>
+										</blockquote>								
+									</li>
+								</ul>
+							</li>															
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>
+				When is the context of a function the same as its parent?
+				<ul><li>When the function has empty scope!</li></ul>
+			</li>
+			<li>
+				When is the context of a function the same as the context of its location?
+				<ul><li>When the function has empty scope!</li></ul>
+			</li>
+			<li>
+				True or False. The outer context of a function is the location context of its definition.
+				<ul><li>True</li></ul>
+			</li>			
+		</ol>
+	</section>
+		
+	</section>
+<section>
+	<h2>How to Copy a Function</h2>
+	<p>
+		Copying a function means to create another function with the same text. Both source and target of the
+		copy will have equivalent scopes. However, their outer contexts are dictated by their locations, or
+		points of definition, whence the outer contexts generally differ. 
+	</p>
+	<p>
+		To copy a function, you stringify it and then use <var>eval</var> on the resulting string. <dfn>Stringify</dfn>
+		means that you obtain a string by surrounding the function with 
+		parentheses. 
+	</p>
+	
+	<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+		<header class="codeHeader">Example - Copy a function with eval<div class="codeListing"></div></header>
+		<div class="numberShield colorLightBurlywood"></div>
+		
+		// In some scope A
+		var z = 1;	
+		const sum = function(a,b){return a + b + z;}
+		const sumString = "(" + sum + ")";
+		
+		(function()
+		{
+			// Inside some scope B. 
+			var z = 10;
+			
+			const sumCopy = eval(sumString);
+		
+			// Line 6 is, via eval expansion, the same as writing 
+			// const sumCopy = function(a,b){return a + b + z;} in place 
+			// on the same line 6.
+
+			alert(sumCopy(1,2)); // = 1 + 2 + 10 = 13
+		})();
+				
+	</div>
+	<p>
+		sumCopy is a reference to a function defined on the right side of line 6.
+		We will think of sumCopy as a function except in technical situations
+		where it's important to realize that sumCopy is just a reference to
+		a function. Keep in mind that the context/outer-context of the function is not
+		determined by where the reference is defined, but by where the function is defined.
+		In this case they're the same, but it will get wild later on.
+	</p>	
+</section>
+<section>
+	<h2>Evaluators</h2>
+	<p>
+		An <dfn>evaluator</dfn> is a function that takes a function as its single argument, copies the function, and
+		returns the copy. 
+	</p>
+	<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+		<header class="codeHeader">Example - Copy a function with an evaluator<div class="codeListing"></div></header>
+		<div class="numberShield colorLightBurlywood"></div>
+		
+		// define an evaluator
+		const evaluator = function(func){return eval('(' + func + ')');}
+		
+		// copy an anonymous function
+		// sum is the copy of function(a, b){return a + b;}
+		
+		const sum = evaluator(function(a, b){return a + b;}); 
+		
+		alert(sum(1,2)); // 1 + 2 = 3		
+	</div>
+	<p>
+		Now imagine on line 1 that the text of <var>func</var> is expanded in place to produce the copy, 
+		because that's what actually happens. Thus the copy is nested inside the evaluator, 
+		i.e., the 
+		parent of the copy is the evaluator. The copy therefore inherits the context of the evaluator.
+		In particular, the variable <var>func</var> as a member of the context of the evaluator is also
+		a member of the context of the copy. Even though the copy doesn't use <var>func</var>, <var>func</var>
+		is still in context, i.e., it's still available for use by the copy. So let's actually see the copy
+		use <var>func</var> in the following listing.		
+	</p>
+	
+	<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+		<header class="codeHeader">Example - A copy inherits the evaluator's context<div class="codeListing"></div></header>
+		<div class="numberShield colorLightBurlywood"></div>
+		
+		// define an evaluator. 
+		const evaluator = function(func){return eval('(' + func + ')');}
+		
+		// copy an anonymous function that uses func
+		const sum = evaluator(function(a, b){alert(func); return a + b;}); 
+		
+		alert(sum(1,2)); 
+		// alerts "function(a, b){alert(func); return a + b;}" before alerting 3.		
+	</div>
+	<p>
+		So this is BAD! Forcing the variable <var>func</var> into the context of the copy that the copy might accidently
+		use is bad. Forcing <var>func</var> into the context of the copy that might override another variable
+		<var>func</var> of the same name that the copy actually wants to use is bad. 
+	</p>
+	<p class="display">
+		So what we just learned is that an evaluator should introduce no context of its own, i.e., an evaluator
+		should have empty scope. Yes! Its easy to write an evaluator with empty scope. The evaluator simply 
+		doesn't declare any parameters (or other variables).
+	</p>
+	<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+		<header class="codeHeader">Example - An evaluator with empty scope<div class="codeListing"></div></header>
+		<div class="numberShield colorLightBurlywood"></div>
+		
+		// define an evaluator with empty scope. 
+		// arguments[0] is the function to be copied.
+		const evaluator = function(){return eval('(' + arguments[0] + ')');}
+		
+		const sum = evaluator(function(a, b){return a + b;}); 
+		
+		alert(sum(1,2)); // alerts  3	
+	</div>	
+	<p>
+		Above <var>sum</var> defined on line 2 is a reference to a function defined on line 1
+		while evaluator executed. While we will still call <var>sum</var> a function copy, keep 
+		in mind that all function copies are actually references to the true copies defined at 
+		at the location where <var>eval</var> creates it.
+	</p>
+	
+			
+</section>
+<section>
+	<h2>Providing Context to Function Copies</h2>
+	<p>
+		In Meouzer's magical evaluator paradigm of function copying using eval to expand function text in place
+		to accomplish amazing things, it's the parent of the evaluator
+		whose scope provides needed context to the copies created by the evaluator.
+	</p>
+	<p>
+		We want to copy the following three functions to a particular location and supply the needed context
+		variables <var>a</var> and <var>b</var>.
+	</p>
+	<ol>
+		<li>function(value) { a = value; }</li>
+		<li>function() {return a; }</li>
+		<li>function() {return a * b; }</li>
+	</ol>
+	
+	<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+		<header class="codeHeader">Example - Providing Copies with Context<div class="codeListing"></div></header>
+		<div class="numberShield colorLightBurlywood"></div>
+		
+		// getEvaluator is the parent to the evaluator returned on line 4. Its 
+		// scope provides context to the copy functions returned by the evaluator.
+				
+		// In some scope A
+		function getEvaluator()  
+		{
+			// set up some context for function copy on line 4
+			var a = 1;
+			var b = 2;
+			
+			// return an evaluator
+			return function(){return eval('('+arguments[0]+')');}
+		}
+		
+		(function()
+		{
+			// In some scope B thematically miles apart from scope A	
+			const evaluator = getEvaluator();
+		
+			// copy three functions into the evaluator's context
+			const setA = evaluator(function(value){a = value;});
+			const getA = evaluator(function(){return a;});
+			const product = evaluator(function(){return a * b;});
+	
+			// Make sure the variables declared in the evaluator parent
+			// are in context of the functions that evaluator copied.
+			
+			var a = -100;  // but try to confuse the evaluator and its copies
+			var b = -200; 
+			
+			setA(100);
+			alert(getA());      // 100
+			alert(product()); // a*b = 100 * 2 = 200	
+		})();
+	
+		
+	</div>
+	<p>
+		The evaluator parent needs to be careful with its scope. If for example, after line 3, the declaration
+		<var>var helperVariable = { };</var> is made, then <var>helperVariable</var> is in the context of all function
+		copies, <var>setA()</var>, <var>getA()</var>, and <var>product()</var>. As noted before, that would be BAD! 
+	</p>
+	<p class="display">
+		Of course, colloquially speaking <var>setA</var>, <var>getA</var>, and <var>product</var> are functions.
+		However, with the utmost
+		technical precision in mind, are <var>setA</var>, <var>getA</var>, and <var>product</var> really functions?
+		The answer is no because they are all references to functions, each of which was defined on line 4
+		at <!--the second--> return statement. Why is this nuanced distinction important? It's important because if you
+		want to determine the outer-context of <var>setA</var>, <var>getA</var>, and <var>product</var>
+		you have to look at line 4 where they are defined. You will find that they all have the same outer
+		context. Looking at lines 7, 8, or 9 tells you nothing about their outer context. So the variables
+		on lines 2 and 3 are in their outer context, but the variables on lines 9 and 10 are not in their
+		outer context.		
+	</p>
+</section>
+<section>
+	<h2>Context Evaluation Factories</h2>
+		<p>
+			
+		</p>		
+	<!-- <p> <mark>is this correct???</mark>
+		A <dfn>context evaluation factory</dfn> is a function that takes a context object, uses the
+		context object to define 
+		an parent evaluator (parent function to an evalulator) with the needed scope as defined by the context object, calls the parent evaluator 
+		to obtain the evaluator, and immediately returns
+		the evaluator. So the grandparent of the evaluator is the factory. Of course by now we know that
+		the factory like the evaluator should have empty scope.
+	</p>-->
+	<p>
+		The <dfn>context object</dfn> is a literal object. The names of its keys are the names of the variables
+		that are to be put into context for the function copies. The key values are the values for the corresponding
+		variables. For example with the context object <var>{a:1, b:new Date()}</var>, the variables <var>var a = 1</var>,
+		and <var>var b = new Date()</var> are forced into the context of the function copies created by the evaluator. 
+	</p>
+	<!-- <p class="display">
+		The outer context of a functi
+		The outer context of a function copy created by the evaluator is the factory's context
+		overriden as indicated by the context object. 
+	</p> -->
+	<ol class="display">
+		<li style="list-style:none"><u style="margin-left:auto;margin-right:auto;display:table;" >Summation of Contexts</u></li>
+		<li style="margin-left:1em" value="1">
+			The outer-context of a function copy created by the evaluator is always the evaluator's context.
+			<ul><li>That's why we can say <dfn><b>an evaluator copies functions into its context</b></dfn>.</li></ul>
+		</li>
+		<li style="margin-left:1em">
+			The evaluator's context is the factory's context but overridden as directed by the context object.
+		</li>
+		<li style="margin-left:1em">
+			The factory's context is the context of the factory's location because the factory has empty scope.	
+		</li>
+	</ol>
+		
+	<!-- <p>
+		The location of the context evaluation factory makes a difference because the context of that location
+		is forced upon the copies of the evaluator. That's why in code below, we took a single context evaluation factory,
+		stringified it to produce the context evaluation factory string <var>cefString</var>. Now wherevever
+		<var>var factory = eval(cefString)</var> is written, an in place context evaluation factory is produced, 
+		say in some context A. The context of the resulting evaluator is also A but with overrides described by 
+		the context object. Now what's really neat, no matter where the evaluator copies, the function being 
+		copied is copied into the the evaluator's context. Specifically this means the context of the function 
+		copy is the same as the evaluator's context, but of course the function copy overrides with its scope.		
+	</p>
+	-->
+	
+	<section>
+		<h3>The Globally Scoped Context Evaluation Factory</h3>
+		<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+		<header class="codeHeader">The Globally Scoped Context Evaluation Factory<div class="codeListing"></div></header>
+		<div class="numberShield colorLightBurlywood"></div>
+		
+			// Written in the global scope
+			
+			var Z = 100; // global variable
+			
+			// Context evaluation factory written at the global scope		
+			const ceFactory = function()
+			{	
+				// The context object is arguments[0]. Remember we can't use
+				// variables.		
+			
+				return eval("(function(" + Object.keys(arguments[0]) + "\c)\
+				{\
+					return function(){return eval('('+arguments[0]+')');}\
+				}).apply(null,Object.keyValues(arguments[0]));");
+			}
+			
+			// The context of the context evaluation factory is forced into
+			// the context of any evaluator copy. In particular, the global 
+			// variable Z = 100 will be forced into the context of any evaluator 
+			// copy.
+	
+			(function(){
+				// In some scope A, not the global scope
+			
+				// This local Z, and X are completely ignored by evaluator 
+				// copies because the factory is written at global scope.
+				var Z = 0;  
+				var X = 1;
+							
+				const evaluator = ceFactory({b:2, c:3}); 
+							
+				const sum = evaluator(function(a){return a + b + c + Z}); 
+				
+				alert(sum(1)); // 1 + 2 + 3 + 100 = 106
+				
+			})();
+			
+			<header class="codeSection">
+				Helper Function Object.keyValues
+			</header>
+			
+			 \numbersOff
+			 Object.defineProperty(Object, 'keyValues',
+			   {
+			       value:function(X)
+			       {
+			           return Object.keys(X).map(function(x){return X[x];});
+			       }
+			   });	
+		</div>
+	</section>
+	<section>
+		<h3>Locally Scoped Context Evaluation Factories</h3>
+		<p>
+			The one and only globally scoped context evaluation factory might do exactly what you want,
+			and might not. In fact you probably want a local, not global, scope forced into the outer
+			context of evaluator function copies. No problem! You just rewrite <var>ceFactory</var> at the local scope in question.
+			Of course that's just copying <var>ceFactory</var> and we know that can be accomplished be using <var>eval</var>
+			on the stringification <var style="white-space:nowrap">const cefString = '(' + ceFactory + ')'</var>.
+		</p>
+		
+		<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+			<header class="codeHeader">Context Evaluation Factory String<div class="codeListing"></div></header>
+			<div class="numberShield colorLightBurlywood"></div>
+			
+			// At the glolbal scope ready for deployment in any scope
+			const cefString = '('  + ceFactory + ')';
+
+		</div>
+		
+		<div id="div" class="codeBox simple centerTable" data-codeNumbers="true">
+		<header class="codeHeader">Locally Scoped Context Evaluation Factory<div class="codeListing"></div></header>
+		<div class="numberShield colorLightBurlywood"></div>
+		
+			var Z = 100; // global variable
+				
+			(function(){
+				// In some scope A, not the global scope
+			
+				// This local Z, and X are not ignored by evaluator 
+				// copies because the factory is written at this scope.
+				var Z = 0;  
+				var X = 1;
+			
+				const localFactory = eval(cefString);
+				
+				const evaluator = localFactory({b:2, c:3}); 
+							
+				const sum = evaluator(function(a){return a + b + c + Z}); 
+				
+				alert(sum(1)); // 1 + 2 + 3 + 0 = 6
+				
+			})();	
+			
+			// Even if lines 6-8 were spread out in different scopes, 
+			// the scope A variables var Z = 0, and var X = 1 are
+			// forced into the context of function copies.	Why?
+			// Because the code const evaluator = localFactory({b:2, c:3}); 
+			// does not define the evaluator!! This only obtains a reference
+			// to the evaluator, which is actually defined on line 5.
+			
+			// Do you believe that sum is a reference to a function that is 
+			// also defined on line 5. You should because it's true. 
+			// Eval magic!
+			
+		</div>		
+	</section>
+</section>
+
+<section>
+	<h2>Evaluation Modules</h2>
+	<p>
+		The set of all function references created by an evaluator is called an <dfn>evaluation module</dfn>.
+		The members of the module can work harmoniously using the same outer context, i.e., the context
+		of the evaluator. If one member changes the value of a variable in the evaluator's 
+		context, the other members see the change: this is true even if the function references themselves are
+		scattered across wildly different scopes (remember the actual functions which are referenced live in
+		the evaluators context). One member can use another member if the latter
+		is visible to the former.
+	</p>
+		<div id="div" class="codeBox simple centerTable">
+		
+		// Create an evaluator with a = 1, and b = 2 in context.
+							
+		const evaluator = (function(a, b)
+		{
+			return function(){return eval('(' + arguments[0] + ')');};
+			}).call(null, 1, 2);
+			
+		// create three members of an evaluation module.
+		// some of which use the others.
+				
+		const sum = evaluator(function(){return a + b;});	
+		const scale = evaluator(function(f){a *= f; b *= f;});
+		const average = evaluator(function(){return sum()/2;});
+			
+		// test it out
+		scale(10);
+		alert(sum());       // 10 + 20 = 30
+		alert(average()); // (10 + 20)/2 	= 15	
+	</div>	
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+<!-- 
+
+-->
+
+<!-- 
+<section>
+	<h2>Copying Functions with Evaluator</h2>
+	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
+		<header class="codeHeader colorLightBurlywood">
+			<div class="codeListing"></div>
+			The Evaluator Function
+		</header><div class="numberShield colorLightBurlywood"></div>
+		
+		function getEvaluator()
+		{
+		return eval("(function(" + Object.keys(arguments[0]) + "\c)\
+		{\
+			for(let i = 0, keys = Object.keys(this.contextObject),\ 
+				length = keys.length; i &lt; length; i++)\
+			{\
+				eval(keys[i] + ' = this.contextObject.' + keys[i] + ';');\
+			}\
+			this.e = function(func)\
+			{\
+				return eval('('+func+')');\
+			};\
+			this.e.contextObject= this.contextObject;\
+			this.e.setValue = function(name, value){eval(name + ' = value');};\
+			this.e.setValues = function(co)\
+			{\
+				for(let i = 0, keys = Object.keys(co), length = keys.length;\ 
+					i &lt; length; i++)\
+				{\
+					eval(keys[i] + ' = co.' + keys[i] + ';');\
+				}\
+			};\
+			this.e.updateAll = function()\
+			{\
+				for(let i = 0, keys = Object.keys(this.contextObject),\ 
+					length = keys.length; i &lt; length; i++)\
+				{\
+					eval(keys[i] + ' = this.contextObject.' + keys[i] + ';');\
+				}\
+			};\
+			return this.e;\
+		});").call({contextObject:arguments[0]});
+	}   
+	
+	const Evaluator = "(function(){return " + getEvaluator + ";})();";
+
+	</div>	
+
+</section>
+-->
+
+<br><br><br><br><br><br><br><br><br><br><br>	
+</body>
+
+</html>
+
+

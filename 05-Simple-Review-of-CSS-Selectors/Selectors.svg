@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1501 1196" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-147.766,-255.219)">
+        <g>
+            <g transform="matrix(2.3936,0,0,2.09245,-72.6048,0.0226415)">
+                <rect x="93" y="162" width="625" height="530" style="fill:rgb(0,252,255);stroke:black;stroke-width:1.99px;"/>
+            </g>
+            <g transform="matrix(1.2624,0,0,1.55472,109.597,167.136)">
+                <rect x="93" y="162" width="625" height="530" style="fill:rgb(220,220,255);stroke:black;stroke-width:3.16px;"/>
+            </g>
+            <g transform="matrix(1.37199,0,0,1.51206,232.539,386.333)">
+                <rect x="55" y="95" width="471" height="365" style="fill:rgb(173,249,114);stroke:black;stroke-width:3.1px;"/>
+            </g>
+            <g transform="matrix(0.825755,0,0,0.587594,169.921,457.151)">
+                <rect x="250" y="255" width="592" height="557" style="fill:rgb(185,225,250);stroke:black;stroke-width:6.24px;"/>
+            </g>
+            <g transform="matrix(1.28983,0,0,1.28349,219,360.558)">
+                <g transform="matrix(0.489865,0,0,0.159785,39.5338,190.255)">
+                    <rect x="250" y="255" width="592" height="557" style="fill:rgb(255,235,0);stroke:black;stroke-width:9.51px;"/>
+                </g>
+                <g transform="matrix(1.55059,0,0,1.55825,-145.073,-199.126)">
+                    <text x="209px" y="308.923px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;">Simple Selectors</text>
+                </g>
+            </g>
+            <g transform="matrix(2,0,0,2,16.4021,239.748)">
+                <text x="209px" y="308.923px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;">Product  Selectors</text>
+            </g>
+            <g transform="matrix(2,0,0,2,4.79363,395.05)">
+                <text x="209px" y="308.923px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;">Combined  Selectors</text>
+            </g>
+            <g transform="matrix(2,0,0,2,-59.4962,538.754)">
+                <text x="209px" y="308.923px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;">HTML<tspan x="264.939px 270.727px " y="308.923px 308.923px "> G</tspan>roup  Selectors</text>
+            </g>
+            <g transform="matrix(1,0,0,1,7,-39)">
+                <g transform="matrix(0.808863,0,0,0.40447,875.985,639.848)">
+                    <rect x="250" y="255" width="592" height="557" style="fill:rgb(241,165,255);stroke:black;stroke-width:6.99px;"/>
+                </g>
+                <g transform="matrix(2,0,0,2,719.583,242.009)">
+                    <text x="209px" y="308.923px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;">Pseudo Selectors</text>
+                </g>
+            </g>
+            <g transform="matrix(2,0,0,2,192.504,737.754)">
+                <text x="209px" y="308.923px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;">CSS Group Selectors</text>
+            </g>
+            <g transform="matrix(1,0,0,1,199.5,-37)">
+                <text x="267px" y="340.754px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:66.667px;fill:rgb(108,0,0);">The set of all CSS selectors</text>
+            </g>
+        </g>
+    </g>
+</svg>
