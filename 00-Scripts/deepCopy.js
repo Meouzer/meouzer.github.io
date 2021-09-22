@@ -1,54 +1,23 @@
 ﻿	"use strict";
 	
 	// This file: deepCopy.js
-	// uses: typing.js and valueCopy.js
+	// uses: valueCopy.js which uses  typing.js 
 	
-	function getInternalState(source)
-	{
-		const x = [];
-		
-		if(isSet(source))
-		{
-			source.forEach(function (value1, value2, thisSet) 
-			{
-				x.push(value2);					
-			});			
-		}
-		else if(isMap(source))
-		{
-			source.forEach(function (value, key, map) 
-			{
-				x.push({key: key, value: value });
-			});		
-		}
-			
-			return x;
-	}
-
-		
-	function setValue(obj, p, pd, value) 
-	{
-		pd.value = value;
-		if(pd.configurable) Object.defineProperty(obj, p, pd);
-		else if(pd.writable) obj[p] = value;			
-	} 
-		
+	
 	function evaluateGetterSetter(func, evaluator)
 	{		
 		if(!isNativeCode(func))
 		{
 			// change any "get" or "set" to "function"
-			// strip off any name and then evaluate.
-			evaluator = evaluator || globalEvaluator;
-				
-			const s = func.toString();
-			let n = 0;
-			const R = [];
-			let r = 0;
-			R[r++] = "function"; 		
-			n = (s[0] == 'g' || s[0] == 's')? 3: 8;				
-			R[r++] = s.substring(n);
-			return evaluator(R.join(''));
+			evaluator = evaluator || globalEvaluator;			
+						
+			let s = func.toString();
+			if(s[0] == 'g' || s[0] == 's')
+			{
+				s = "function" + s.substring(3);
+			}		
+			
+			return evaluator(s); 
 		}
 		else
 		{					
@@ -64,121 +33,158 @@
 		return valueCopy(obj, evaluator);
 	}
 		
-	function loadQuirk(q)
-	{
-		const target = q.target;
-		const originalTarget = q.originalTarget;
-								
-		if(isSet(originalTarget))
-		{	
-			for(let i = 0, length = target.length; i < length; i++)
-			{
-				originalTarget.add(target[i]);
-			}
-		}
-		else if(isMap(originalTarget))
-		{					
-			for(let i = 0, length = target.length; i < length; i++)
-			{
-				originalTarget.set(target[i].key, target[i].value);
-			}
-		}		
-	}
 		
 	function deepCopy(source, evaluator)
-	{			
+	{
 		if(isPrimitive(source)) return source;
-		const stack = [];
-		const quirkArray = [];
+		const target = getTarget(source, evaluator);
+		if(target === source) return source;
 		const wm = new WeakMap();
-							
-		function addToStack(source)
-		{
-			const target = getTarget(source, evaluator);
-			if(target === source) return null;
-			stack.push({source:source, target:target, keys:Object.getOwnPropertyNames(source), index:0});
-			wm.set(source, target);
+		wm.set(source, target);
+
 			
-			if(isSet(source) || isMap(source))
-			{
-				const inState = getInternalState(source);
-				const keys = []; for(let i = 0; i < inState.length; i++) keys[i] = i; 
-				const element = {source:inState, target:[],  originalTarget:target, keys:keys, index:0}
-				stack.push(element);
-				quirkArray.push(element);
-			}					  	
-				
-			return target;
-		}
+		const stack = [{source:source, target:target}];
 			
-		const target = addToStack(source);
-		if(target === null) return source;			
-						
 		while(stack.length > 0)
 		{
-			const top = stack[stack.length - 1];
-			const source = top.source;
-			const target = top.target;
-			
-			if(top.index < top.keys.length)
+			const top = stack.pop();
+		
+			if(top === null)
 			{
-				for(const p of Object.getOwnPropertyNames(source))
+				// Post order processing. 
+				// Freezing, sealing, and preventing extensions 
+				// can only be done post order.
+				const top1 = stack.pop();
+								
+				if(Object.isFrozen(top1.source))
 				{
-					const pd = Object.getOwnPropertyDescriptor(source, p);
-					
-					if(pd.get || pd.set)
-					{												
-						if(pd.get) pd.get = evaluateGetterSetter(pd.get, evaluator);
-						if(pd.set) pd.set = evaluateGetterSetter(pd.set, evaluator);
-						if(!hasOwnProperty(target, p) ) // to do: check configurability
-						{							
-							Object.defineProperty(target, p, pd);
-						}
-					}
-					else if(isPrimitive(source[p]))
-					{	
-						// This case not needed, but does process primitives faster.
-						setValue(target, p, pd, pd.value);		
-					}	
-					else if(wm.has(source[p])) 
-					{ 
-						setValue(target, p, pd, wm.get(source[p]));		
-					}																	
-					else
-					{	
-						const t = addToStack(source[p]);
-						t !== null? setValue(target, p, pd, t) : setValue(target, p, pd, pd.value); 			
-					}
+					Object.freeze(top1.target)
+				}
+				else if (Object.isSealed(top1.source))
+				{
+					Object.seal(top1.target);
+				}	
+				else if(!Object.isExtensible(top1.source))
+				{
+					Object.preventExtensions(top1.target);
 				}
 					
-				top.index++;
-			}
+					continue;
+				}
 			else
 			{
-				const top = stack.pop();
+				stack.push(top);
+				stack.push(null);
+			}
 				
-				if(top.originalTarget)
-				{
-					loadQuirk(top);
-				}
+			const source = top.source;
+			const target = top.target;				
 				
-				if(Object.isFrozen(top.source))
-				{
-					Object.freeze(top.target)
+			// process nodes of the object tree in  preorder	
+			for(const p of Object.getOwnPropertyNames(source))
+			{			
+				const pd = Object.getOwnPropertyDescriptor(source, p);
+				
+				if(pd.get || pd.set)
+				{					
+					if(!hasOwnProperty(target, p) ) 
+					{		
+						if(pd.get) pd.get = evaluateGetterSetter(pd.get, evaluator);
+						if(pd.set) pd.set = evaluateGetterSetter(pd.set, evaluator);					
+						Object.defineProperty(target, p, pd);
+					}
 				}
-				else if (Object.isSealed(top.source))
+				else if(isPrimitive(source[p]))
 				{
-					Object.seal(top.target);
-				}	
-				else if(!Object.isExtensible(top.source))
-				{
-					Object.preventExtensions(top.target);
+					Object.defineProperty(target, p, pd);	
 				}				
-			}												
-		}
+				else if(wm.has(source[p]))
+				{
+					pd.value = wm.get(source[p]);
+					Object.defineProperty(target, p, pd);		
+				}					
+				else
+				{			
+					pd.value = getTarget(source[p], evaluator); 
+					Object.defineProperty(target, p, pd);	
+					if(target[p] !== source[p]) 
+					{ 
+						stack.push({source:source[p], target:target[p]}); 
+						wm.set(source[p], target[p]);
+					}
+				}  
+			}	
+			
+			if(isSet(source))
+			{
+				for(const value of source.values())
+				{
+					if(wm.has(value))
+					{						
+					 	target.add(wm.get(value)); 
+					}
+					else
+					{
+					 	const targetValue = getTarget(value);
+						target.add(targetValue);
 						
-		return target;
-	}	
+						if(value !== targetValue) 
+						{
+							stack.push({source:value, target:targetValue});
+							wm.set(value, targetValue);
+						}
+					}				
+				}
+			}
+			else if(isMap(source)) 
+			{
+				for(const key of source.keys())
+				{
+					const value = source.get(key);
+					
+					let targetKey;
+					let targetValue;
+					
+					if(wm.has(key))
+					{
+						targetKey = wm.get(key);
+					}
+					else
+					{
+						targetKey = getTarget(key);
+						
+						if(key !== targetKey)
+						{
+							stack.push({source:key, target:targetKey});
+							wm.set(key, targetKey);
+						}
+					}
+					
+					if(wm.has(value))
+					{
+						targetValue = wm.get(value);
+					}
+					else
+					{
+						targetValue = getTarget(value);
+						
+						if(value !== targetValue)
+						{
+							stack.push({source:value, target:targetValue});
+							wm.set(value, targetValue);
+						}
+					}
+
+					target.set(targetKey, targetValue);					
+					
+				}
+			}
+						
+		}						
+				
+		return target;	
+	} 
+
 	
 	// ===================================================================================================================
 	

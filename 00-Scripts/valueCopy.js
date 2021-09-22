@@ -5,6 +5,11 @@
 	
 	const copySymbol = Symbol("copy"); // Made global for ES6 classes.
 	
+	function globalEvaluator()
+	{
+		return eval('('+arguments[0]+')');
+	}
+	
 	const valueCopy = (function()
 	{				
 		// const copySymbol = Symbol("copy");		
@@ -39,10 +44,7 @@
 			}
 		});	
 		
-		function globalEvaluator()
-		{
-			return eval('('+arguments[0]+')');
-		}
+		
 
 		
 		// Override for Functions 
