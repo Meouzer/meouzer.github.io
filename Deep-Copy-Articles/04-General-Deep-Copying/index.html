@@ -1,45 +1,36 @@
-﻿<!DOCTYPE html>
+﻿ <!DOCTYPE html>
 <html>
 
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-<title>JavaScript: Deep Copying</title>
+<title>Deep Copies with Circular References and Other Stuff</title>
 <link href="../../00-Commons/Main.css" rel="stylesheet" type="text/css"/>
 <link href="../../00-Commons/JSHTML.css" rel="stylesheet" type="text/css"/>
 <script src="../../00-Commons/JSHTML.js"></script>
 <script src="../../00-Scripts/typing.js"></script>
 <script src="../../00-Scripts/stringify.js"></script>
-<script src="../../00-Scripts/valueCopy.js"></script> 
-<script src="../01a-Copying-Functions-Part-1/evaluators.js"></script> 
+<script src="../../00-Scripts/valueCopy.js"></script>
 <script src="../../00-Scripts/deepCopy.js"></script>
 <script src="Test-deepCopy.js"></script> 
 <script src="Test-deepSystemCopy.js"></script> 
 
-<script>	
-	window.addEventListener("load", function()
-	{
-		applyJSHTML();			
-	});			
-	
-	const x = new Map([['key1', 'value1'], ['key2', {a:1,b:2}]]);	
-	const y = deepCopy(x);
-					
+
+<script>
+	window.addEventListener("load", function(){applyJSHTML()});	
 </script>
 
 </head>
 
-<body class="GPeachBlue" style="font-size:16px;width:800px; font-family:sans-serif">
+<body class="GPeachBlue" style="font-size:16px;width:800px;">
 <span style="position:absolute;left:900px">© 2019 Meouzer Consortium</span>
 <header>
-	<h1>Deep Copying in JavaScript<br>
-		<span style="font-size:.8em">The deepCopy() Function and Intro to deepCopySystem</span>
-	</h1>
-	<span class="centerTable" style="font-size: 1.3em;margin-top:1em;color:maroon">Meouzer</span>
+	<h1>On the Road to General Deep Copying</h1>
+	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">Meouzer</span>
 	<span class="centerTable" style="font-size: 1.3em;margin-top:.5em;color:maroon">The Curiously Deep Copy Cat</span>
 	<span class="centerTable" style="font-size: 1.2em; color: maroon;">meouzer@gmail.com</span>	
 </header>	
-	
-<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
+
+	<blockquote class="mt2 pth" style="background-color:rgba(255,192,203,.2);border:thick rgba(90,0,0,.1) ridge;" >
 	<img alt="loading" src="../../00-Commons/Meouzer.jpg" style="width: 100px; display: inline-block;">
 	<div style="display: inline-block; width: 500px; vertical-align: top;text-align:left; margin-left:1em; line-height: 1.5em">
 	 An oyster met an oyster and they were oysters two. Two oysters met two oysters and they were oysters too.
@@ -54,362 +45,796 @@
 </p>
 <p>
 	Full code is at <a target="_blank" href="../../00-Scripts/deepCopy.js">deepCopy.js</a>, which depends on
-	<a target="_blank" href="../../00-Scripts/ValueCopy.js">valueCopy.js</a>, which depends on
+	<a target="_blank" href="../../00-Scripts/valueCopy.js">ValueCopy.js</a>, which depends on
 		<a target="_blank" href="../../00-Scripts/typing.js">typing.js</a>. 
 </p>
- 
 <section>
 	<h2>Introduction</h2>
-	<p>
-		The <var>deepDataCopy()</var> function could deeply copy only data. However, <var>deepCopy()</var> can do more
-		because it can handle functions and setters/getters in the copy stream. However, one requirement is that a single 
-		evaluator must be capable of correctly copying all the functions and setter/getters. It seems that a single evaluator
-		will work in many situations, as is that case when deep copying some programmer defined classes. 
+	<p>Listing 7 gives the <var>deepCopy()</var> function after its its predecessors, each of which covers
+	 one technical complexity.
 	</p>
-	<p class="display">
-		Using the  <var>deepCopy()</var> function directly can get to complicated to handle, and so its use
-		is somewhat deprecated. However,  <var>deepCopy()</var> forms the basis of <var>deepCopySystem</var>,
-		which makes things much simpler. The next article will show how to deep copy a class instance
-		using <var>deepCopySystem</var>. Also see code listing #5 below.
+	
+	<p>
+		If a deep copy algorithm is applied to <var>x</var> to produce <var>y</var>, then <var>x</var> is a <dfn>source</dfn>
+		and <var>y</var> is its <dfn>target</dfn>. This terminology continues as follows. If <var>p<sub>1</sub>.p<sub>2</sub>...p<sub>n</sub>.</var>
+		is a dotted chain of properties then <var>x.p<sub>1</sub>.p<sub>2</sub>...p<sub>n</sub></var> is a <dfn>source</dfn>
+		and <var>y.p<sub>1</sub>.p<sub>2</sub>...p<sub>n</sub></var> is its target. Of course, during a deep copy algorithm
+		the target of a source won't be completely filled in untill the algorithm completes.
 	</p>
 </section>
 
-<section>
-	<h2></h2>
-	<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
-		<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
-				The deepCopy() Function
-		</header><div class="numberShield colorLightBurlywood"></div>
-		
-		function deepCopy(source, evaluator)		
-		{	
-		// for handling circular and duplicate references
-		const wm = new WeakMap(); 
-		
-		// stack of source/descendent-sources in preorder
-		const stack = [];			
-		
-		// the target to be returned
-		const target = ValueCopy(source, evaluator); 	
-		
-		if(target == source) return source; // source is value copy primitive	
-		
-		wm.set(source, target);		// record the source and target	
-		
-		// push source onto stack
-		stack.push({source:source, target:target,  
-		keys:Object.getOwnPropertyNames(source), index:0});	
-		
-		if(isSet(source) || isMap(source))
+	<!-- 
+
+	<div class="codeBox" style="border-radius:20px;background-color:rgb(255,245,255)">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Using shallowCopy() to implement a recurseive deep copy function.
+       	</header>       	
+       	
+       	deepCopy_1(source)
 		{
-			// copy internal properties of source to target externally	
-			target.clear();						
-			stack.push({source:getInternalState(source), 
-			target:target,  keys:["internalState"], index:0});
-		}
-	
-						
-		while(stack.length &gt; 0) // while still processing sources
-		{						
-			const T = stack[stack.length - 1]; // peek top of stack
-										
-			if(T.index &lt; T.keys.length ) // still processing child source nodes
-			{		
-				// T.index is index of current child source to process.
-				
-				// get key of current child source being processed
-				const key = T.keys[T.index]; 
-				
-				if(!isOffLimitProperty(T.source, key))
-				{				
-					const source = T.source[key]; // current child source to process	
-									
-					if(!wm.has(source)) // no circular or duplicate reference
-					{
-						// copy key property from T.source to T.target 
-						valueCopyProperty(T.source, T.target, key, evaluator); 	   	
-					 		
-					 	const pd = Object.getOwnPropertyDescriptor(T.source, key);
-	                                      
-						if (!(pd.get || pd.set) &amp;&amp; (T.target[key] != T.source[key]) )  
-						{   	
-							// record source and target						
-							wm.set(T.source[key], T.target[key]); 							
+			if(isPrimitive(source)) return source;
+			const target = shallowCopy(source);
+			
+			for(const p of Object.getOwnPropertyNames(target))
+			{
+				if(isObject(target[p])) 
+				{
+					target[p] = shallowCopy(target[p]);   
+					stack.push(target[p]);
+				}
+			}							
 							
-							// push child source onto stack
-							stack.push({source: T.source[key], target:T.target[key], 
-			                keys:Object.getOwnPropertyNames(T.source[key]), 
-			                index:0}); 
-			                
-			                if(isSet(source) || isMap(source))
-							{	
-								// copy internal properties of source to target externally	
-								T.target[key].clear();						
-								stack.push({source:getInternalState(source), 
-								target:T.target[key],  keys:["internalState"], index:0});
-							}
-			            }
+			return target;	
+		}         
+     
+	</div>	-->
+	
+	
+	<!-- 
+	<div class="codeBox" style="border-radius:20px;background-color:rgb(255,245,255)">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Using shallowCopy() to implement a stacked deep copy function.
+       	</header>       	
+       	
+       	deepCopy_2(source)
+		{
+			if(isPrimitive(source)) return source;
+			const target = shallowCopy(source);
+			const stack = [target];
+			
+			while(stack.length &gt; 0)
+			{
+				const target = stack.pop();
+					
+				for(const p of Object.getOwnPropertyNames(target))
+				{
+					if(isObject(target[p])) 
+					{
+						target[p] = shallowCopy(target[p]);   
+						stack.push(target[p]);
 					}
+				}							
+			}			
+				
+			return target;	
+		}        
+	</div>	-->
+
+
+
+	<div class="codeBox" style="border-radius:20px 0 20px 0;background-color:rgb(255,245,255)" data-codeNumbers="true">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Deep Copy JSON Object Literals.
+       	</header><div class="numberShield colorLightBurlywood"></div>        	
+		<p style="margin-left:3em; color:red">We start with deep copying JSON Literal Objects, and add complexity in pieces to
+				build up to general deep copying.
+		</p>        	
+       	function deepCopy_JSON_Literal(source)
+		{
+			// Rather than use a recursive function, a stack is used. What would be 
+			// pushed onto the call stack in a recursive function is instead pushed onto 
+			// a data stack.
+		
+			if(isPrimitive(source)) return source;
+			const target = isArray(source)? []:{} // the target starts off 
+			&nbsp;                                                //as a value copy of the source.
+						
+			const stack = [{source:source, target:target}];
+			
+			while(stack.length &gt; 0) // while still processing sources in preorder
+			{
+				const top = stack.pop();
+				const source = top.source;	// get source
+				const target = top.target;  // get currently unfilled target (the valueCopy)
+					
+				// process nodes of the object tree in  preorder	
+				for(const p of Object.getOwnPropertyNames(source))
+				{			
+					if(isPrimitive(source[p]))
+					{
+						// fill in target property
+						target[p] = source[p];
+					}									
 					else
 					{	
-						// close circular or duplicate reference
-											
-						const pd = Object.getOwnPropertyDescriptor(T.source, key);
-						
-						if(pd.get || pd.set)
-						{							
-							// copy the getter/setter. 
-							valueCopyProperty(T.source, T.target, key, evaluator); 
-						}
-						else
-						{
-							const value = wm.get(T.source[key]);
-							const pd = Object.getOwnPropertyDescriptor(T.source, key);
-							pd.value = value;
-							Object.defineProperty(T.target, key, pd);						
-						}
-					}	
-				}															
+						// push source and its valueCopy onto stack		
+						target[p] = isArray(source[p])? []:{}
+						stack.push({source:source[p], target:target[p]});
+					}  
+				}							
+			}			
 				
-				T.index++; // process next child source.				
-			}
-			else 
+			return target;	
+		}  
+		
+		<p style="margin-left:3em;color:red">Complexities not accounted for</p>
+		<ul style="margin-left:2em;color:red">
+			<li>Value Copying</li>
+			<li>Circular References</li>
+			<li>Post Order Processing</li>
+			<li>Functions</li>
+			<li>Property Descriptors</li>
+			<li>Gets/Sets</li>
+			<li>Sets and Maps</li>
+		</ul>
+				     
+	</div>		
+	
+	<div class="codeBox" style="border-radius:20px 0 20px 0;background-color:rgb(255,245,255)" data-codeNumbers="true">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Going beyond JSON with valueCopy()
+       	</header><div class="numberShield colorLightBurlywood"></div>         	
+       	<p style="margin-left:3em;margin-right:1em; color:red">To go beyond JSON object literals and deep copy most anything,
+       	simply modify lines 3 and 13 of code listing 1 by setting the target to a value copy of the source.
+       	WeakSets and WeakMaps are copy primitives, which explains lines 4 and 15.
+		</p>          	       	
+       	function deepCopy_1(source)
+		{
+			if(isPrimitive(source)) return source;
+			
+			// targets start off as value copies of sources
+			const target = valueCopy(source); 
+			
+			// if target is source then source is a copy primitive (a WeakSet or WeakMap)
+			if(target === source) return source; 
+			
+			const stack = [{source:source, target:target}];
+			
+			while(stack.length &gt; 0)
 			{
-				// all child sources of a source node have been 
-				// processed so pop source off the stack
 				const top = stack.pop();
+				const source = top.source; // get source
+				const target = top.target; // get its unfilled value copy
 				
-				// Move needed external properties to internal properties
-				// in case top.target is a Set or Map
-				processTargetPostOrder(top.target);																				
-			}
-		}		
+				// process nodes of the object tree in  preorder	
+				for(const p of Object.getOwnPropertyNames(source))
+				{			
+					if(isPrimitive(source[p]))
+					{
+						// fill in target primitive property
+						target[p] = source[p];
+					}									
+					else
+					{	
+						// push source and its valueCopy onto stack					
+						target[p] = valueCopy(source[p]);
 						
-		return target;	
-	}
+						if(target[p] !== source[p]) // but disallow copy primitives
+						{ 
+							stack.push({source:source[p], target:target[p]}); 
+						}
+					}  
+				}							
+			}			
+				
+			return target;	
+		}  
 		
+		<p style="margin-left:3em;color:red">Complexities Remaining</p>
+		<ul style="margin-left:2em;color:red">
+			<li>Circular References</li>
+			<li>Post Order Processing</li>
+			<li>Functions</li>
+			<li>Property Descriptors</li>
+			<li>Gets/Sets</li>
+			<li>Sets and Maps</li>
+		</ul>
+
+				     
+	</div>		
+	
+	
+	
+	
+	
+	
+<!-- 
+	Preorder processing.
+	Add post order processing
+-->
+
+
+<!-- 
+	(1) Recursive form using shallow copy () [JSON object literal] [{} : [] .]
+	(2) The use stack on (1) [works if tail end recursive].
+	(3) Show its preorder.
+	(4) Take care of configurability, writability.
+	(6a) Then take care of circular references
+	(5a) Then method 1 of including post order processing
+	(5b) Then method 2 of including post order processing. (put in appendix)
+-->
+
+	
+	<div class="codeBox" style="border-radius:20px 0 20px 0;background-color:rgb(255,245,255)" data-codeNumbers="true">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Going Beyond JSON with valueCopy() and Circular References
+       	</header><div class="numberShield colorLightBurlywood"></div>          	
+       	<p style="margin-left:3em;margin-right:1em;color:red">
+       		To handle circular and duplicate references, a weak map is used to record sources
+       		and their targets. If a source is copied to a target and if the source is found
+       		again, then it is copied to the same target on line 16.       		 
+       	</p>       	
+       	function deepCopy_2(source)
+		{
+			if(isPrimitive(source)) return source;
+			const target = valueCopy(source);
+			if(target === source) return source;
+			const wm = new WeakMap();
+			wm.set(source, target);
+
+			
+			const stack = [{source:source, target:target}];
+			
+			while(stack.length &gt; 0)
+			{
+				const top = stack.pop();
+				const source = top.source;
+				const target = top.target;
+				
+				// process nodes of the object tree in  preorder	
+				for(const p of Object.getOwnPropertyNames(source))
+				{			
+					if(isPrimitive(source[p]))
+					{
+						target[p] = source[p];
+					}				
+					else if(wm.has(source[p]))
+					{
+						target[p] = wm.get(source[p]);
+					}					
+					else
+					{			
+						target[p] = valueCopy(source[p]);
+						if(target[p] !== source[p]) 
+						{
+							stack.push({source:source[p], target:target[p]});
+							wm.set(source[p], target[p]);
+						}
+					}  
+				}							
+			}			
+				
+			return target;	
+		} 	 
+		
+		<p style="margin-left:3em;color:red">Complexities Remaining</p>
+		<ul style="margin-left:2em;color:red">			
+			<li>Post Order Processing</li>
+			<li>Functions</li>
+			<li>Property Descriptors</li>
+			<li>Gets/Sets</li>
+			<li>Sets and Maps</li>
+		</ul>			     
 	</div>	
-</section>
-<section>
-	<h2>Examples</h2>
-	<p>
-		Our examples will be kept as simple as possible.
-	</p>
-	<section>
-		<h3>Copying Data</h3>
-		<p>
-			Like <var>deepCopyData()</var>, <var>deepCopy()</var> can copy pure data with circular and duplicate references.
-		</p>
-		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
-			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
-					Copy Data with Circular References
-			</header><div class="numberShield colorLightBurlywood"></div>
+	
+	<div class="codeBox" style="border-radius:20px 0 20px 0;background-color:rgb(255,245,255)" data-codeNumbers="true">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Post Order Procescsing
+       	</header><div class="numberShield colorLightBurlywood"></div>          	
+       	<p style="margin-left:3em;margin-right:1em;color:red">
+       		Post order processing of a node occurs after it and all its descendents have been processed in preorder. 
+       		The technique for doing so involves pushing null markers onto the stack. The first time a 
+       		node is visited on the stack, it's in preorder. Then a null marker is pushed onto the stack.
+       		The second time the node is visited on the stack, the null marker indicates it's in post order.    		 
+       	</p>       	
+       	function deepCopy_3(source)
+		{
+			if(isPrimitive(source)) return source;
+			const target = valueCopy(source);
+			if(target === source) return source;
+			const wm = new WeakMap();
+			wm.set(source, target);
+
 			
-			function CopyPureDataWithCircularReference()
+			const stack = [{source:source, target:target}];
+			
+			while(stack.length &gt; 0)
 			{
-				var x = new Map([['key1', 'value1'], ['key2', {a:1,b:2}],
-		        [new Boolean(true), new Number(7)]]);
-		        
-		        var y = new Set(["cat", "dog", ["a", new String("b")]]);
-		        
-		        x.a = y;
-				y.b = x;
-				x.f = 1;
-				y.g = 2;	
-				
-				var z = {M:x, N:y};				 			  			 		 	
-				var cz = deepCopy(z);
-				console.log ("ref 1 passed " + (z.M.a != cz.N.a));
-				console.log ("ref 2 passed " + (z.N.b != cz.N.b));			 			 	
-				console.log("CopyPureDataWithCircularReference passed: " 
-				+ (stringify(z) == stringify(cz)));
-			}		
+				const top = stack.pop();
 			
-		</div>		
-	</section>
-	<section>
-		<h3>Copying a Get that Uses Pure Data Only</h3>
-		
-		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
-			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
-					Copy Get Returning Pure Data
-			</header><div class="numberShield colorLightBurlywood"></div>
-
-			function TestGet()
-			{
-				const z = {}; // cz will be the deep copy of z
-				
-				const x = new Map([['key1', 'value1'], ['key2', {a:1,b:2}],
-		        [new Boolean(true), new Number(7)]]);
-		        
-		        x.y = new Set(["cat", "dog", ["a", new String("b")]]);
-		
-				Object.defineProperty(z, "x",
-				{					
-					get:function(){return x;},
-		
-				});
-				
-				// make sure cz.x returns a deep copy of z.x.
-				// If you want cz.x to be z.x use an empty context object {}.
-				const evaluator = eval(Evaluator)({"const x":deepCopy(x)});						
-				
-				var cz = deepCopy(z, evaluator);
-				
-				console.log("TestGet ref 1 passed: " + (z.x != cz.x) );
-				console.log("TestGet ref 2 passed: " + (z.x.y != cz.x.y) );	
-				console.log("TestGet passed: " + (stringify(cz) == stringify(z)) );				
-			}
-
-		</div>
-	</section>
-	<section>
-		<h3>Copying a Get that doesn't use Pure Data Only</h3>
-		
-		<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
-			<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
-					Two Chained Gets
-			</header><div class="numberShield colorLightBurlywood"></div>
-
-			function TestTwoGets()
-			{
-				const z = {}; // cz will be the deep copy of z
-				const x = {a:{b:{c:1}}};
-				const y = {c:{a:{b:1}}};
-				
-				// x has a getter and so is no longer pure data
-				Object.defineProperty(x, "y", 
+				if(top === null)
 				{
-					get:function(){return y;},
-				});				
-				
-				// getter that does not use pure data only		
-				Object.defineProperty(z, "x",
-				{
-					get:function(){return x;},
-		
-				});
-					
-				// first make a deep copy cx of x. An evaluator must be
-				// used since x has a getter property y.
-				const evaluator1 =  eval(cefString)({y:deepCopy(y)});
-				const cx =  deepCopy(x, evaluator1);
-					
-				// next make a deep copy of z
-				const evaluator = eval(cefString)({x:cx});				
-				var cz = deepCopy(z, evaluator);
-				
-				console.log("TestTwoGets ref 1 passed: " + (z.x != cz.x));
-				console.log("TestTwoGets ref 2 passed: " + (z.x.y != cz.x.y));		
-				console.log("TestTwoGets passed: " + (stringify(cz) == stringify(z)));				
-			}
-
-		</div>
-		
-		<p>
-			You can now see that things can quickly get out of hand.  Let's take the example above and make things
-			even more complicated by creating a property <var>z</var> of <var>y</var> that returns <var>z</var>, thus creating 
-			a circular three chained sequence of gets. However, there is a simple way to deep copy <var>z</var> using 
-			the deep copy system method.			
-		</p>
-	</section>
-	<section>
-		<h3>Deep Copy System for Copying Circular Gets</h3>
-			<div class="codeBox colorLightPink rounded" data-codeNumbers="true">
-				<header class="codeHeader colorLightBurlywood"><div class="codeListing"></div>
-					Copying Circular Gets with deepCopySystem	
-				</header><div class="numberShield colorLightBurlywood"></div>
-						
-				function TestCircularGets()
-				{
-					const z = {}; // cz will be the deep copy of z
-					const x = {a:{b:{c:1}}};
-					const y = {c:{a:{b:1}}};
-							
-					Object.defineProperty(z, "x",
+					// Post order processing. 
+					// Freezing, sealing, and preventing extensions 
+					// can only be done post order.
+					const top1 = stack.pop();
+									
+					if(Object.isFrozen(top1.source))
 					{
-						get:function(){return x;},
-			
-					});
-					
-					Object.defineProperty(x, "y",
+						Object.freeze(top1.target)
+					}
+					else if (Object.isSealed(top1.source))
 					{
-						get:function(){return y;},
-					});
-					
-					Object.defineProperty(y, "z",
+						Object.seal(top1.target);
+					}	
+					else if(!Object.isExtensible(top1.source))
 					{
-						get:function(){return z;},
-					});
-			
+						Object.preventExtensions(top1.target);
+					}
 					
-					const dcs = eval(deepCopySystem)({"const z":z, "const x":x, 
-					"const y":y});		
-					const cz = dcs.z;				
-					
-					console.log("TestCircularGets ref 1 passed: " + (z != cz));
-					console.log("TestCircularGets ref 2 passed: " + (z.x != cz.x));
-					console.log("TestCircularGets ref 3 passed: " + (z.x.y != cz.x.y));		
-					console.log("TestCircularGets ref 4 passed: " + (z.x.y.z != cz.x.y.z));
-					console.log("TestCircularGets passed: " + (stringify(cz) == stringify(z)));				
+					continue;
 				}
-
-			TestCircularGets();	
-			
-			<header class="codeSection">
-				Expansion of line 11 (more or less)
-			</header>
-			\numbersRestart
-			
-			const dcs = (function ()
-			{	
-				const evaluator = function()
+				else
 				{
-					return eval('('+ arguments[0] +')');
-				}				
+					stack.push(top);
+					stack.push(null);
+				}
 				
-				this.dcs =	deepCopy(this.contextObject, evaluator);	
-					
-				const z = this.dcs.z;
-				const x = this.dcs.x;
-				const y = this.dcs.y;
-				return this.dcs;
-			}).call({contextObject:{z:z, x:x, y:y}})
-			
-			</div>
-			<p>
-				Behind the  scenes <var>deepCopySystem</var> uses <var>deepCopy()</var>. It looks like when
-				things get complicated using <var>deepCopySystem</var> is simple, while using <var>deepCopy()</var>
-				directly could become too complex to handle.
-			</p>
-			<p>
-				The way the deep copy system works is magical. Above what happens is that 
-				<var>deepCopy()</var> is called on the object <var>{z:z, x:x, y:y}</var> using an evaluator to obtain
-				a deep copy <var>{z:cz, x:cx, y:cy}</var>, where the constants <var>const z = cz</var>, <var>const x = cx </var>, and
-				<var>const y = cx</var> are put into the evaluator's context. The copied gets therefore instead of 
-				returning the original <var>x</var>, <var>y</var>, and <var>z</var> return <var>cx</var>, <var>cy</var>, 
-				and <var>cz</var>. So <var>cz</var>, <var>cx</var>, <var>cy</var> are deep copies of <var>z</var>, <var>x</var>, 
-				<var>y</var>, while <var>cz.x = cx</var>, <var>cx.y = cy</var>, and <var>cy.z = cz</var>. 
-			</p>			
-			<p>
-				To see how <var>deepCopySystem</var> works, we expanded line 11. OK! this isn't the exact expansion
-				but it gives you what you need to know in a little bit simpler form than the actual expansion.
-				Once you gander and understand the expansion, you are ready to take a look at <var>deepCopySystem</var>
-				in <a target="_blank" href="../../00-Scripts/deepCopy.js">deepCopy.js</a>
-			</p>			
-	</section>
-</section>
-<section>
-	<h2>From the Meouzer Collection</h2>
-	<p class="display centerTable">
-		Deep copying was one of Meouzer's projects<br>
-		as in deep copying so many objects<br>
-		now here's the need to know scoop<br>
-		he wrote an infinite loop<br>
-		and said there goes my infinite prospects<br>
-	</p>
+				const source = top.source;
+				const target = top.target;				
+				
+				// process nodes of the object tree in  preorder	
+				for(const p of Object.getOwnPropertyNames(source))
+				{			
+					if(isPrimitive(source[p]))
+					{
+						target[p] = source[p];
+					}				
+					else if(wm.has(source[p]))
+					{
+						target[p] = wm.get(source[p]);
+					}					
+					else
+					{			
+						target[p] = valueCopy(source[p]);
+						if(target[p] !== source[p]) 
+						{
+							stack.push({source:source[p], target:target[p]});
+							wm.set(source[p], target[p]);
+						}
+					}  
+				}							
+			}			
+				
+			return target;	
+		}  
+		
+		<p style="margin-left:3em;color:red">Complexities Remaining</p>
+		<ul style="margin-left:2em;color:red">			
+			<li>Functions</li>
+			<li>Property Descriptors</li>
+			<li>Gets/Sets</li>
+			<li>Sets and Maps</li>
+		</ul>			     
+	</div>	
 
-</section>
+	<div class="codeBox" style="border-radius:20px 0 20px 0;background-color:rgb(255,245,255)" data-codeNumbers="true">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Functions and Property Descriptors
+       	</header><div class="numberShield colorLightBurlywood"></div>          	
+       	<p style="margin-left:3em;margin-right:1em;color:red">
+       		To make sure that nodes which are functions are copied, simply add an evaluator parameter to the deep
+       		copy function on line 1, and also to the calls to valueCopy() on lines 3 and 30. Then functions are 
+       		copied into the evaluator's context. If no evaluator is specified, the global evaluator is used as
+       		the default, which works well if the function nodes don't depend on an outer context.	 
+       	</p>       	
+       	<p style="margin-left:3em;color:red">
+       		 
+       	</p>
+       	function deepCopy_4(source, evaluator)
+		{
+			if(isPrimitive(source)) return source;
+			const target = valueCopy(source, evaluator);
+			if(target === source) return source;
+			const wm = new WeakMap();
+			wm.set(source, target);
+
+			
+			const stack = [{source:source, target:target}];
+			
+			while(stack.length &gt; 0)
+			{
+				const top = stack.pop();
+			
+				if(top === null)
+				{
+					// Post order processing. 
+					// Freezing, sealing, and preventing extensions 
+					// can only be done post order.
+					const top1 = stack.pop();
+									
+					if(Object.isFrozen(top1.source))
+					{
+						Object.freeze(top1.target)
+					}
+					else if (Object.isSealed(top1.source))
+					{
+						Object.seal(top1.target);
+					}	
+					else if(!Object.isExtensible(top1.source))
+					{
+						Object.preventExtensions(top1.target);
+					}
+					
+					continue;
+				}
+				else
+				{
+					stack.push(top);
+					stack.push(null);
+				}
+				
+				const source = top.source;
+				const target = top.target;				
+				
+				// process nodes of the object tree in  preorder	
+				for(const p of Object.getOwnPropertyNames(source))
+				{			
+					const pd = Object.getOwnPropertyDescriptor(source, p);
+				
+					if(isPrimitive(source[p]))
+					{
+						Object.defineProperty(target, pd);	
+					}				
+					else if(wm.has(source[p]))
+					{
+						pd.value = wm.get(source[p]);
+						Object.defineProperty(target, pd);		
+					}					
+					else
+					{			
+						pd.value = valueCopy(source[p], evaluator);
+						Object.defineProperty(target, pd);	
+						if(target[p] !== source[p]) 
+						{
+							stack.push({source:source[p], target:target[p]});
+							wm.set(source[p], target[p]);
+						}
+					}  
+				}							
+			}			
+				
+			return target;	
+		} 
+				
+		<p style="margin-left:3em;color:red">Complexities Remaining</p>
+		<ul style="margin-left:2em;color:red">			
+			<li>Gets/Sets</li>
+			<li>Sets and Maps</li>
+		</ul>			     
+	</div>	
+
+
+	<div class="codeBox" style="border-radius:20px 0 20px 0;background-color:rgb(255,245,255)" data-codeNumbers="true">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Gets and Sets
+       		</header><div class="numberShield colorLightBurlywood"></div>       
+       	<p style="margin-left:3em;margin-right:1em;color:red">
+       		 Gets and Sets can only be copied with property descriptors. As functions they must also be
+       		 evaluated with an evaluator: They must be copied into the evaluators context. See lines
+       		 26-30.
+       	</p>
+       	function deepCopy_5(source, evaluator)
+		{
+			if(isPrimitive(source)) return source;
+			const target = valueCopy(source, evaluator);
+			if(target === source) return source;
+			const wm = new WeakMap();
+			wm.set(source, target);
+			
+			const stack = [{source:source, target:target}];
+			
+			while(stack.length &gt; 0)
+			{
+				const top = stack.pop();
+			
+				if(top === null)
+				{
+					// Post order processing. 
+					// Freezing, sealing, and preventing extensions 
+					// can only be done post order.
+					const top1 = stack.pop();
+									
+					if(Object.isFrozen(top1.source))
+					{
+						Object.freeze(top1.target)
+					}
+					else if (Object.isSealed(top1.source))
+					{
+						Object.seal(top1.target);
+					}	
+					else if(!Object.isExtensible(top1.source))
+					{
+						Object.preventExtensions(top1.target);
+					}
+					
+					continue;
+				}
+				else
+				{
+					stack.push(top);
+					stack.push(null);
+				}
+				
+				const source = top.source;
+				const target = top.target;				
+				
+				// process nodes of the object tree in  preorder	
+				for(const p of Object.getOwnPropertyNames(source))
+				{			
+					const pd = Object.getOwnPropertyDescriptor(source, p);
+				
+					if(pd.get || pd.set)
+					{					
+						if(!hasOwnProperty(target, p) ) 
+						{		
+							if(pd.get) pd.get = evaluateGetterSetter(pd.get, evaluator);
+							if(pd.set) pd.set = evaluateGetterSetter(pd.set, evaluator);					
+							Object.defineProperty(target, p, pd);
+						}
+					}
+					else if(isPrimitive(source[p]))
+					{
+						Object.defineProperty(target, p, pd);	
+					}				
+					else if(wm.has(source[p]))
+					{
+						pd.value = wm.get(source[p]);
+						Object.defineProperty(target, p, pd);		
+					}					
+					else
+					{			
+						pd.value = valueCopy(source[p], evaluator);
+						Object.defineProperty(target, p, pd);	
+						if(target[p] !== source[p]) 
+						{
+							stack.push({source:source[p], target:target[p]});
+							wm.set(source[p], target[p]);
+						}
+					}  
+				}							
+			}			
+				
+			return target;	
+		} 
+		\numbersRestart
+		<hr>
+		function evaluateGetterSetter(func, evaluator)
+		{		
+			<p style="margin-left:5em;margin-right:1em;margin-top:0;color:red">A literal get is not defined with a property descriptor and looks like
+			get(){...}. The programmer can't use that form at all. We need to make it look like function(){...} so we can
+			use it as the get in a property descriptor.	
+			Similarly for literal sets. Line 7 makes sure the get/set is evaluated into the evaluator's context.		
+		 </p>
+			if(!isNativeCode(func))
+			{
+				// change any "get" or "set" to "function" and 
+				// copy it into the evaluators context on line 7
+				
+				evaluator = evaluator || globalEvaluator;
+					
+				let s = func.toString();
+				if(s[0] == 'g' || s[0] == 's')
+				{
+					s = "function" + s.substring(3);
+				}		
+				
+				return evaluator(s); 
+			}
+			else
+			{					
+				// can't evaluate native code.
+				return func;
+			}
+		}
+
+				
+		<p style="margin-left:3em;color:red">Complexities Remaining</p>
+		<ul style="margin-left:2em;color:red">		
+			<li>Sets and Maps</li>
+		</ul>			     
+	</div>	
+
+	<div class="codeBox" style="border-radius:20px 0 20px 0;background-color:rgb(255,245,255)" data-codeNumbers="true">  
+       	<header class="codeHeader colorBurlywood"><div class="codeListing"></div>
+       		Sets and Maps Round Things Up to a Full Fledged Deep Copy Function
+       		</header><div class="numberShield colorLightBurlywood"></div>          	
+        <p style="margin-left:3em;margin-right:1em;color:red">
+       		 
+       	</p>
+       	function getTarget(obj, evaluator)
+		{
+			// Set and Map targets should initially be completely empty.
+			// So calling getTarget(obj, evaluator) below is a substitute
+			// for calling valueCopy(obj, evaluator) in previous listings
+		
+			if(isSet(obj)) return new Set();
+			if(isMap(obj)) return new Map();
+			return valueCopy(obj, evaluator);
+		}
+		
+		
+	function deepCopy(source, evaluator)
+	{
+		if(isPrimitive(source)) return source;
+		const target = getTarget(source, evaluator);
+		if(target === source) return source;
+		const wm = new WeakMap();
+		wm.set(source, target);
+
+			
+		const stack = [{source:source, target:target}];
+			
+		while(stack.length &gt; 0)
+		{
+			const top = stack.pop();
+		
+			if(top === null)
+			{
+				// Post order processing. 
+				// Freezing, sealing, and preventing extensions 
+				// can only be done post order.
+				const top1 = stack.pop();
+								
+				if(Object.isFrozen(top1.source))
+				{
+					Object.freeze(top1.target)
+				}
+				else if (Object.isSealed(top1.source))
+				{
+					Object.seal(top1.target);
+				}	
+				else if(!Object.isExtensible(top1.source))
+				{
+					Object.preventExtensions(top1.target);
+				}
+					
+					continue;
+				}
+			else
+			{
+				stack.push(top);
+				stack.push(null);
+			}
+				
+			const source = top.source;
+			const target = top.target;				
+				
+			// process nodes of the object tree in  preorder	
+			for(const p of Object.getOwnPropertyNames(source))
+			{			
+				const pd = Object.getOwnPropertyDescriptor(source, p);
+				
+				if(pd.get || pd.set)
+				{					
+					if(!hasOwnProperty(target, p) ) 
+					{		
+						if(pd.get) pd.get = evaluateGetterSetter(pd.get, evaluator);
+						if(pd.set) pd.set = evaluateGetterSetter(pd.set, evaluator);					
+						Object.defineProperty(target, p, pd);
+					}
+				}
+				else if(isPrimitive(source[p]))
+				{
+					Object.defineProperty(target, p, pd);	
+				}				
+				else if(wm.has(source[p]))
+				{
+					pd.value = wm.get(source[p]);
+					Object.defineProperty(target, p, pd);		
+				}					
+				else
+				{			
+					pd.value = getTarget(source[p], evaluator); 
+					Object.defineProperty(target, p, pd);	
+					if(target[p] !== source[p]) 
+					{ 
+						// if source[p] not a copy primitive push onto stack
+						
+						stack.push({source:source[p], target:target[p]}); 
+						wm.set(source[p], target[p]);
+					}
+				}  
+			}	
+			
+			if(isSet(source))
+			{
+				for(const value of source.values()) // loop through members of Set
+				{
+					// value is a member of the set and is also a source
+				
+					if(wm.has(value))
+					{	
+						// value as a source already has a target,
+						// which is wm.get(value) 
+							
+						// add the target of value to the target Set 				
+					 	target.add(wm.get(value)); 
+					 }
+					 else
+					 {
+					 	const targetValue = getTarget(value);
+						target.add(targetValue);
+						
+						if(value !== targetValue) 
+						{
+							stack.push({source:value, target:targetValue});
+							wm.set(value, targetValue);
+						}
+					 }				
+				}
+			}
+			else if(isMap(source)) 
+			{
+				for(const key of source.keys())
+				{
+					const value = source.get(key);
+					
+					// key and value are sources
+					
+					let targetKey;			// target of key
+					let targetValue;		// target of value
+					
+					if(wm.has(key))
+					{
+						// key as a source already has a target,
+						// which is wm.get(key)
+						
+						targetKey = wm.get(key);
+					}
+					else
+					{
+						targetKey = getTarget(key);
+						
+						if(key !== targetKey)
+						{
+							stack.push({source:key, target:targetKey});
+							wm.set(key, targetKey);
+						}
+					}
+					
+					if(wm.has(value))
+					{
+						// value as a source already has a target,
+						// which is wm.get(value)
+
+						targetValue = wm.get(value);
+					}
+					else
+					{
+						targetValue = getTarget(value);
+						
+						if(value!== targetValue)
+						{
+							stack.push({source:value, target:targetValue});
+							wm.set(value, targetValue);
+						}
+					}
+
+					// In the target Map, set the key and value.
+					target.set(targetKey, targetValue);
+					
+				}
+			}					
+		}						
+				
+		return target;	
+	} 
+
+				     
+	</div>	
+
+
 
 <br><br><br><br><br><br><br><br><br><br><br>	
 </body>

@@ -184,7 +184,7 @@
 		console.log("TestTwoGets passed: " + (stringify(cz) == stringify(z)));				
 	}
 
-	TestTwoGets();
+	//TestTwoGets();
 
 	
 	function TestCircularGets()
