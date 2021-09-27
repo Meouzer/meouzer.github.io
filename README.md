@@ -1,7 +1,7 @@
 # meouzer.github.io
 Deep Copying and Serialization/Deserialization (Circular and Duplicate References Always Supported)
 
-See Updates.md: Latest update 9-22-2021   -- Deep Copy Algorithm made 4 times faster in deep copying a particular ES5 and ES6 classes. General Deep Copying article going over the algorithm is heavily commented and goes from deep copying JSON literal objects all the way to full blown deep copying that can copy classes.
+See Updates.md: Latest update 9-27-2021   -- Small change to deepCopy.js
 
 Did you know that robust deep copying depends on typing? We have the following, but first our data can be infinitely complex. You can have Sets whose members are Maps whose keys are ArrayBuffers and values are typed arrays. The set can also have properties that are DataViews whose properties are Maps whose properties are Sets whose properties are ArrayBuffers.
 
