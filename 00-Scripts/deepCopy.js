@@ -47,36 +47,7 @@
 			
 		while(stack.length > 0)
 		{
-			const top = stack.pop();
-		
-			if(top === null)
-			{
-				// Post order processing. 
-				// Freezing, sealing, and preventing extensions 
-				// can only be done post order.
-				const top1 = stack.pop();
-								
-				if(Object.isFrozen(top1.source))
-				{
-					Object.freeze(top1.target)
-				}
-				else if (Object.isSealed(top1.source))
-				{
-					Object.seal(top1.target);
-				}	
-				else if(!Object.isExtensible(top1.source))
-				{
-					Object.preventExtensions(top1.target);
-				}
-					
-					continue;
-				}
-			else
-			{
-				stack.push(top);
-				stack.push(null);
-			}
-				
+			const top = stack.pop();				
 			const source = top.source;
 			const target = top.target;				
 				
@@ -114,6 +85,21 @@
 					}
 				}  
 			}	
+			
+			// After target children attached, can freeze etc.
+			if(Object.isFrozen(source))
+			{
+				Object.freeze(target)
+			}
+			else if (Object.isSealed(source))
+			{
+				Object.seal(target);
+			}	
+			else if(!Object.isExtensible(source))
+			{
+				Object.preventExtensions(target);
+			}
+
 			
 			if(isSet(source))
 			{
