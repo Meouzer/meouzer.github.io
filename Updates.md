@@ -7,3 +7,7 @@ classes.
 9-22-2021
 
 Deep Copy Algorithm made 4 times faster in deep copying a particular ES5 class and a particular ES6 class. This is done by using a different technqiue for post order processing: that is null markers on the stack are used to indicate whether a node is in pre-order or post-order. The General Deep Copying article goes over the algorithm, is heavily commented and goes in easy steps from deep copying JSON literal objects all the way to full blown deep copying that can copy classes. Both valueCopy.js and deepCopy.js changed.
+
+Latest update 9-27-2021   -- Small change to deepCopy.js. The idea of null markers is too complicated/silly -- used to do
+freezing, sealing, and preventing extensions after all children have been processed. Much simpler to freeze, seal,
+prevent extensions after all children have been attached.
